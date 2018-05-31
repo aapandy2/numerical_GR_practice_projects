@@ -1,17 +1,18 @@
 import numpy as np
 import pylab as pl
 import subprocess
+from scipy.integrate import cumtrapz, simps
 
 #set parameters for simulation
 N = 300
 delta_x = 1./N
 delta_t = 0.005
 courant = delta_t / delta_x
-timesteps = 250
+timesteps = 1000
 
 #define grid
 M = 1.
-R = 10. #if M=1, this is 10M
+R = 100. 
 r_grid = np.linspace(2. * M, R, N)
 
 #initialize arrays
@@ -20,8 +21,8 @@ Phi = np.zeros((timesteps, N)) #this is r
 Pi  = np.zeros((timesteps, N)) #this is s
 
 #define initial data
-r_0   = 5.
-delta = 0.05
+r_0   = 50.
+delta = 10.
 amp   = 0.5
 
 def alpha(r):
@@ -37,7 +38,7 @@ def beta(r):
 	return ans
 
 phi[0, :] = amp * np.exp(-(r_grid-r_0)**2./delta**2.)
-Phi[0, :] = 2. * amp * (r_grid - r_0)/delta**2. * np.exp(-(r_grid-r_0)**2./delta**2.)
+Phi[0, :] = -2. * amp * (r_grid - r_0)/delta**2. * np.exp(-(r_grid-r_0)**2./delta**2.)
 Pi[0, :]  = a(r_grid)/alpha(r_grid) * (1./r_grid * phi[0, :] + (1. - beta(r_grid)) * Phi[0, :])
 
 #pl.plot(r_grid, phi[0, :])
@@ -133,10 +134,6 @@ for i in range(N, 2*N):
                    else courant/(4.*r_grid[j-1]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j])if j==i-N+1
                    else 0 for j in range(2*N)]
 
-#print np.matrix(A)
-#print '----------------------------------------------------------'
-#print np.matrix(B)
-
 def update_u(timestep):
     u = np.zeros(2*N)
     for i in range(2*N):
@@ -152,9 +149,9 @@ def update_r_s(ans, timestep):
         if(i < N):
             Phi[timestep, i] = ans[i]
         else:
-            Pi[timestep, i-N] = ans[i]            
-#            Pi[timestep, 0]   = Phi[timestep, 0]      #Sommerfeld conditions; note: works better to set s using r
-#            Pi[timestep, N-1] = -Phi[timestep, N-1] #Sommerfeld conditions
+            Pi[timestep, i-N] = ans[i]
+	Pi[timestep, N-1] = phi[timestep, N-1]/r_grid[N-1]*a(r_grid[N-1])/alpha(r_grid[N-1]) * (beta(r_grid[N-1]) - alpha(r_grid[N-1])/a(r_grid[N-1])) - Phi[timestep, N-1] #outgoing radiation condition
+#	Phi[timestep, N-1] = phi[timestep, N-1]/r_grid[N-1]*a(r_grid[N-1])/alpha(r_grid[N-1]) * (beta(r_grid[N-1]) - alpha(r_grid[N-1])/a(r_grid[N-1])) - Pi[timestep, N-1]
     return 0
 
 for n in range(1, timesteps):
@@ -166,18 +163,34 @@ for n in range(1, timesteps):
 
     update_r_s(ans, n)
 
-#command0 = subprocess.Popen('mkdir temp_folder/'.split(), stdout=subprocess.PIPE)
-#command0.wait()
+    for i in range(N):
+	    phi[n, i] = phi[n-1, i] + delta_t * (alpha(r_grid[i])/a(r_grid[i])*Pi[n-1, i] + beta(r_grid[i])*Phi[n-1, i])
+
+mass_aspect = 4. * np.pi * r_grid**2. * (alpha(r_grid)/(2. * a(r_grid)) * (Phi**2. + Pi**2.) + beta(r_grid)*Phi*Pi)
+
+m = np.zeros(timesteps)
+for i in range(timesteps):
+    m[i] = simps(mass_aspect[i, :], r_grid)
+
+pl.plot(range(timesteps), m)
+pl.title('Total Mass')
+pl.show()
+
+command0 = subprocess.Popen('mkdir temp_folder/'.split(), stdout=subprocess.PIPE)
+command0.wait()
 
 for i in range(timesteps):
     if(i % 50 == 0):
 	print 'saving frame ' + str(i) + ' out of ' + str(timesteps)
-    pl.plot(r_grid, Pi[i, :])
-    pl.ylim([-10., 10.])
+    pl.plot(r_grid, phi[i, :])
+#    pl.plot(r_grid, mass_aspect[i, :])
+    pl.xlim([r_grid[0]-0.1, r_grid[N-1]])
+    pl.ylim([-0.05, 0.5])
+#    pl.ylim([0., 1400.])
     pl.savefig('temp_folder/%03d'%i + '.png')
     pl.clf()
 
-#command1 = subprocess.Popen('ffmpeg -y -i temp_folder/%03d.png wave_equation.m4v'.split(), stdout=subprocess.PIPE)
-#command1.wait()
-#command2 = subprocess.Popen('rm -r temp_folder/'.split(), stdout=subprocess.PIPE)
-#command2.wait()
+command1 = subprocess.Popen('ffmpeg -y -i temp_folder/%03d.png IEF_scalar_rad.m4v'.split(), stdout=subprocess.PIPE)
+command1.wait()
+command2 = subprocess.Popen('rm -r temp_folder/'.split(), stdout=subprocess.PIPE)
+command2.wait()
