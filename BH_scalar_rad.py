@@ -6,9 +6,9 @@ from scipy.integrate import cumtrapz, simps
 #set parameters for simulation
 N = 300
 delta_x = 1./N
-delta_t = 0.01
+delta_t = 0.005
 courant = delta_t / delta_x
-timesteps = 600
+timesteps = 800
 
 #define grid
 M = 1.
@@ -17,12 +17,12 @@ r_grid = np.linspace(2. * M, R, N)
 
 #initialize arrays
 phi = np.zeros((timesteps, N))
-Phi = np.zeros((timesteps, N)) #this is r
-Pi  = np.zeros((timesteps, N)) #this is s
+Phi = np.zeros((timesteps, N)) 
+Pi  = np.zeros((timesteps, N))
 
 #define initial data
 r_0   = 50.
-delta = 10.
+delta = 5.
 amp   = 1.
 
 def alpha(r):
@@ -43,9 +43,11 @@ phi[0, :] = amp * np.exp(-(r_grid-r_0)**2./delta**2.)
 #using an analytical derivative gives incorrect result
 for i in range(N):
 	if(i == 0):
-		Phi[0, i] = (phi[0, i+1] - phi[0, i])  /delta_x
+#		Phi[0, i] = (phi[0, i+1] - phi[0, i])  /delta_x
+		Phi[0, i] = (-phi[0, i+2] + 4.*phi[0, i+1] - 3.*phi[0, i])/(2.*delta_x)
 	elif(i == N-1):
-		Phi[0, i] = (phi[0, i]   - phi[0, i-1])/delta_x
+#		Phi[0, i] = (phi[0, i]   - phi[0, i-1])/delta_x
+		Phi[0, i] = (phi[0, i-2] - 4.*phi[0, i-1] + 3.*phi[0, i])/(2.*delta_x)
 	else:
 		Phi[0, i] = (phi[0, i+1] - phi[0, i-1])/(2. * delta_x)
 
@@ -58,17 +60,22 @@ B = np.zeros((2*N, 2*N))
 #define matrix A
 for i in range(N):
     if(i == 0):
-        A[i, :] = [1. + courant/4.*beta(r_grid[j])                        if j==0 
-		   else -courant/4.*beta(r_grid[j])                       if j==1 
-		   else courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N])  if j==N 
-		   else -courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N]) if j==N+1 
+        A[i, :] = [1. + 3.*courant/4.*beta(r_grid[j])                    if j==0 
+		   else -4.*courant/4.*beta(r_grid[j])                   if j==1 
+		   else courant/4.*beta(r_grid[j])                       if j==2
+		   else 3.*courant/4.*alpha(r_grid[j%N])/a(r_grid[j%N])  if j==N 
+		   else -4.*courant/4.*alpha(r_grid[j%N])/a(r_grid[j%N]) if j==N+1 
+		   else courant/4.*alpha(r_grid[j%N])/a(r_grid[j%N])     if j==N+2
 		   else 0 for j in range(2*N)]
     elif(i == N-1):
-        A[i, :] = [1 - courant/4.*beta(r_grid[j])                         if j==N-1 
-		   else courant/4.*beta(r_grid[j])                        if j==N-2 
-		   else courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N])  if j==2*N-2 
-		   else -courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N]) if j==2*N-1 
+        A[i, :] = [1 - 3.*courant/4.*beta(r_grid[j])                        if j==N-1 
+		   else 4.*courant/4.*beta(r_grid[j])                       if j==N-2 
+		   else -courant/4.*beta(r_grid[j])                         if j==N-3
+		   else -courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N])   if j==2*N-3
+		   else 4.*courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N]) if j==2*N-2 
+		   else -3*courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N]) if j==2*N-1 
 		   else 0 for j in range(2*N)]
+
     else:
         A[i, :] = [1                                                  if j==i 
 		   else courant/4.*beta(r_grid[j])                    if j==(i-1) 
@@ -79,16 +86,20 @@ for i in range(N):
 
 for i in range(N, 2*N):
     if(i == N):
-        A[i, :] = [1. + courant/4.*beta(r_grid[j%N])                                              if j==N
-                   else -courant/(4.*r_grid[j%N-1]**2.)*r_grid[j%N]**2.*beta(r_grid[j%N])         if j==N+1
-                   else courant/4.*alpha(r_grid[j])/a(r_grid[j])                                  if j==0
-                   else -courant/(4.*r_grid[j-1]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j]) if j==1
+        A[i, :] = [1. + 3.*courant/4.*beta(r_grid[j%N])                                              if j==N
+                   else -4.*courant/(4.*r_grid[j%N-1]**2.)*r_grid[j%N]**2.*beta(r_grid[j%N])         if j==N+1
+		   else courant/(4.*r_grid[j%N-2]**2.)*r_grid[j%N]**2.*beta(r_grid[j%N])             if j==N+2
+                   else 3.*courant/4.*alpha(r_grid[j])/a(r_grid[j])                                  if j==0
+                   else -4.*courant/(4.*r_grid[j-1]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j]) if j==1
+		   else courant/(4.*r_grid[j-2]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j])     if j==2
                    else 0 for j in range(2*N)]
     elif(i == 2*N-1):
-        A[i, :] = [1 - courant/4.*beta(r_grid[j%N])                                             if j==2*N-1
-                   else courant/(4.*r_grid[j%N+1]**2.)*r_grid[j%N]**2.*beta(r_grid[j%N])        if j==2*N-2
-                   else -courant/4.*alpha(r_grid[j])/a(r_grid[j])                               if j==N-1
-                   else courant/(4.*r_grid[j+1]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j])if j==N-2
+        A[i, :] = [1 - 3.*courant/4.*beta(r_grid[j%N])                                              if j==2*N-1
+                   else 4.*courant/(4.*r_grid[j%N+1]**2.)*r_grid[j%N]**2.*beta(r_grid[j%N])         if j==2*N-2
+		   else -courant/(4.*r_grid[j%N+2]**2.)*r_grid[j%N]**2.*beta(r_grid[j%N])           if j==2*N-3
+                   else -3.*courant/4.*alpha(r_grid[j])/a(r_grid[j])                                if j==N-1
+                   else 4.*courant/(4.*r_grid[j+1]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j]) if j==N-2
+		   else -courant/(4.*r_grid[j+2]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j])   if j==N-3
                    else 0 for j in range(2*N)]
     else:
         A[i, :] = [1                                                                             if j==i
@@ -98,40 +109,48 @@ for i in range(N, 2*N):
                    else -courant/(4.*r_grid[j-1]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j])if j==i-N+1
                    else 0 for j in range(2*N)]
 
-#define matrix B
+#define matrix B, now fully to second order accuracy
 for i in range(N):
     if(i == 0):
-        B[i, :] = [1. - courant/4.*beta(r_grid[j])                        if j==0
-                   else courant/4.*beta(r_grid[j])                        if j==1
-                   else -courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N]) if j==N
-                   else courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N])  if j==N+1
-                   else 0 for j in range(2*N)]
+        B[i, :] = [1. - 3.*courant/4.*beta(r_grid[j])                    if j==0 
+		   else 4.*courant/4.*beta(r_grid[j])                    if j==1 
+		   else -courant/4.*beta(r_grid[j])                      if j==2
+		   else -3.*courant/4.*alpha(r_grid[j%N])/a(r_grid[j%N]) if j==N 
+		   else 4.*courant/4.*alpha(r_grid[j%N])/a(r_grid[j%N])  if j==N+1 
+		   else -courant/4.*alpha(r_grid[j%N])/a(r_grid[j%N])    if j==N+2
+		   else 0 for j in range(2*N)]
     elif(i == N-1):
-        B[i, :] = [1 + courant/4.*beta(r_grid[j])                         if j==N-1
-                   else -courant/4.*beta(r_grid[j])                       if j==N-2
-                   else -courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N]) if j==2*N-2
-                   else courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N])  if j==2*N-1
-                   else 0 for j in range(2*N)]
+        B[i, :] = [1 + 3.*courant/4.*beta(r_grid[j])                         if j==N-1 
+		   else -4.*courant/4.*beta(r_grid[j])                       if j==N-2 
+		   else courant/4.*beta(r_grid[j])                           if j==N-3
+		   else courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N])     if j==2*N-3
+		   else -4.*courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N]) if j==2*N-2 
+		   else 3*courant/4.*alpha(r_grid[j % N])/a(r_grid[j % N])   if j==2*N-1 
+		   else 0 for j in range(2*N)]
     else:
-        B[i, :] = [1                                                  if j==i
-                   else -courant/4.*beta(r_grid[j])                   if j==(i-1)
-                   else courant/4.*beta(r_grid[j])                    if j==(i+1)
-                   else -courant/4.*alpha(r_grid[j%N])/a(r_grid[j%N]) if j==(N+i-1)
-                   else courant/4.*alpha(r_grid[j%N])/a(r_grid[j%N])  if j==(N+i+1)
-                   else 0 for j in range(2*N)]
+        B[i, :] = [1                                                  if j==i 
+		   else -courant/4.*beta(r_grid[j])                   if j==(i-1) 
+		   else courant/4.*beta(r_grid[j])                    if j==(i+1) 
+		   else -courant/4.*alpha(r_grid[j%N])/a(r_grid[j%N]) if j==(N+i-1) 
+		   else courant/4.*alpha(r_grid[j%N])/a(r_grid[j%N])  if j==(N+i+1) 
+		   else 0 for j in range(2*N)]
 
 for i in range(N, 2*N):
     if(i == N):
-        B[i, :] = [1. - courant/4.*beta(r_grid[j%N])                                             if j==N
-                   else courant/(4.*r_grid[j%N-1]**2.)*r_grid[j%N]**2.*beta(r_grid[j%N])         if j==N+1
-                   else -courant/4.*alpha(r_grid[j])/a(r_grid[j])                                if j==0
-                   else courant/(4.*r_grid[j-1]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j]) if j==1
+        B[i, :] = [1. - 3.*courant/4.*beta(r_grid[j%N])                                             if j==N
+                   else 4.*courant/(4.*r_grid[j%N-1]**2.)*r_grid[j%N]**2.*beta(r_grid[j%N])         if j==N+1
+		   else -courant/(4.*r_grid[j%N-2]**2.)*r_grid[j%N]**2.*beta(r_grid[j%N])           if j==N+2
+                   else -3.*courant/4.*alpha(r_grid[j])/a(r_grid[j])                                if j==0
+                   else 4.*courant/(4.*r_grid[j-1]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j]) if j==1
+		   else -courant/(4.*r_grid[j-2]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j])   if j==2
                    else 0 for j in range(2*N)]
     elif(i == 2*N-1):
-        B[i, :] = [1 + courant/4.*beta(r_grid[j%N])                                               if j==2*N-1
-                   else -courant/(4.*r_grid[j%N+1]**2.)*r_grid[j%N]**2.*beta(r_grid[j%N])         if j==2*N-2
-                   else courant/4.*alpha(r_grid[j])/a(r_grid[j])                                  if j==N-1
-                   else -courant/(4.*r_grid[j+1]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j]) if j==N-2
+        B[i, :] = [1 + 3.*courant/4.*beta(r_grid[j%N])                                               if j==2*N-1
+                   else -4.*courant/(4.*r_grid[j%N+1]**2.)*r_grid[j%N]**2.*beta(r_grid[j%N])         if j==2*N-2
+		   else courant/(4.*r_grid[j%N+2]**2.)*r_grid[j%N]**2.*beta(r_grid[j%N])             if j==2*N-3
+                   else 3.*courant/4.*alpha(r_grid[j])/a(r_grid[j])                                  if j==N-1
+                   else -4.*courant/(4.*r_grid[j+1]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j]) if j==N-2
+		   else courant/(4.*r_grid[j+2]**2.)*r_grid[j]**2.*alpha(r_grid[j])/a(r_grid[j])     if j==N-3
                    else 0 for j in range(2*N)]
     else:
         B[i, :] = [1                                                                              if j==i
@@ -157,8 +176,11 @@ def update_r_s(ans, timestep):
             Phi[timestep, i] = ans[i]
         else:
             Pi[timestep, i-N] = ans[i]
+
+	#establish RADIATION ZONE to prevent reflection at outer boundary
 	Pi[timestep, N-1] = phi[timestep, N-1]/r_grid[N-1]*a(r_grid[N-1])/alpha(r_grid[N-1]) * (beta(r_grid[N-1]) - alpha(r_grid[N-1])/a(r_grid[N-1])) - Phi[timestep, N-1] #outgoing radiation condition
-#	Phi[timestep, N-1] = phi[timestep, N-1]/r_grid[N-1]*a(r_grid[N-1])/alpha(r_grid[N-1]) * (beta(r_grid[N-1]) - alpha(r_grid[N-1])/a(r_grid[N-1])) - Pi[timestep, N-1]
+	Pi[timestep, N-2] = phi[timestep, N-2]/r_grid[N-2]*a(r_grid[N-2])/alpha(r_grid[N-2]) * (beta(r_grid[N-2]) - alpha(r_grid[N-2])/a(r_grid[N-2])) - Phi[timestep, N-2] 
+	Pi[timestep, N-3] = phi[timestep, N-3]/r_grid[N-3]*a(r_grid[N-3])/alpha(r_grid[N-3]) * (beta(r_grid[N-3]) - alpha(r_grid[N-3])/a(r_grid[N-3])) - Phi[timestep, N-3]
     return 0
 
 for n in range(1, timesteps):
@@ -171,7 +193,8 @@ for n in range(1, timesteps):
     update_r_s(ans, n)
 
     for i in range(N):
-	    phi[n, i] = phi[n-1, i] + delta_t * (alpha(r_grid[i])/a(r_grid[i])*Pi[n-1, i] + beta(r_grid[i])*Phi[n-1, i])
+#	    phi[n, i] = phi[n-1, i] + delta_t * (alpha(r_grid[i])/a(r_grid[i])*Pi[n-1, i] + beta(r_grid[i])*Phi[n-1, i]) #uses O(h) forward time-differencing
+    	    phi[n, i] = phi[n-1, i] + 0.5 * delta_t * ((alpha(r_grid[i])/a(r_grid[i])*Pi[n, i] + beta(r_grid[i])*Phi[n, i]) + (alpha(r_grid[i])/a(r_grid[i])*Pi[n-1, i] + beta(r_grid[i])*Phi[n-1, i]))	#uses O(h^2) Crank-Nicolson time differencing
 
 #this computes the mass aspect function dm/dr
 mass_aspect = 4. * np.pi * r_grid**2. * (alpha(r_grid)/(2. * a(r_grid)) * (Phi**2. + Pi**2.) + beta(r_grid)*Phi*Pi)
@@ -199,9 +222,9 @@ for i in range(timesteps):
     pl.plot(r_grid, phi[i, :])
 #    pl.plot(r_grid, mass_aspect[i, :])
 #    pl.xlim([r_grid[0]-0.1, r_grid[N-1]])
-#    pl.ylim([-10., 10.])
-#    pl.ylim([-0.05, 10.])
-#    pl.ylim([0., 1400.])
+#    pl.ylim([-100., 60.])
+#    pl.ylim([-0.05, 0.5])
+    pl.ylim([-14., 14.])
     pl.savefig('temp_folder/%03d'%i + '.png')
     pl.clf()
 
