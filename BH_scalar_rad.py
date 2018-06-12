@@ -204,12 +204,40 @@ m = np.zeros(timesteps)
 for i in range(timesteps):
     m[i] = simps(mass_aspect[i, :], r_grid)
 
+# Set plot parameters to make beautiful plots
+pl.rcParams['figure.figsize']  = 10, 10
+pl.rcParams['lines.linewidth'] = 1.5
+pl.rcParams['font.family']     = 'serif'
+pl.rcParams['font.weight']     = 'bold'
+pl.rcParams['font.size']       = 15
+pl.rcParams['font.sans-serif'] = 'serif'
+pl.rcParams['text.usetex']     = True
+pl.rcParams['axes.linewidth']  = 1.5
+pl.rcParams['axes.titlesize']  = 'large'
+pl.rcParams['axes.labelsize']  = 'large'
+
+pl.rcParams['xtick.major.size'] = 8
+pl.rcParams['xtick.minor.size'] = 4
+pl.rcParams['xtick.major.pad']  = 8
+pl.rcParams['xtick.minor.pad']  = 8
+pl.rcParams['xtick.color']      = 'k'
+pl.rcParams['xtick.labelsize']  = 'large'
+pl.rcParams['xtick.direction']  = 'in'
+
+pl.rcParams['ytick.major.size'] = 8
+pl.rcParams['ytick.minor.size'] = 4
+pl.rcParams['ytick.major.pad']  = 8
+pl.rcParams['ytick.minor.pad']  = 8
+pl.rcParams['ytick.color']      = 'k'
+pl.rcParams['ytick.labelsize']  = 'large'
+pl.rcParams['ytick.direction']  = 'in'
+
 #this plots the total mass at each timestep
 pl.plot(range(timesteps), m)
 pl.title('Total Mass')
 pl.xlabel('Timestep')
-pl.ylabel('m')
-pl.show()
+pl.ylabel('$$m$$')
+pl.savefig('total_mass.png')
 
 #make temp folder to save frames which will be made into the movie
 command0 = subprocess.Popen('mkdir temp_folder/'.split(), stdout=subprocess.PIPE)
@@ -219,13 +247,30 @@ command0.wait()
 for i in range(timesteps):
     if(i % 50 == 0):
 	print 'saving frame ' + str(i) + ' out of ' + str(timesteps)
-    pl.plot(r_grid, phi[i, :])
-#    pl.plot(r_grid, mass_aspect[i, :])
-#    pl.xlim([r_grid[0]-0.1, r_grid[N-1]])
-#    pl.ylim([-100., 60.])
-#    pl.ylim([-0.05, 0.5])
-    pl.ylim([-14., 14.])
+    figure, ax = pl.subplots(nrows=2, ncols=2, sharex=True, sharey=False)
+    ax[0,0].plot(r_grid, phi[i, :])
+    ax[0,0].set_title('$$\\phi$$')
+    ax[1,0].plot(r_grid, Phi[i, :])
+    ax[1,0].set_title('$$\\Phi$$')
+    ax[1,1].plot(r_grid, Pi[i, :])
+    ax[1,1].set_title('$$\\Pi$$')
+    ax[0,1].plot(r_grid, mass_aspect[i, :])
+    ax[0,1].set_title('$$\\frac{dm}{dr}$$')
+ 
+    #draw x label $r$
+    figure.add_subplot(111, frameon=False)
+    pl.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    pl.xlabel('$r$', fontsize='large')
+ 
+    #set y limits on plots
+    ax[0,0].set_ylim(-14., 10.)
+    ax[0,1].set_ylim(0., 1.5e7)
+    ax[1,0].set_ylim(-100., 60.)
+    ax[1,1].set_ylim(-100., 60.)
+
+    #save frames, close frames, clear memory
     pl.savefig('temp_folder/%03d'%i + '.png')
+    pl.close()
     pl.clf()
 
 #make movie
