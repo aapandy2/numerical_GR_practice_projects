@@ -479,7 +479,7 @@ As an example, I will write the discretized version of equation \ref{eq:Phi_EOM}
 \begin{equation}
 \frac{1}{\Delta t} (\Phi^{n+1}_j - \Phi^{n}_j) = \frac{1}{2} \Big[ \frac{(\beta \Phi + \frac{\alpha}{a} \Pi)^{n+1}_{j+1} - (\beta \Phi + \frac{\alpha}{a} \Pi)^{n+1}_{j-1}}{2 \Delta r} + \frac{(\beta \Phi + \frac{\alpha}{a} \Pi)^{n}_{j+1} - (\beta \Phi + \frac{\alpha}{a} \Pi)^{n}_{j-1}}{2 \Delta r} \Big].
 \end{equation}
-In this equation there are quantities in parentheses, where the right parenthesis has indices.  This shorthand means that the quantities in the parentheses inherit the indices outside.  Note that $\beta$, $\alpha$, and $a$ all depend on $r$, which changes across the spatial grid.  Thus these quantities also inherit (and in the code must be passed) the index $j$.
+In this equation there are quantities in parentheses, where the right parenthesis has indices.  This shorthand means that the quantities in the parentheses inherit the indices outside.  Note that $\beta$, $\alpha$, and $a$ all depend on $r$, which changes across the spatial grid.  Thus these quantities also inherit (and in the code must be passed) the spatial index.
 
 The above procedure is also applied to equation \ref{eq:Pi_EOM}, and all equations are rearranged so that the quantities at the future timestep $n+1$ are on the left-hand side, and the known quantities at the current timestep are on the right-hand side.  The equations are then written in matrix form
 \begin{equation} \label{eq:CN_matrix_eqn}
@@ -509,7 +509,7 @@ At the outer boundary, I implement outgoing radiation (Sommerfeld) boundary cond
 \Pi &= \Big(\beta - \frac{\alpha}{a} \Big) \frac{a}{\alpha} \frac{\phi}{r} - \Phi. \\
 \end{aligned}
 \end{equation}
-The above condition is asserted at the end of each timestep, and is used to set the value of $\Phi^{n}_{j}$ for $j = N-3, N-2, N-1$, which I will refer to as the ``radiation zone."  Applying this boundary condition at these three points minimizes numerical reflection off of the outer boundary, which is entirely artificial.
+The above condition is asserted at the end of each timestep, and is used to set the value of $\Pi^{n}_{j}$ for $j = N-3, N-2, N-1$, which I will refer to as the ``radiation zone."  Applying this boundary condition at these three points minimizes numerical reflection off of the outer boundary, which is entirely artificial.
 
 \subsubsection{Results}
 Running the code outputs a video file called ``IE0\_scalar\_rad.m4v" which shows the evolution through time of $\phi$, $\frac{d m}{d r}$, $\Phi$, and $\Pi$.  It also saves an image to the local directory called ``total\_mass.png" which is $\frac{d m}{d r}$ integrated over the grid (from $r = 2 M$ to $r = R$, which is the outer boundary set in the code).  A screenshot of the video output is shown in figure 1, below, and an example total mass plot is shown in figure 2 for $\Delta = 5$.
