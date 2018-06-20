@@ -1,0 +1,136 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{braket}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathtools}
+\usepackage{tikz}
+
+\allowdisplaybreaks
+\numberwithin{equation}{section}
+
+\interfootnotelinepenalty=10000
+
+\usepackage{calligra}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue}
+
+\DeclareMathAlphabet{\mathcalligra}{T1}{calligra}{m}{n}
+\DeclareFontShape{T1}{calligra}{m}{n}{<->s*[2.2]callig15}{}
+\newcommand{\scriptr}{\mathcalligra{r}\,}
+\newcommand{\boldscriptr}{\pmb{\mathcalligra{r}}\,}
+
+\newcommand{\Lagr}{\mathcal{L}}
+\newcommand{\Hami}{\mathcal{H}}
+\newcommand{\reals}{\rm I\!R}
+\newcommand{\order}{\mathcal{O}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bp}{\mathbf{p}}
+\newcommand{\bq}{\mathbf{q}}
+\newcommand{\redtext}[1]{\textcolor{red}{#1}}
+\newcommand{\pvec}[1]{\vec{#1}\mkern2mu\vphantom{#1}}
+
+
+\begin{document}
+	\title{Numerical Relativity Project \#2}
+	\author{Alex Pandya}
+	\date{June 20th, 2018}
+	\maketitle
+
+\section{Background}
+In this project we now aim to solve the equations of motion for a self-gravitating scalar field in spherical symmetry.  The key difference between this project and the previous one is that we now care about how the scalar field modifies the spacetime it occupies, whereas in the previous project we used a static Schwarzschild spacetime.
+
+The spherically symmetric line element in isotropic (conformally flat) form is given by
+\begin{equation}
+ds^2 = -(\alpha^2 - \psi^4 \beta^2) dt^2 + 2 \psi^4 \beta dr dt + \psi^4 [dr + r^2 (d\theta^2 + \sin^2 \theta d\phi^2)],
+\end{equation}
+where $\alpha(r, t)$ is called the \textit{lapse function}, $\beta(r, t)$ is the \textit{shift} (which comes from the norm of the \textit{shift vector} $\beta^i$ when we don't have spherical symmetry), and $\psi(r, t)$ is the \textit{conformal factor}.
+
+In this formalism, the Klein-Gordon equation for the scalar field $\phi(r, t)$ may be written in terms of auxiliary variables $\xi$ and $\Pi$, defined to be:
+\begin{align}
+\xi(r, t) &= \phi' \label{eq:xi_defn} \\
+\Pi(r, t) &= \frac{\psi^2}{\alpha}(\dot{\phi} - \beta \xi), \label{eq:Pi_defn} 
+\end{align}
+where throughout this document a dot $(\dot{~})$ denotes a partial derivative with respect to $t$, and a prime $(')$ denotes a partial derivative with respect to $r$.  Using these auxiliary variables, we can derive a closed system of equations for the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$).
+
+The first equation of this system is the hyperbolic Klein-Gordon equation
+\begin{equation} \label{eq:hyperbolic_KGE}
+\dot{\Pi} - \frac{1}{r^2 \psi^4} \Big[ r^2 \psi^4 \Big( \beta \Pi + \frac{\alpha \xi}{\psi^2} \Big)\Big]' + \frac{2}{3} \Pi \Big[ \beta' + \frac{2 \beta}{r} \Big(1 + \frac{3 r \psi'}{\psi} \Big) \Big] = 0,
+\end{equation}
+followed by the hyperbolic evolution equation for $\xi$:
+\begin{equation} \label{eq:xi_evol}
+\dot{\xi} - \Big( \frac{\alpha \Pi}{\psi^2} + \beta \xi \Big)' = 0,
+\end{equation}
+the Hamiltonian constraint equation, which we will use as an elliptic constraint for $\psi$
+\begin{equation} \label{eq:psi_evol}
+\psi'' + \psi' \frac{2}{r} + \frac{\psi^5}{12} \Big[ \frac{1}{\alpha} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] + \pi \psi [\xi^2 + \Pi^2] = 0,
+\end{equation}
+the momentum constraint equation, an elliptic equation for $\beta$
+\begin{equation} \label{eq:beta_evol}
+\beta'' + \Big( \beta' - \frac{\beta}{r} \Big) \Big[ \frac{2}{r} + \frac{6 \psi'}{\psi} - \frac{\alpha'}{\alpha} \Big] + \frac{12 \pi \alpha \xi \Pi}{\psi^2} = 0,
+\end{equation}
+and the maximal slicing condition yields an elliptic equation for $\alpha$:
+\begin{equation} \label{eq:alpha_evol}
+\alpha'' + \alpha' \Big[ \frac{2}{r} + \frac{2 \psi'}{\psi} \Big] - \alpha^{-1} \Big[ \frac{2 \psi^4}{3} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] - 8 \pi \alpha \Pi^2 = 0.
+\end{equation}
+
+\section{Problem 2a}
+This problem asks us to verify the boundary conditions on the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$) at $r = 0$, to ensure that they are regular and finite there.
+
+Expanding out equation \ref{eq:hyperbolic_KGE}, we get:
+\begin{equation}
+\begin{aligned}
+0 &= \dot{\Pi} - \Big[ \frac{2 \beta \Pi}{r} + \frac{4 \psi' \beta \Pi}{\psi} + \beta' \Pi + \beta \Pi' + \frac{2 \alpha \xi}{r \psi^2} + \frac{2 \psi' \alpha \xi}{\psi^3} + \frac{\alpha' \xi}{\psi^2} + \frac{\alpha \xi'}{\psi^2} \Big] \\
+&+ \frac{2}{3} \Pi \Big[ \beta' + \frac{2 \beta}{r} \Big(1 + \frac{3 r \psi'}{\psi} \Big) \Big]; \\
+\end{aligned}
+\end{equation}
+inspection of this equation implies that in order for it to be regular and finite at $r = 0$, we must require $\beta \Pi \to 0$ and $\alpha \xi \to 0$ as $r \to 0$.  We need more equations to constrain the behavior further.
+
+Expanding out equation \ref{eq:xi_evol} doesn't help us, so we can determine most of the other conditions simply by inspection of equations \ref{eq:psi_evol} - \ref{eq:alpha_evol}.  The second term in equation \ref{eq:psi_evol} implies that $\psi' \to 0$ as $r \to 0$, and the term inside both brackets and parentheses implies $\beta \to 0$ as $r \to 0$.  Equation \ref{eq:alpha_evol}'s second term implies $\alpha' \to 0$ as $r \to 0$.  Now that we know these things, the constraint on $\alpha'$ implies that $\alpha$ will not be constrained, so from the paragraph above we know that $\xi \to 0$.  
+
+So far, we have:
+\begin{equation*}
+\begin{aligned}
+\beta  (r=0, t) &= 0 \\
+\xi    (r=0, t) &= 0 \\
+\psi'  (r=0, t) &= 0 \\
+\alpha'(r=0, t) &= 0,
+\end{aligned}
+\end{equation*}
+but we still need a constraint on $\Pi$ or $\Pi'$ to fully constrain the system.  Looking at the definition of $\Pi$ in equation \ref{eq:Pi_defn}, we can see that as $r \to 0$ the second term drops out, but we don't know anything about the first term.  Let's try taking a derivative with respect to $r$, and see what falls out:
+\begin{equation*}
+\begin{aligned}
+\Pi' &= \Big[ \psi^2 \alpha^{-1} \dot{\phi} - \psi^2 \alpha^{-1} \beta \xi \Big]' \\
+&= 2 \psi \psi' \alpha^{-1} \dot{\phi} - \psi^2 \alpha^{-2} \alpha' \dot{\phi} + \psi^2 \alpha^{-1} \dot{\phi}' \\
+&- 2 \psi \psi' \alpha^{-1} \beta \xi + \psi^2 \alpha^{-2} \alpha' \beta \xi - \psi^2 \alpha^{-1} \beta' \xi - \psi^2 \alpha^{-1} \beta \xi';
+\end{aligned}
+\end{equation*}
+applying the constraints we already know for when $r \to 0$, we find:
+\begin{equation*}
+\begin{aligned}
+\Pi'(r=0, t) &= \psi^2 \alpha^{-1} \dot{\phi}' \\
+&= \psi^2 \alpha^{-1} \partial_r (\partial_t \phi) \\
+&= \psi^2 \alpha^{-1} \partial_t (\partial_r \phi) \\
+&= \psi^2 \alpha^{-1} \partial_t (\xi) \\
+&= \psi^2 \alpha^{-1} \partial_t (0) \\
+&= 0,
+\end{aligned}
+\end{equation*}
+so in summary, at $r = 0$, we have the full set of conditions
+\begin{equation}
+\begin{aligned}
+\beta  (r=0, t) &= 0 \\
+\xi    (r=0, t) &= 0 \\
+\psi'  (r=0, t) &= 0 \\
+\alpha'(r=0, t) &= 0 \\
+\Pi'   (r=0, t) &= 0,
+\end{aligned}
+\end{equation}
+as we were asked to show.
+
+\section{Problem 2b}
+
+
+\end{document}

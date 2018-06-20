@@ -1,1 +1,0 @@
-# numerical_GR_practice_projects
