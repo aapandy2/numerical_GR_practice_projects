@@ -43,15 +43,15 @@
 In this project we now aim to solve the equations of motion for a self-gravitating scalar field in spherical symmetry.  The key difference between this project and the previous one is that we now care about how the scalar field modifies the spacetime it occupies, whereas in the previous project we used a static Schwarzschild spacetime.
 
 The spherically symmetric line element in isotropic (conformally flat) form is given by
-\begin{equation}
-ds^2 = -(\alpha^2 - \psi^4 \beta^2) dt^2 + 2 \psi^4 \beta dr dt + \psi^4 [dr + r^2 (d\theta^2 + \sin^2 \theta d\phi^2)],
+\begin{equation} \label{eq:line_element}
+ds^2 = -(\alpha^2 - \psi^4 \beta^2) dt^2 + 2 \psi^4 \beta dr dt + \psi^4 [dr^2 + r^2 (d\theta^2 + \sin^2 \theta d\phi^2)],
 \end{equation}
 where $\alpha(r, t)$ is called the \textit{lapse function}, $\beta(r, t)$ is the \textit{shift} (which comes from the norm of the \textit{shift vector} $\beta^i$ when we don't have spherical symmetry), and $\psi(r, t)$ is the \textit{conformal factor}.
 
-In this formalism, the Klein-Gordon equation for the scalar field $\phi(r, t)$ may be written in terms of auxiliary variables $\xi$ and $\Pi$, defined to be:
+In this formalism, the Klein-Gordon equation for the scalar field $\Phi(r, t)$ may be written in terms of auxiliary variables $\xi$ and $\Pi$, defined to be:
 \begin{align}
-\xi(r, t) &= \phi' \label{eq:xi_defn} \\
-\Pi(r, t) &= \frac{\psi^2}{\alpha}(\dot{\phi} - \beta \xi), \label{eq:Pi_defn} 
+\xi(r, t) &= \Phi' \label{eq:xi_defn} \\
+\Pi(r, t) &= \frac{\psi^2}{\alpha}(\dot{\Phi} - \beta \xi), \label{eq:Pi_defn} 
 \end{align}
 where throughout this document a dot $(\dot{~})$ denotes a partial derivative with respect to $t$, and a prime $(')$ denotes a partial derivative with respect to $r$.  Using these auxiliary variables, we can derive a closed system of equations for the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$).
 
@@ -131,6 +131,47 @@ so in summary, at $r = 0$, we have the full set of conditions
 as we were asked to show.
 
 \section{Problem 2b}
+In this problem we are asked to derive boundary conditions to be applied at the outer boundary ($r = R$) which do not couple matter variables ($\Pi, \xi$) or space variables ($\alpha, \beta, \psi$) amongst themselves or to each other.  We are told to define the space variable boundary conditions such that they are consistent to $O(1/r^2)$ with asymptotic flatness (which we should expect for large $R$), which means we should have conditions with solutions of the form
+\begin{equation} \label{eq:space_var_outer_behavior}
+\begin{aligned}
+\psi   &= 1 + \frac{a_0(t)}{r} + O(1/r^2) \\
+\alpha &= 1 + \frac{b_0(t)}{r} + O(1/r^2) \\
+\beta  &= 0 + \frac{c_0(t)}{r} + O(1/r^2),
+\end{aligned}
+\end{equation}
+where the leading order behavior is determined by the asymptotic behavior of the space variable (e.g. by comparing the metric \ref{eq:line_element} to the Minkowski metric).
+
+We have to enforce the above behavior on our variables somehow and write constraint equations.  Taking a derivative with respect to $r$ of the above equations, we find:
+\begin{align}
+\psi' + \frac{\psi - 1}{r}     &= 0 \\
+\alpha' + \frac{\alpha - 1}{r} &= 0 \\
+\beta' + \frac{\beta}{r}       &= 0,
+\end{align} 
+which we will enforce as our outer boundary condition on these variables\footnote{I don't like the description for this problem very much.  I think it's important to state that for these boundary conditions we're trying to write down constraint equations which force $\{\psi, \alpha, \beta\}$ to obey equation \ref{eq:space_var_outer_behavior}.}.
+
+Now we need boundary conditions for the matter variables $\xi$ and $\Pi$.  We are asked to force these variables to be consistent with the outgoing radiation condition to $O(1/r^2)$.  Applying the outgoing radiation condition to the matter variables, we have:
+\begin{equation}
+\begin{aligned}
+0 &= \partial_t (r \xi) + \partial_r (r \xi) \\
+&= r \partial_t \xi + r \partial_r \xi + \xi \\
+&= r \dot{\xi} + r \xi' + \xi \\
+&= \dot{\xi} + \xi' + \frac{\xi}{r}.
+\end{aligned}
+\end{equation}
+following the exact same procedure for $\Pi$, we find
+\begin{equation}
+0 = \dot{\Pi} + \Pi' + \frac{\Pi}{r}.
+\end{equation}
+Since we directly used the outgoing radiation condition to derive these equations, they are guaranteed to be consistent with the outgoing radiation condition to any order in $1/r$.
+
+These boundary conditions have been verified by comparison with those coded up in the sample code for this project\footnote{Sample code which solves problems 1-5: \url{http://physics.princeton.edu/~fpretori/group_resources/PiTP_2009/emkg_5.tar.gz}} and by taking the spherical-symmetry special case of the boundary conditions\footnote{The outer boundary conditions can be found in equation 9 of \url{https://arxiv.org/pdf/gr-qc/0508110.pdf}.  These equations may be converted to spherical coordinates by noting that $r = \sqrt{\rho^2 + z^2}$, and converting the $\rho$ and $z$ derivatives to be $r$ derivatives.} in a paper describing an axisymmetric self-gravitating scalar field code \cite{Pretorius06}, though in the latter they use Dirichlet boundary conditions for $\alpha, \beta$ rather than the Robin conditions we use here.
+
+
+
+\begin{thebibliography}{widestlabel}
+	\bibitem{Pretorius06}
+	F. Pretorius and M. W. Choptuik, ``Adaptive Mesh Refinement for Coupled Elliptic-Hyperbolic Systems", J. Comput. Phys. 218 (2006)
+\end{thebibliography}
 
 
 \end{document}
