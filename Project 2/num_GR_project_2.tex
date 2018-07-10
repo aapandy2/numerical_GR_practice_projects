@@ -32,6 +32,8 @@
 \newcommand{\redtext}[1]{\textcolor{red}{#1}}
 \newcommand{\pvec}[1]{\vec{#1}\mkern2mu\vphantom{#1}}
 
+\setcounter{section}{-1}
+
 
 \begin{document}
 	\title{Numerical Relativity Project \#2}
@@ -76,7 +78,7 @@ and the maximal slicing condition yields an elliptic equation for $\alpha$:
 \alpha'' + \alpha' \Big[ \frac{2}{r} + \frac{2 \psi'}{\psi} \Big] - \alpha^{-1} \Big[ \frac{2 \psi^4}{3} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] - 8 \pi \alpha \Pi^2 = 0.
 \end{equation}
 
-\section{Problem 2a}
+\section{Problem 1}
 This problem asks us to verify the boundary conditions on the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$) at $r = 0$, to ensure that they are regular and finite there.
 
 Expanding out equation \ref{eq:hyperbolic_KGE}, we get:
@@ -130,7 +132,7 @@ so in summary, at $r = 0$, we have the full set of conditions
 \end{equation}
 as we were asked to show.
 
-\section{Problem 2b}
+\section{Problem 2}
 In this problem we are asked to derive boundary conditions to be applied at the outer boundary ($r = R$) which do not couple matter variables ($\Pi, \xi$) or space variables ($\alpha, \beta, \psi$) amongst themselves or to each other.  We are told to define the space variable boundary conditions such that they are consistent to $O(1/r^2)$ with asymptotic flatness (which we should expect for large $R$), which means we should have conditions with solutions of the form
 \begin{equation} \label{eq:space_var_outer_behavior}
 \begin{aligned}
@@ -166,7 +168,15 @@ Since we directly used the outgoing radiation condition to derive these equation
 
 These boundary conditions have been verified by comparison with those coded up in the sample code for this project\footnote{Sample code which solves problems 1-5: \url{http://physics.princeton.edu/~fpretori/group_resources/PiTP_2009/emkg_5.tar.gz}} and by taking the spherical-symmetry special case of the boundary conditions\footnote{The outer boundary conditions can be found in equation 9 of \url{https://arxiv.org/pdf/gr-qc/0508110.pdf}.  These equations may be converted to spherical coordinates by noting that $r = \sqrt{\rho^2 + z^2}$, and converting the $\rho$ and $z$ derivatives to be $r$ derivatives.} in a paper describing an axisymmetric self-gravitating scalar field code \cite{Pretorius06}, though in the latter they use Dirichlet boundary conditions for $\alpha, \beta$ rather than the Robin conditions we use here.
 
+\section{Problem 3}
+In this problem we are asked to write code to solve the Klein-Gordon equation in the form of equations \ref{eq:hyperbolic_KGE} - \ref{eq:xi_evol} to integrate $\Pi$ and $\xi$ for a flat space background.  We are also asked to use equation \ref{eq:Pi_defn} to integrate the scalar field $\Phi$.  The problem statement tells us to use a second-order Crank-Nicolson scheme, and to implement Kreiss-Oliger (KO) dissipation near the origin.
 
+To begin, we must note that the flat space background part of the problem statement implies that we can take the zeroth order behavior of equation \ref{eq:space_var_outer_behavior} to set the values of the space variables, namely: $\psi = \alpha = 1$ and $\beta = 0$.
+
+Now we can go about discretizing the equations.  Starting with equation \ref{eq:hyperbolic_KGE}, we get (for our centered difference):
+\begin{equation}
+\dot{\Pi} - \frac{1}{r^2 \psi^4} \Big[ r^2 \psi^4 \Big( \beta \Pi + \frac{\alpha \xi}{\psi^2} \Big)\Big]' + \frac{2}{3} \Pi \Big[ \beta' + \frac{2 \beta}{r} \Big(1 + \frac{3 r \psi'}{\psi} \Big) \Big] = 0
+\end{equation}
 
 \begin{thebibliography}{widestlabel}
 	\bibitem{Pretorius06}
