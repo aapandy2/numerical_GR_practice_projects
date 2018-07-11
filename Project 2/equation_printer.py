@@ -18,15 +18,6 @@ Pi_prime    = Symbol('Pi\'')
 psi_prime   = symbols('psi\'')
 
 
-#type in equation
-R = 0
-L = xi_dot - diff( alpha*Pi/psi**2 + beta*xi, r)
-R = solve((L-R), xi_dot)[0]
-L = xi_dot
-
-#print L, '=', R
-
-
 #functions to format equation
 def remove_fns(expr):
 	for fn in expr.atoms(Function):
@@ -62,16 +53,19 @@ def apply_format(expr):
 	return newexpr
 
 
-#L_formatted = apply_format(L)
-#R_formatted = apply_format(R)
-#
-#print L_formatted, '=', R_formatted, '\n'
+def display_formatted(L, R):
+	L_formatted = apply_format(L)
+	R_formatted = apply_format(R)
+	
+	print L_formatted, '=', R_formatted, '\n'
+
+	return 0
 	
 
 #assumes formatted expr
 def append_indices(expr_formatted):
 	for atom in expr_formatted.atoms():
-		if( (str(atom).replace('-', '')).isdigit() != True): #filter out integers
+		if( (str(atom).replace('-', '')).isdigit() != True and str(atom) != 'r' and str(atom) != 't'): #filter out integers
 			expr_formatted = expr_formatted.subs(atom, symbols( str(atom) + '[n][j]' ) )
 
 	return expr_formatted
@@ -152,7 +146,7 @@ def CN_full_expr(L_indexed_derivs, R_indexed_derivs):
         return [L, R]
 
 
-def display_CN_result(L, R, mode='normal'):
+def CN_result(L, R, mode='no_output'):
 	L_formatted = apply_format(L)
 	R_formatted = apply_format(R)
 
@@ -167,8 +161,8 @@ def display_CN_result(L, R, mode='normal'):
 
 	L, R = CN_full_expr(CN_L, CN_R)	
 
-	L = L.expand()
-	R = R.expand()
+#	L = L.simplify()
+#	R = R.simplify()
 
 	if(mode == 'normal'):
 		print L, '=', R, '\n'
@@ -176,33 +170,48 @@ def display_CN_result(L, R, mode='normal'):
 	elif(mode == 'piecewise'):
 		for atom in L.atoms(Mul):
 			print atom
+		print '='
+		for atom in R.atoms(Mul):
+			print atom
+
+	return [L, R]
+
+
+def print_coefficients(L, R, symbols_list):
+	for symbol in symbols_list:
+
+		if(symbol.find('[n+1]') > 0):
+			print '\n' + symbol + ' coeff:', L.coeff(symbols(symbol))
+		elif(symbol.find('[n]') > 0):
+			print '\n' + symbol + ' coeff:', R.coeff(symbols(symbol))
 
 	return 0
 
+#type in equation
 
-#L_final, R_final = CN_full_expr(CN_L, CN_R)
-#
-#print L_final, '=', R_final, '\n'
+print '------------equation-1------------------------'
 
-#display_CN_result(L, R)
+
+R = 0
+L = xi_dot - diff( alpha*Pi/psi**2 + beta*xi, r)
+R = solve((L-R), xi_dot)[0]
+L = xi_dot
+
+display_formatted(L, R)
+
+L_final, R_final = CN_result(L, R)
+
+print_coefficients(L_final, R_final, ['Pi[n+1][j]', 'Pi[n+1][j+1]', 'Pi[n+1][j-1]', 'xi[n+1][j]', 'xi[n+1][j+1]', 'xi[n+1][j-1]'])
+
+print '------------equation-2------------------------'
 
 R = 0
 L = Pi_dot - 1/(r**2 * psi**4) * diff(r**2 * psi**4 * (beta*Pi + alpha*xi/psi**2), r) + 2/3 * Pi * (beta.diff(r) + 2*beta/r * (1 + 3 * r * psi.diff(r) / psi))
 R = solve((L-R), Pi_dot)[0]
 L = Pi_dot
-#print L, '=', R
-#print apply_format(L), '=', apply_format(R), '\n'
 
-#L_formatted = apply_format(L)
-#R_formatted = apply_format(R)
-#print L_formatted, '=', R_formatted, '\n'
-#
-#indexed_L = append_indices(L_formatted)
-#indexed_R = append_indices(R_formatted)
-#print indexed_L, '=', indexed_R, '\n'
-#
-#CN_L = CN_time_deriv(indexed_L)
-#CN_R = centered_derivs(indexed_R)
-#print CN_L.expand(), '!=', CN_R.expand(), '[RHS needs to be time-averaged]\n'
+display_formatted(L, R)
 
-display_CN_result(L, R, 'piecewise')
+L_final, R_final = CN_result(L, R)
+
+print_coefficients(L_final, R_final, ['Pi[n+1][j]', 'Pi[n+1][j+1]', 'Pi[n+1][j-1]', 'xi[n+1][j]', 'xi[n+1][j+1]', 'xi[n+1][j-1]'])
