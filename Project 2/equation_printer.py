@@ -144,13 +144,15 @@ def CN_full_expr(L_indexed_derivs, R_indexed_derivs):
 			L_indexed_derivs = L_indexed_derivs - atom
 			R_indexed_derivs = R_indexed_derivs + atom
 
-        L = L_indexed_derivs - CN_advanced(R_indexed_derivs)/2
-	R = R_indexed_derivs
+	RHS_adv = CN_advanced(R_indexed_derivs)/2
+
+        L = L_indexed_derivs - RHS_adv
+	R = R_indexed_derivs/2
 
         return [L, R]
 
 
-def display_CN_result(L, R):
+def display_CN_result(L, R, mode='normal'):
 	L_formatted = apply_format(L)
 	R_formatted = apply_format(R)
 
@@ -160,9 +162,20 @@ def display_CN_result(L, R):
 	CN_L = CN_time_deriv(indexed_L)
 	CN_R = centered_derivs(indexed_R)
 
+	CN_L = CN_L.expand()
+	CN_R = CN_R.expand()
+
 	L, R = CN_full_expr(CN_L, CN_R)	
 
-	print L, '=', R, '\n'
+	L = L.expand()
+	R = R.expand()
+
+	if(mode == 'normal'):
+		print L, '=', R, '\n'
+
+	elif(mode == 'piecewise'):
+		for atom in L.atoms(Mul):
+			print atom
 
 	return 0
 
@@ -178,7 +191,18 @@ L = Pi_dot - 1/(r**2 * psi**4) * diff(r**2 * psi**4 * (beta*Pi + alpha*xi/psi**2
 R = solve((L-R), Pi_dot)[0]
 L = Pi_dot
 #print L, '=', R
-print apply_format(L), '=', apply_format(R), '\n'
+#print apply_format(L), '=', apply_format(R), '\n'
 
-display_CN_result(L, R)
+#L_formatted = apply_format(L)
+#R_formatted = apply_format(R)
+#print L_formatted, '=', R_formatted, '\n'
+#
+#indexed_L = append_indices(L_formatted)
+#indexed_R = append_indices(R_formatted)
+#print indexed_L, '=', indexed_R, '\n'
+#
+#CN_L = CN_time_deriv(indexed_L)
+#CN_R = centered_derivs(indexed_R)
+#print CN_L.expand(), '!=', CN_R.expand(), '[RHS needs to be time-averaged]\n'
 
+display_CN_result(L, R, 'piecewise')
