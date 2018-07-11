@@ -73,9 +73,9 @@ def display_formatted(L, R):
 def append_indices(expr_formatted):
 	for atom in expr_formatted.atoms():
 		if( ((str(atom).replace('-', '')).replace('.', '')).isdigit() != True and str(atom) != 'r' and str(atom) != 't'): #filter out integers
-			expr_formatted = expr_formatted.subs(atom, symbols( str(atom) + '[n][j]' ) )
+			expr_formatted = expr_formatted.subs(atom, symbols( str(atom) + '[n][j%N]' ) )
 		elif( (str(atom).replace('-', '')).isdigit() != True and str(atom) == 'r' ):
-			expr_formatted = expr_formatted.subs(atom, symbols('r_grid[j]'))
+			expr_formatted = expr_formatted.subs(atom, symbols('r_grid[j%N]'))
 
 	return expr_formatted
 
@@ -112,8 +112,8 @@ def centered_derivs(expr_indexed):
                 	        atomstr = str(atom)
 				if(atomstr.find('\'') > 0):
                                		atomstr = atomstr.replace('\'', '')
-                               		atomstr_fwd = atomstr.replace('j]', 'j+1]')
-					atomstr_bwd = atomstr.replace('j]', 'j-1]')
+                               		atomstr_fwd = atomstr.replace('j%N]', 'j%N+1]')
+					atomstr_bwd = atomstr.replace('j%N]', 'j%N-1]')
  
                               		#need to define dummy variables and substitute them
                                		atomstr_sum = '(x - y)/(2 * dr)'
@@ -133,8 +133,8 @@ def fwd_derivs(expr_indexed):
                                 if(atomstr.find('\'') > 0):
                                         atomstr = atomstr.replace('\'', '')
 					atomstr_cent = atomstr
-                                        atomstr_fwd1 = atomstr.replace('j]', 'j+1]')
-                                        atomstr_fwd2 = atomstr.replace('j]', 'j+2]')
+                                        atomstr_fwd1 = atomstr.replace('j%N]', 'j%N+1]')
+                                        atomstr_fwd2 = atomstr.replace('j%N]', 'j%N+2]')
 
                                         #need to define dummy variables and substitute them
                                         atomstr_sum = '(- 3 * x + 4 * y - z)/(2 * dr)'
@@ -154,8 +154,8 @@ def bwd_derivs(expr_indexed):
                                 if(atomstr.find('\'') > 0):
                                         atomstr = atomstr.replace('\'', '')
                                         atomstr_cent = atomstr
-                                        atomstr_bwd1 = atomstr.replace('j]', 'j-1]')
-                                        atomstr_bwd2 = atomstr.replace('j]', 'j-2]')
+                                        atomstr_bwd1 = atomstr.replace('j%N]', 'j%N-1]')
+                                        atomstr_bwd2 = atomstr.replace('j%N]', 'j%N-2]')
 
                                         #need to define dummy variables and substitute them
                                         atomstr_sum = '(3 * x - 4 * y + z)/(2 * dr)'
@@ -285,14 +285,16 @@ def debug_mode(L, R):
 #
 #print L, '=', R, '\n'
 #
-#display_formatted(L, R)
+##display_formatted(L, R)
 #
-#L_final, R_final = CN_result(L, R, space_deriv='centered')
+#L_final, R_final = CN_result(L, R, space_deriv='backward')
 #
-#print_coefficients(L_final, R_final, ['Pi[n+1][j+2]', 'Pi[n+1][j+1]', 'Pi[n+1][j]', 'Pi[n+1][j-1]', 'Pi[n+1][j-2]', 'xi[n+1][j+2]', 'xi[n+1][j+1]', 'xi[n+1][j]', 'xi[n+1][j-1]', 'xi[n+1][j-2]'])
+#print_coefficients(L_final, R_final, ['Pi[n+1][j%N+2]', 'Pi[n+1][j%N+1]', 'Pi[n+1][j%N]', 'Pi[n+1][j%N-1]', 'Pi[n+1][j%N-2]', 'xi[n+1][j%N+2]', 'xi[n+1][j%N+1]', 'xi[n+1][j%N]', 'xi[n+1][j%N-1]', 'xi[n+1][j%N-2]'])
 #
-##print_coefficients(L_final, R_final, ['Pi[n][j+2]', 'Pi[n][j+1]', 'Pi[n][j]', 'Pi[n][j-1]', 'Pi[n][j-2]', 'xi[n][j+2]', 'xi[n][j+1]', 'xi[n][j]', 'xi[n][j-1]', 'xi[n][j-2]'])
+#print '---------------------------------------------------------------'
 #
+#print_coefficients(L_final, R_final, ['Pi[n][j%N+2]', 'Pi[n][j%N+1]', 'Pi[n][j%N]', 'Pi[n][j%N-1]', 'Pi[n][j%N-2]', 'xi[n][j%N+2]', 'xi[n][j%N+1]', 'xi[n][j%N]', 'xi[n][j%N-1]', 'xi[n][j%N-2]'])
+
 print '------------equation-2------------------------'
 
 R = 0
@@ -301,10 +303,12 @@ R = solve((L-R), Pi_dot)[0]
 L = Pi_dot
 
 
-debug_mode(L, R)
+#debug_mode(L, R)
 
-#L_final, R_final = CN_result(L, R, space_deriv='centered')
+L_final, R_final = CN_result(L, R, space_deriv='backward')
 
-#print_coefficients(L_final, R_final, ['Pi[n+1][j+2]', 'Pi[n+1][j+1]', 'Pi[n+1][j]', 'Pi[n+1][j-1]', 'Pi[n+1][j-2]', 'xi[n+1][j+2]', 'xi[n+1][j+1]', 'xi[n+1][j]', 'xi[n+1][j-1]', 'xi[n+1][j-2]'])
+print_coefficients(L_final, R_final, ['Pi[n+1][j%N+2]', 'Pi[n+1][j%N+1]', 'Pi[n+1][j%N]', 'Pi[n+1][j%N-1]', 'Pi[n+1][j%N-2]', 'xi[n+1][j%N+2]', 'xi[n+1][j%N+1]', 'xi[n+1][j%N]', 'xi[n+1][j%N-1]', 'xi[n+1][j%N-2]'])
 
-#print_coefficients(L_final, R_final, ['Pi[n][j+2]', 'Pi[n][j+1]', 'Pi[n][j]', 'Pi[n][j-1]', 'Pi[n][j-2]', 'xi[n][j+2]', 'xi[n][j+1]', 'xi[n][j]', 'xi[n][j-1]', 'xi[n][j-2]'])
+print '---------------------------------------------------------------'
+
+print_coefficients(L_final, R_final, ['Pi[n][j%N+2]', 'Pi[n][j%N+1]', 'Pi[n][j%N]', 'Pi[n][j%N-1]', 'Pi[n][j%N-2]', 'xi[n][j%N+2]', 'xi[n][j%N+1]', 'xi[n][j%N]', 'xi[n][j%N-1]', 'xi[n][j%N-2]'])
