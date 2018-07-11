@@ -95,7 +95,7 @@ def CN_time_deriv(expr_indexed):
 				atomstr_adv = atomstr.replace('[n', '[n+1')
 		
 				#need to define dummy variables and substitute them
-				atomstr_sum = '(x - y)/(2 * dt)'
+				atomstr_sum = '(x - y)/dt'
 		
 				atom_sympy  = sympify(atomstr_sum)
 				atom_sympy  = atom_sympy.subs('x', symbols(atomstr_adv))
