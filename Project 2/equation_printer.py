@@ -1,8 +1,15 @@
 from sympy import *
 import numpy as np
 
+#TODO: 1.) need to thoroughly test this for trial equations.
+#TODO: 2.) the way r is being handled is not correct; it's being treated
+#          as an analytic variable; should be okay for small grid spacing
+#TODO: 3.) make all numbers have trailing decimal
+
 #define symbols
-r, t   = symbols('r t')
+r, t             = symbols('r t')
+delta_r, delta_t = symbols('delta_r delta_t')
+
 xi_dot = Function('xi_dot') (r)
 Pi_dot = Function('Pi_dot') (r)
 alpha  = Function('alpha') (r)
@@ -59,14 +66,16 @@ def display_formatted(L, R):
 	
 	print L_formatted, '=', R_formatted, '\n'
 
-	return 0
+	return [L_formatted, R_formatted]
 	
 
 #assumes formatted expr
 def append_indices(expr_formatted):
 	for atom in expr_formatted.atoms():
-		if( (str(atom).replace('-', '')).isdigit() != True and str(atom) != 'r' and str(atom) != 't'): #filter out integers
+		if( ((str(atom).replace('-', '')).replace('.', '')).isdigit() != True and str(atom) != 'r' and str(atom) != 't'): #filter out integers
 			expr_formatted = expr_formatted.subs(atom, symbols( str(atom) + '[n][j]' ) )
+		elif( (str(atom).replace('-', '')).isdigit() != True and str(atom) == 'r' ):
+			expr_formatted = expr_formatted.subs(atom, symbols('r_grid[j]'))
 
 	return expr_formatted
 
@@ -86,11 +95,12 @@ def CN_time_deriv(expr_indexed):
 				atomstr_adv = atomstr.replace('[n', '[n+1')
 		
 				#need to define dummy variables and substitute them
-				atomstr_sum = '(x - y)/2'
+				atomstr_sum = '(x - y)/(2 * dt)'
 		
 				atom_sympy  = sympify(atomstr_sum)
 				atom_sympy  = atom_sympy.subs('x', symbols(atomstr_adv))
 				atom_sympy  = atom_sympy.subs('y', symbols(atomstr))
+				atom_sympy  = atom_sympy.subs('dt', delta_t)
 	#			print atom_sympy
 				expr_indexed = expr_indexed.subs(atom, atom_sympy)
 	return expr_indexed
@@ -106,14 +116,57 @@ def centered_derivs(expr_indexed):
 					atomstr_bwd = atomstr.replace('j]', 'j-1]')
  
                               		#need to define dummy variables and substitute them
-                               		atomstr_sum = '(x - y)/2'
+                               		atomstr_sum = '(x - y)/(2 * dr)'
 
                                		atom_sympy  = sympify(atomstr_sum)
                                		atom_sympy  = atom_sympy.subs('x', symbols(atomstr_fwd))
                                		atom_sympy  = atom_sympy.subs('y', symbols(atomstr_bwd))
+					atom_sympy  = atom_sympy.subs('dr', delta_r)
                                		expr_indexed = expr_indexed.subs(atom, atom_sympy)
 	return expr_indexed
 
+
+def fwd_derivs(expr_indexed):
+        for atom in expr_indexed.atoms():
+                if(atom != expr_indexed and (str(atom).replace('-', '')).isdigit() != True):
+                                atomstr = str(atom)
+                                if(atomstr.find('\'') > 0):
+                                        atomstr = atomstr.replace('\'', '')
+					atomstr_cent = atomstr
+                                        atomstr_fwd1 = atomstr.replace('j]', 'j+1]')
+                                        atomstr_fwd2 = atomstr.replace('j]', 'j+2]')
+
+                                        #need to define dummy variables and substitute them
+                                        atomstr_sum = '(- 3 * x + 4 * y - z)/(2 * dr)'
+
+                                        atom_sympy  = sympify(atomstr_sum)
+                                        atom_sympy  = atom_sympy.subs('x', symbols(atomstr_cent))
+                                        atom_sympy  = atom_sympy.subs('y', symbols(atomstr_fwd1))
+					atom_sympy  = atom_sympy.subs('z', symbols(atomstr_fwd2))
+                                        atom_sympy  = atom_sympy.subs('dr', delta_r)
+                                        expr_indexed = expr_indexed.subs(atom, atom_sympy)
+        return expr_indexed
+
+def bwd_derivs(expr_indexed):
+        for atom in expr_indexed.atoms():
+                if(atom != expr_indexed and (str(atom).replace('-', '')).isdigit() != True):
+                                atomstr = str(atom)
+                                if(atomstr.find('\'') > 0):
+                                        atomstr = atomstr.replace('\'', '')
+                                        atomstr_cent = atomstr
+                                        atomstr_bwd1 = atomstr.replace('j]', 'j-1]')
+                                        atomstr_bwd2 = atomstr.replace('j]', 'j-2]')
+
+                                        #need to define dummy variables and substitute them
+                                        atomstr_sum = '(3 * x - 4 * y + z)/(2 * dr)'
+
+                                        atom_sympy  = sympify(atomstr_sum)
+                                        atom_sympy  = atom_sympy.subs('x', symbols(atomstr_cent))
+                                        atom_sympy  = atom_sympy.subs('y', symbols(atomstr_bwd1))
+                                        atom_sympy  = atom_sympy.subs('z', symbols(atomstr_bwd2))
+                                        atom_sympy  = atom_sympy.subs('dr', delta_r)
+                                        expr_indexed = expr_indexed.subs(atom, atom_sympy)
+        return expr_indexed
 
 
 #CN_L = CN_time_deriv(indexed_L)
@@ -133,20 +186,23 @@ def CN_advanced(expr_indexed):
 
 #needs L and R after indexing and explicitly writing derivatives
 def CN_full_expr(L_indexed_derivs, R_indexed_derivs):
-	for atom in L_indexed_derivs.atoms(Mul):
-		if(atom != L_indexed_derivs and str(atom).find('[n]') > 0):
-			L_indexed_derivs = L_indexed_derivs - atom
-			R_indexed_derivs = R_indexed_derivs + atom
-
-	RHS_adv = CN_advanced(R_indexed_derivs)/2
+	RHS_adv = CN_advanced(R_indexed_derivs)/2.
 
         L = L_indexed_derivs - RHS_adv
-	R = R_indexed_derivs/2
+	R = R_indexed_derivs/2.
+
+	for atom in L.atoms(Mul):
+                if(atom != L and str(atom).find('[n]') > 0):
+                        L = L - atom
+                        R = R - atom
+
 
         return [L, R]
 
 
-def CN_result(L, R, mode='no_output'):
+def CN_result(L, R, space_deriv='centered', print_mode='no_output'):
+	print '\n' + space_deriv + '\n'	
+
 	L_formatted = apply_format(L)
 	R_formatted = apply_format(R)
 
@@ -154,7 +210,13 @@ def CN_result(L, R, mode='no_output'):
 	indexed_R = append_indices(R_formatted)	
 
 	CN_L = CN_time_deriv(indexed_L)
-	CN_R = centered_derivs(indexed_R)
+
+	if(space_deriv == 'centered'):
+		CN_R = centered_derivs(indexed_R)
+	elif(space_deriv == 'forward'):
+		CN_R = fwd_derivs(indexed_R)
+	elif(space_deriv == 'backward'):
+		CN_R = bwd_derivs(indexed_R)
 
 	CN_L = CN_L.expand()
 	CN_R = CN_R.expand()
@@ -164,10 +226,10 @@ def CN_result(L, R, mode='no_output'):
 #	L = L.simplify()
 #	R = R.simplify()
 
-	if(mode == 'normal'):
+	if(print_mode == 'normal'):
 		print L, '=', R, '\n'
 
-	elif(mode == 'piecewise'):
+	elif(print_mode == 'piecewise'):
 		for atom in L.atoms(Mul):
 			print atom
 		print '='
@@ -187,31 +249,62 @@ def print_coefficients(L, R, symbols_list):
 
 	return 0
 
+def debug_mode(L, R):
+
+        print L, '=', R, '\n'
+
+        L_formatted, R_formatted = display_formatted(L, R)
+
+        indexed_L = append_indices(L_formatted)
+        indexed_R = append_indices(R_formatted)
+
+        print indexed_L, '=', indexed_R, '\n'
+
+	CN_L = CN_time_deriv(indexed_L)
+	CN_R = centered_derivs(indexed_R)
+	
+	print CN_L, '!=', CN_R, '[RHS needs to be time-averaged]\n'
+
+	#note: CN_result takes in original L, R
+	CL_L_final, CN_R_final = CN_result(L, R)
+
+	print CL_L_final, '\n=\n', CN_R_final, '\n'
+
+        return 0.
+
+
 #type in equation
 
-print '------------equation-1------------------------'
-
-
-R = 0
-L = xi_dot - diff( alpha*Pi/psi**2 + beta*xi, r)
-R = solve((L-R), xi_dot)[0]
-L = xi_dot
-
-display_formatted(L, R)
-
-L_final, R_final = CN_result(L, R)
-
-print_coefficients(L_final, R_final, ['Pi[n+1][j]', 'Pi[n+1][j+1]', 'Pi[n+1][j-1]', 'xi[n+1][j]', 'xi[n+1][j+1]', 'xi[n+1][j-1]'])
-
+#print '------------equation-1------------------------'
+#
+#
+#R = 0
+#L = xi_dot - diff( alpha*Pi/psi**2 + beta*xi, r)
+#R = solve((L-R), xi_dot)[0]
+#L = xi_dot
+#
+#print L, '=', R, '\n'
+#
+#display_formatted(L, R)
+#
+#L_final, R_final = CN_result(L, R, space_deriv='centered')
+#
+#print_coefficients(L_final, R_final, ['Pi[n+1][j+2]', 'Pi[n+1][j+1]', 'Pi[n+1][j]', 'Pi[n+1][j-1]', 'Pi[n+1][j-2]', 'xi[n+1][j+2]', 'xi[n+1][j+1]', 'xi[n+1][j]', 'xi[n+1][j-1]', 'xi[n+1][j-2]'])
+#
+##print_coefficients(L_final, R_final, ['Pi[n][j+2]', 'Pi[n][j+1]', 'Pi[n][j]', 'Pi[n][j-1]', 'Pi[n][j-2]', 'xi[n][j+2]', 'xi[n][j+1]', 'xi[n][j]', 'xi[n][j-1]', 'xi[n][j-2]'])
+#
 print '------------equation-2------------------------'
 
 R = 0
-L = Pi_dot - 1/(r**2 * psi**4) * diff(r**2 * psi**4 * (beta*Pi + alpha*xi/psi**2), r) + 2/3 * Pi * (beta.diff(r) + 2*beta/r * (1 + 3 * r * psi.diff(r) / psi))
+L = Pi_dot - 1./(r**2. * psi**4.) * diff(r**2. * psi**4. * (beta*Pi + alpha*xi/psi**2.), r) + 2./3. * Pi * (beta.diff(r) + 2.*beta/r * (1. + 3. * r * psi.diff(r) / psi))
 R = solve((L-R), Pi_dot)[0]
 L = Pi_dot
 
-display_formatted(L, R)
 
-L_final, R_final = CN_result(L, R)
+debug_mode(L, R)
 
-print_coefficients(L_final, R_final, ['Pi[n+1][j]', 'Pi[n+1][j+1]', 'Pi[n+1][j-1]', 'xi[n+1][j]', 'xi[n+1][j+1]', 'xi[n+1][j-1]'])
+#L_final, R_final = CN_result(L, R, space_deriv='centered')
+
+#print_coefficients(L_final, R_final, ['Pi[n+1][j+2]', 'Pi[n+1][j+1]', 'Pi[n+1][j]', 'Pi[n+1][j-1]', 'Pi[n+1][j-2]', 'xi[n+1][j+2]', 'xi[n+1][j+1]', 'xi[n+1][j]', 'xi[n+1][j-1]', 'xi[n+1][j-2]'])
+
+#print_coefficients(L_final, R_final, ['Pi[n][j+2]', 'Pi[n][j+1]', 'Pi[n][j]', 'Pi[n][j-1]', 'Pi[n][j-2]', 'xi[n][j+2]', 'xi[n][j+1]', 'xi[n][j]', 'xi[n][j-1]', 'xi[n][j-2]'])
