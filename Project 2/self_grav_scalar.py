@@ -6,18 +6,18 @@ from scipy.integrate import cumtrapz, simps
 #set parameters for simulation
 N = 100
 delta_r = 1./N
-delta_t = 0.005
+delta_t = 0.01
 courant = delta_t / delta_r
-timesteps = 200
+timesteps = 300
 
 #define grid
-M     = 1.
+#M     = 1.
 R     = 100. 
 amp   = 1.
 r_0   = 50.
 delta = 10.
 
-r_grid = np.linspace(2. * M, R, N)
+r_grid = np.linspace(delta_r, R, N)
 
 
 #initialize arrays
@@ -195,6 +195,38 @@ for n in range(1, timesteps):
 
     update_r_s(ans, n)
 
+    #impose regularity conditions at r = 0 (j = 0); they are:
+    #xi = 0; Pi' = 0; psi' = 0; alpha' = 0; beta = 0;
+    xi[n, 0]    = 0.
+    beta[n, 0]  = 0.
+    Pi[n, 0]    = (4. * Pi[n, 1] - Pi[n, 2])/3.
+    alpha[n, 0] = (4. * alpha[n, 1] - alpha[n, 2])/3.
+    psi[n, 0]   = (4. * psi[n, 1] - psi[n, 2])/3.
+
+    #impose boundary conditions at r = R (j = N-1); they are:
+    #psi' + (psi-1)/r = 0; alpha' + (alpha-1)/r = 0; beta' + beta/r = 0;
+    #xi_dot + xi' + xi/r = 0; Pi_dot + Pi' + Pi/r = 0 [implemented with backwards CN]
+    psi[n, N-1]   = ( 1./(3./(2. * delta_r) + 1./r_grid[N-1]) 
+                    * (4.*psi[n, N-2]/(2.*delta_r) 
+                        - psi[n, N-3]/(2.*delta_r) 
+                        + 1./r_grid[N-1]) )
+    alpha[n, N-1] = ( 1./(3./(2. * delta_r) + 1./r_grid[N-1])
+                    * (4.*alpha[n, N-2]/(2.*delta_r) 
+                        - alpha[n, N-3]/(2.*delta_r) 
+                        + 1./r_grid[N-1]) )
+    beta[n, N-1]  = ( 1./(3./(2. * delta_r) + 1./r_grid[N-1])
+                    * (4.*beta[n, N-2]/(2.*delta_r) 
+                        - beta[n, N-3]/(2.*delta_r)) )
+    xi[n, N-1]    = ( 1./(1. + 3.*delta_t/(4.*delta_r) + delta_t/(2.*r_grid[N-1]))
+                     *(xi[n-1, N-1] - delta_t/2.*( (-4.*xi[n, N-2] + xi[n, N-3])/(2.*delta_r) 
+                       + (3.*xi[n-1, N-1] - 4.*xi[n-1, N-2] +xi[n-1, N-3])/(2.*delta_r) 
+                           + xi[n-1, N-1]/r_grid[N-1])) )
+    Pi[n, N-1]    = ( 1./(1. + 3.*delta_t/(4.*delta_r) + delta_t/(2.*r_grid[N-1]))
+                     *(Pi[n-1, N-1] - delta_t/2.*( (-4.*Pi[n, N-2] + Pi[n, N-3])/(2.*delta_r) 
+                       + (3.*Pi[n-1, N-1] - 4.*Pi[n-1, N-2] +Pi[n-1, N-3])/(2.*delta_r) 
+                           + Pi[n-1, N-1]/r_grid[N-1])) )
+
+
     for i in range(N):
         #uses O(h^2) Crank-Nicolson time differencing
     	phi[n, i] = ( phi[n-1, i] + 0.5 * delta_t * ((alpha[n][i]/psi[n][i]**2.*Pi[n, i] 
@@ -269,7 +301,7 @@ for i in range(timesteps):
     pl.xlabel('$r$', fontsize='large')
  
     #set y limits on plots
-#    ax[0,0].set_ylim(-14., 10.)
+    ax[0,0].set_ylim(0., 1.)
 #    ax[0,1].set_ylim(0., 1.5e7)
 #    ax[1,0].set_ylim(-100., 60.)
 #    ax[1,1].set_ylim(-100., 60.)
