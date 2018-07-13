@@ -196,7 +196,6 @@ def CN_full_expr(L_indexed_derivs, R_indexed_derivs):
                         L = L - atom
                         R = R - atom
 
-
         return [L, R]
 
 
@@ -273,6 +272,21 @@ def debug_mode(L, R):
         return 0.
 
 
+def KO_centered(KO_var):
+	KO_centered_str = '-(eps/(16.*dt))* (f_m2-4*f_m1+6*f_j-4*f_p1+f_p2)'
+	KO_centered_eqn = (-symbols('epsilon')/(16.*symbols('delta_t'))
+			   * (symbols('f_m2')-4.*symbols('f_m1')+6.*symbols('f_j')
+                              -4.*symbols('f_p1')+symbols('f_p2') ) )
+	KO_centered_eqn = KO_centered_eqn.subs('f_m2', symbols(KO_var + '[n][j%N-2]'))
+        KO_centered_eqn = KO_centered_eqn.subs('f_m1', symbols(KO_var + '[n][j%N-1]'))
+        KO_centered_eqn = KO_centered_eqn.subs('f_j',  symbols(KO_var + '[n][j%N]'))
+        KO_centered_eqn = KO_centered_eqn.subs('f_p1', symbols(KO_var + '[n][j%N+1]'))
+        KO_centered_eqn = KO_centered_eqn.subs('f_p2', symbols(KO_var + '[n][j%N+2]'))
+        KO_centered_eqn = KO_centered_eqn.subs('eps',  symbols('epsilon') )
+        KO_centered_eqn = KO_centered_eqn.subs('dt',   symbols('delta_t'))
+
+	return KO_centered_eqn
+
 #type in equation
 
 #print '------------equation-1------------------------'
@@ -283,9 +297,27 @@ def debug_mode(L, R):
 #R = solve((L-R), xi_dot)[0]
 #L = xi_dot
 #
-#print L, '=', R, '\n'
+##debug_mode(L, R)
 #
-##display_formatted(L, R)
+#L_final, R_final = CN_result(L, R, space_deriv='centered')
+#
+#print 'KO_centered=', KO_centered('xi').expand()
+#
+##print_coefficients(L_final, R_final, ['Pi[n+1][j%N+2]', 'Pi[n+1][j%N+1]', 'Pi[n+1][j%N]', 'Pi[n+1][j%N-1]', 'Pi[n+1][j%N-2]', 'xi[n+1][j%N+2]', 'xi[n+1][j%N+1]', 'xi[n+1][j%N]', 'xi[n+1][j%N-1]', 'xi[n+1][j%N-2]'])
+#
+#print_coefficients(L_final, R_final, ['Pi[n][j%N+2]', 'Pi[n][j%N+1]', 'Pi[n][j%N]', 'Pi[n][j%N-1]', 'Pi[n][j%N-2]', 'xi[n][j%N+2]', 'xi[n][j%N+1]', 'xi[n][j%N]', 'xi[n][j%N-1]', 'xi[n][j%N-2]'])
+#
+#print '---------------------------------------------------------------'
+#
+#print '------------equation-2------------------------'
+#
+#R = 0
+#L = Pi_dot - 1./(r**2. * psi**4.) * diff(r**2. * psi**4. * (beta*Pi + alpha*xi/psi**2.), r) + 2./3. * Pi * (beta.diff(r) + 2.*beta/r * (1. + 3. * r * psi.diff(r) / psi))
+#R = solve((L-R), Pi_dot)[0]
+#L = Pi_dot
+#
+#
+##debug_mode(L, R)
 #
 #L_final, R_final = CN_result(L, R, space_deriv='backward')
 #
@@ -295,20 +327,20 @@ def debug_mode(L, R):
 #
 #print_coefficients(L_final, R_final, ['Pi[n][j%N+2]', 'Pi[n][j%N+1]', 'Pi[n][j%N]', 'Pi[n][j%N-1]', 'Pi[n][j%N-2]', 'xi[n][j%N+2]', 'xi[n][j%N+1]', 'xi[n][j%N]', 'xi[n][j%N-1]', 'xi[n][j%N-2]'])
 
-print '------------equation-2------------------------'
+print '------------equation-1------------------------'
+
 
 R = 0
-L = Pi_dot - 1./(r**2. * psi**4.) * diff(r**2. * psi**4. * (beta*Pi + alpha*xi/psi**2.), r) + 2./3. * Pi * (beta.diff(r) + 2.*beta/r * (1. + 3. * r * psi.diff(r) / psi))
+L = Pi_dot + diff(Pi, r) + Pi/r
 R = solve((L-R), Pi_dot)[0]
 L = Pi_dot
 
-
 #debug_mode(L, R)
+
+display_formatted(L, R)
 
 L_final, R_final = CN_result(L, R, space_deriv='backward')
 
-print_coefficients(L_final, R_final, ['Pi[n+1][j%N+2]', 'Pi[n+1][j%N+1]', 'Pi[n+1][j%N]', 'Pi[n+1][j%N-1]', 'Pi[n+1][j%N-2]', 'xi[n+1][j%N+2]', 'xi[n+1][j%N+1]', 'xi[n+1][j%N]', 'xi[n+1][j%N-1]', 'xi[n+1][j%N-2]'])
-
-print '---------------------------------------------------------------'
+#print_coefficients(L_final, R_final, ['Pi[n+1][j%N+2]', 'Pi[n+1][j%N+1]', 'Pi[n+1][j%N]', 'Pi[n+1][j%N-1]', 'Pi[n+1][j%N-2]', 'xi[n+1][j%N+2]', 'xi[n+1][j%N+1]', 'xi[n+1][j%N]', 'xi[n+1][j%N-1]', 'xi[n+1][j%N-2]'])
 
 print_coefficients(L_final, R_final, ['Pi[n][j%N+2]', 'Pi[n][j%N+1]', 'Pi[n][j%N]', 'Pi[n][j%N-1]', 'Pi[n][j%N-2]', 'xi[n][j%N+2]', 'xi[n][j%N+1]', 'xi[n][j%N]', 'xi[n][j%N-1]', 'xi[n][j%N-2]'])

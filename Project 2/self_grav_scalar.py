@@ -11,7 +11,6 @@ courant = delta_t / delta_r
 timesteps = 300
 
 #define grid
-#M     = 1.
 R     = 100. 
 amp   = 1.
 r_0   = 50.
@@ -31,7 +30,6 @@ psi   =  np.ones((timesteps, N))
 
 #define initial data for scalar field
 phi[0, :] = amp * np.exp(-(r_grid-r_0)**2./delta**2.)
-#xi[0, :]  = -2.*(r_grid-r_0)/delta**2. * amp*np.exp(-(r_grid-r_0)**2./delta**2.) 
 
 #Note: need to set xi as the numerical derivative of phi;
 #using an analytical derivative gives incorrect result
@@ -177,11 +175,6 @@ def update_r_s(ans, timestep):
             xi[timestep, i] = ans[i]
         else:
             Pi[timestep, i-N] = ans[i]
-
-	#establish RADIATION ZONE to prevent reflection at outer boundary
-#	Pi[timestep, N-1] = phi[timestep, N-1]/r_grid[N-1]*a(r_grid[N-1])/alpha(r_grid[N-1]) * (beta(r_grid[N-1]) - alpha(r_grid[N-1])/a(r_grid[N-1])) - Phi[timestep, N-1] #outgoing radiation condition
-#	Pi[timestep, N-2] = phi[timestep, N-2]/r_grid[N-2]*a(r_grid[N-2])/alpha(r_grid[N-2]) * (beta(r_grid[N-2]) - alpha(r_grid[N-2])/a(r_grid[N-2])) - Phi[timestep, N-2] 
-#	Pi[timestep, N-3] = phi[timestep, N-3]/r_grid[N-3]*a(r_grid[N-3])/alpha(r_grid[N-3]) * (beta(r_grid[N-3]) - alpha(r_grid[N-3])/a(r_grid[N-3])) - Phi[timestep, N-3]
     return 0
 
 for n in range(1, timesteps):
@@ -221,10 +214,18 @@ for n in range(1, timesteps):
                      *(xi[n-1, N-1] - delta_t/2.*( (-4.*xi[n, N-2] + xi[n, N-3])/(2.*delta_r) 
                        + (3.*xi[n-1, N-1] - 4.*xi[n-1, N-2] +xi[n-1, N-3])/(2.*delta_r) 
                            + xi[n-1, N-1]/r_grid[N-1])) )
+    xi[n, N-2]    = ( 1./(1. + 3.*delta_t/(4.*delta_r) + delta_t/(2.*r_grid[N-2]))
+                     *(xi[n-1, N-2] - delta_t/2.*( (-4.*xi[n, N-3] + xi[n, N-4])/(2.*delta_r)
+                       + (3.*xi[n-1, N-2] - 4.*xi[n-1, N-3] +xi[n-1, N-4])/(2.*delta_r)
+                           + xi[n-1, N-2]/r_grid[N-2])) )
     Pi[n, N-1]    = ( 1./(1. + 3.*delta_t/(4.*delta_r) + delta_t/(2.*r_grid[N-1]))
                      *(Pi[n-1, N-1] - delta_t/2.*( (-4.*Pi[n, N-2] + Pi[n, N-3])/(2.*delta_r) 
                        + (3.*Pi[n-1, N-1] - 4.*Pi[n-1, N-2] +Pi[n-1, N-3])/(2.*delta_r) 
                            + Pi[n-1, N-1]/r_grid[N-1])) )
+    Pi[n, N-2]    = ( 1./(1. + 3.*delta_t/(4.*delta_r) + delta_t/(2.*r_grid[N-2]))
+                     *(Pi[n-1, N-2] - delta_t/2.*( (-4.*Pi[n, N-3] + Pi[n, N-4])/(2.*delta_r)
+                       + (3.*Pi[n-1, N-2] - 4.*Pi[n-1, N-3] +Pi[n-1, N-4])/(2.*delta_r)
+                           + Pi[n-1, N-2]/r_grid[N-2])) )
 
 
     for i in range(N):
