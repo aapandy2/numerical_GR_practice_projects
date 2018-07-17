@@ -58,13 +58,18 @@ def populate_matrices(n):
 	for i in range(N):
 	    if(i == 0):
 		A[i, :] = [1 if j==i else 0 for j in range(2*N)]
-	    elif(i == N-1):
-	        A[i, :] = [     (-0.5*1/2*beta[n+1][j%N-2]/delta_r + 1.0*beta[n+1][j%N-1]/delta_r - 1.5*beta[n+1][j%N]/delta_r + 1/(delta_t)) if j==N-1 
-			   else (1.0*beta[n+1][j%N]/delta_r) if j==N-2 
-			   else (-0.5*1/2*beta[n+1][j%N]/delta_r) if j==N-3
-			   else (-0.5*1/2*alpha[n+1][j%N]/(delta_r*psi[n+1][j%N]**2)) if j==2*N-3
-			   else (1.0*alpha[n+1][j%N]/(delta_r*psi[n+1][j%N]**2)) if j==2*N-2 
-			   else (-0.5*1/2*alpha[n+1][j%N-2]/(delta_r*psi[n+1][j%N]**2) + 1.0*alpha[n+1][j%N-1]/(delta_r*psi[n+1][j%N]**2) - 2.0*alpha[n+1][j%N]*psi[n+1][j%N-1]/(delta_r*psi[n+1][j%N]**3) + 0.5*alpha[n+1][j%N]*psi[n+1][j%N-2]/(delta_r*psi[n+1][j%N]**3)) if j==2*N-1 
+#	    elif(i == N-1):
+#	        A[i, :] = [     (-0.5*1/2*beta[n+1][j%N-2]/delta_r + 1.0*beta[n+1][j%N-1]/delta_r - 1.5*beta[n+1][j%N]/delta_r + 1/(delta_t)) if j==N-1 
+#			   else (1.0*beta[n+1][j%N]/delta_r) if j==N-2 
+#			   else (-0.5*1/2*beta[n+1][j%N]/delta_r) if j==N-3
+#			   else (-0.5*1/2*alpha[n+1][j%N]/(delta_r*psi[n+1][j%N]**2)) if j==2*N-3
+#			   else (1.0*alpha[n+1][j%N]/(delta_r*psi[n+1][j%N]**2)) if j==2*N-2 
+#			   else (-0.5*1/2*alpha[n+1][j%N-2]/(delta_r*psi[n+1][j%N]**2) + 1.0*alpha[n+1][j%N-1]/(delta_r*psi[n+1][j%N]**2) - 2.0*alpha[n+1][j%N]*psi[n+1][j%N-1]/(delta_r*psi[n+1][j%N]**3) + 0.5*alpha[n+1][j%N]*psi[n+1][j%N-2]/(delta_r*psi[n+1][j%N]**3)) if j==2*N-1 
+#			   else 0 for j in range(2*N)]
+	    elif(i == N-1): #xi BC
+		A[i, :] = [1. - delta_t/2. * (1./(2.*delta_r) + 1./r_grid[j%N]) if j==i
+			   else -delta_t/2. * (-4./(2.*delta_r)) if j==i-1
+			   else -delta_t/2. * (1./(2.*delta_r)) if j==i-2
 			   else 0 for j in range(2*N)]
 	    else:
 	        A[i, :] = [     (-0.5*1/2*beta[n+1][j%N+1]/delta_r + 0.5*1/2*beta[n+1][j%N-1]/delta_r + 1/(delta_t)) if j==i 
@@ -81,14 +86,19 @@ def populate_matrices(n):
 			   else 4. if j==i+1
 			   else -1. if j==i+2
 	                   else 0 for j in range(2*N)]
-	    elif(i == 2*N-1):
-	        A[i, :] = [     (-0.5*0.166666666666667*beta[n+1][j%N-2]*delta_r**(-1.00000000000000) + 0.5*0.666666666666667*1.00000000000000*beta[n+1][j%N-1]*delta_r**(-1.00000000000000) - 0.5*0.666666666666667*beta[n+1][j%N]*r_grid[j%N]**(-1.00000000000000) - 0.5*2.00000000000000*beta[n+1][j%N]*delta_r**(-1.00000000000000) + 1/(delta_t))  if j==2*N-1
-	                   else (0.5*2.00000000000000*beta[n+1][j%N]*delta_r**(-1.00000000000000))  if j==2*N-2
-			   else (-0.5*1/2*beta[n+1][j%N]*delta_r**(-1.00000000000000))  if j==2*N-3
-	                   else (-0.5*-4.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N-1]/psi[n+1][j%N]**3 - 0.5*1.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N-2]/psi[n+1][j%N]**3 - 0.5*1/2*alpha[n+1][j%N-2]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000) + 0.5*2.00000000000000*alpha[n+1][j%N-1]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000) - 0.5*2.00000000000000*alpha[n+1][j%N]*psi[n+1][j%N]**(-2.00000000000000)*r_grid[j%N]**(-1.00000000000000) - 0.5*6.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000))  if j==N-1
-	                   else (0.5*2.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000))  if j==N-2
-			   else (-0.5*1/2*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000))  if j==N-3
-	                   else 0 for j in range(2*N)]
+#	    elif(i == 2*N-1):
+#	        A[i, :] = [     (-0.5*0.166666666666667*beta[n+1][j%N-2]*delta_r**(-1.00000000000000) + 0.5*0.666666666666667*1.00000000000000*beta[n+1][j%N-1]*delta_r**(-1.00000000000000) - 0.5*0.666666666666667*beta[n+1][j%N]*r_grid[j%N]**(-1.00000000000000) - 0.5*2.00000000000000*beta[n+1][j%N]*delta_r**(-1.00000000000000) + 1/(delta_t))  if j==2*N-1
+#	                   else (0.5*2.00000000000000*beta[n+1][j%N]*delta_r**(-1.00000000000000))  if j==2*N-2
+#			   else (-0.5*1/2*beta[n+1][j%N]*delta_r**(-1.00000000000000))  if j==2*N-3
+#	                   else (-0.5*-4.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N-1]/psi[n+1][j%N]**3 - 0.5*1.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N-2]/psi[n+1][j%N]**3 - 0.5*1/2*alpha[n+1][j%N-2]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000) + 0.5*2.00000000000000*alpha[n+1][j%N-1]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000) - 0.5*2.00000000000000*alpha[n+1][j%N]*psi[n+1][j%N]**(-2.00000000000000)*r_grid[j%N]**(-1.00000000000000) - 0.5*6.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000))  if j==N-1
+#	                   else (0.5*2.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000))  if j==N-2
+#			   else (-0.5*1/2*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000))  if j==N-3
+#	                   else 0 for j in range(2*N)]
+	    elif(i == 2*N-1): #Pi BC
+                A[i, :] = [1. - delta_t/2. * (1./(2.*delta_r) + 1./r_grid[j%N]) if j==i
+                           else -delta_t/2. * (-4./(2.*delta_r)) if j==i-1
+                           else -delta_t/2. * (1./(2.*delta_r)) if j==i-2
+			   else 0 for j in range(2*N)]
 	    else:
 	        A[i, :] = [     (0.5*-0.166666666666667*beta[n+1][j%N+1]*delta_r**(-1.00000000000000) - 0.5*-0.166666666666667*beta[n+1][j%N-1]*delta_r**(-1.00000000000000) - 0.5*0.666666666666667*beta[n+1][j%N]*r_grid[j%N]**(-1.00000000000000) + 1/(delta_t))  if j==i
 	                   else (0.5*1.00000000000000*1/2*beta[n+1][j%N]*delta_r**(-1.00000000000000))  if j==i-1
@@ -121,13 +131,18 @@ def populate_matrices(n):
                            else (0.25*alpha[n][j%N+1]/(delta_r*psi[n][j%N]**2) - 0.25*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) - 0.5*alpha[n][j%N]*psi[n][j%N+1]/(delta_r*psi[n][j%N]**3) + 0.5*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3))  if j==(N+i)
                            else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==(N+i+1)
                            else 0 for j in range(2*N)]
-	    elif(i == N-1):
-	        B[i, :] = [     (-1.0*beta[n][j%N-1]/delta_r + 0.25*beta[n][j%N-2]/delta_r + 1.5*beta[n][j%N]/delta_r + 1/(delta_t))  if j==N-1 
-			   else (-1.0*beta[n][j%N]/delta_r)  if j==N-2 
-			   else (0.25*beta[n][j%N]/delta_r)  if j==N-3
-			   else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==2*N-3
-			   else (-1.0*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==2*N-2 
-			   else (-1.0*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) + 0.25*alpha[n][j%N-2]/(delta_r*psi[n][j%N]**2) + 2.0*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3) - 0.5*alpha[n][j%N]*psi[n][j%N-2]/(delta_r*psi[n][j%N]**3))  if j==2*N-1 
+#	    elif(i == N-1):
+#	        B[i, :] = [     (-1.0*beta[n][j%N-1]/delta_r + 0.25*beta[n][j%N-2]/delta_r + 1.5*beta[n][j%N]/delta_r + 1/(delta_t))  if j==N-1 
+#			   else (-1.0*beta[n][j%N]/delta_r)  if j==N-2 
+#			   else (0.25*beta[n][j%N]/delta_r)  if j==N-3
+#			   else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==2*N-3
+#			   else (-1.0*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==2*N-2 
+#			   else (-1.0*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) + 0.25*alpha[n][j%N-2]/(delta_r*psi[n][j%N]**2) + 2.0*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3) - 0.5*alpha[n][j%N]*psi[n][j%N-2]/(delta_r*psi[n][j%N]**3))  if j==2*N-1 
+#			   else 0 for j in range(2*N)]
+	    elif(i == N-1): #xi BC
+                A[i, :] = [1. + delta_t/2. * (1./(2.*delta_r) + 1./r_grid[j%N]) if j==i
+                           else delta_t/2. * (-4./(2.*delta_r)) if j==i-1
+                           else delta_t/2. * (1./(2.*delta_r)) if j==i-2
 			   else 0 for j in range(2*N)]
 	    else: #ADDED DISS_KO to this
 	        B[i, :] = [     (0.25*beta[n][j%N+1]/delta_r - 0.25*beta[n][j%N-1]/delta_r + 1/(delta_t) - epsilon/(16.*delta_t) * (6.))  if j==i 
@@ -165,14 +180,20 @@ def populate_matrices(n):
                            else (0.25*alpha[n][j%N+1]/(delta_r*psi[n][j%N]**2) - 0.25*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) + 1.0*alpha[n][j%N]/(psi[n][j%N]**2*r_grid[j%N]) + 0.5*alpha[n][j%N]*psi[n][j%N+1]/(delta_r*psi[n][j%N]**3) - 0.5*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3))  if j==i-N
                            else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==i-N+1
                            else 0 for j in range(2*N)]
-	    elif(i == 2*N-1):
-	        B[i, :] = [     (-0.333333333333333*beta[n][j%N-1]/delta_r + 0.0833333333333333*beta[n][j%N-2]/delta_r + 0.333333333333333*beta[n][j%N]/r_grid[j%N] + 1.0*beta[n][j%N]/delta_r + 1/(delta_t))  if j==2*N-1
-	                   else (-1.0*beta[n][j%N]/delta_r)  if j==2*N-2
-			   else (0.25*beta[n][j%N]/delta_r)  if j==2*N-3
-	                   else (-1.0*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) + 0.25*alpha[n][j%N-2]/(delta_r*psi[n][j%N]**2) + 1.0*alpha[n][j%N]/(psi[n][j%N]**2*r_grid[j%N]) - 2.0*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3) + 0.5*alpha[n][j%N]*psi[n][j%N-2]/(delta_r*psi[n][j%N]**3) + 3.0*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==N-1
-	                   else (-1.0*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==N-2
-			   else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==N-3
-	                   else 0 for j in range(2*N)]
+#	    elif(i == 2*N-1):
+#	        B[i, :] = [     (-0.333333333333333*beta[n][j%N-1]/delta_r + 0.0833333333333333*beta[n][j%N-2]/delta_r + 0.333333333333333*beta[n][j%N]/r_grid[j%N] + 1.0*beta[n][j%N]/delta_r + 1/(delta_t))  if j==2*N-1
+#	                   else (-1.0*beta[n][j%N]/delta_r)  if j==2*N-2
+#			   else (0.25*beta[n][j%N]/delta_r)  if j==2*N-3
+#	                   else (-1.0*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) + 0.25*alpha[n][j%N-2]/(delta_r*psi[n][j%N]**2) + 1.0*alpha[n][j%N]/(psi[n][j%N]**2*r_grid[j%N]) - 2.0*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3) + 0.5*alpha[n][j%N]*psi[n][j%N-2]/(delta_r*psi[n][j%N]**3) + 3.0*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==N-1
+#	                   else (-1.0*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==N-2
+#			   else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==N-3
+#	                   else 0 for j in range(2*N)]
+	    elif(i == 2*N-1): #Pi BC
+                A[i, :] = [1. + delta_t/2. * (1./(2.*delta_r) + 1./r_grid[j%N]) if j==i
+                           else delta_t/2. * (-4./(2.*delta_r)) if j==i-1
+                           else delta_t/2. * (1./(2.*delta_r)) if j==i-2
+			   else 0 for j in range(2*N)]
+
 	    else: #ADDED DISS_KO TO THIS
 	        B[i, :] = [     (0.0833333333333333*beta[n][j%N+1]/delta_r - 0.0833333333333333*beta[n][j%N-1]/delta_r + 0.333333333333333*beta[n][j%N]/r_grid[j%N] + 1/(delta_t) - epsilon/(16.*delta_t) * (6.))  if j==i
 	                   else (-0.25*beta[n][j%N]/delta_r - epsilon/(16.*delta_t) * (-4.))  if j==i-1
@@ -220,16 +241,13 @@ for n in range(1, timesteps):
     update_r_s(ans, n)
 
     #impose regularity conditions at r = 0 (j = 0); they are:
-    #xi = 0; Pi' = 0; psi' = 0; alpha' = 0; beta = 0;
-#    xi[n, 0]    = 0.
+    #psi' = 0; alpha' = 0; beta = 0;
     beta[n, 0]  = 0.
-#    Pi[n, 0]    = (4. * Pi[n, 1] - Pi[n, 2])/3.
     alpha[n, 0] = (4. * alpha[n, 1] - alpha[n, 2])/3.
     psi[n, 0]   = (4. * psi[n, 1] - psi[n, 2])/3.
 
     #impose boundary conditions at r = R (j = N-1); they are:
     #psi' + (psi-1)/r = 0; alpha' + (alpha-1)/r = 0; beta' + beta/r = 0;
-    #xi_dot + xi' + xi/r = 0; Pi_dot + Pi' + Pi/r = 0 [implemented with backwards CN]
     psi[n, N-1]   = ( 1./(3./(2. * delta_r) + 1./r_grid[N-1]) 
                     * (4.*psi[n, N-2]/(2.*delta_r) 
                         - psi[n, N-3]/(2.*delta_r) 
@@ -241,14 +259,6 @@ for n in range(1, timesteps):
     beta[n, N-1]  = ( 1./(3./(2. * delta_r) + 1./r_grid[N-1])
                     * (4.*beta[n, N-2]/(2.*delta_r) 
                         - beta[n, N-3]/(2.*delta_r)) )
-    xi[n, N-1]    = ( 1./(1. + 3.*delta_t/(4.*delta_r) + delta_t/(2.*r_grid[N-1]))
-                     *(xi[n-1, N-1] - delta_t/2.*( (-4.*xi[n, N-2] + xi[n, N-3])/(2.*delta_r) 
-                       + (3.*xi[n-1, N-1] - 4.*xi[n-1, N-2] +xi[n-1, N-3])/(2.*delta_r) 
-                           + xi[n-1, N-1]/r_grid[N-1])) )
-    Pi[n, N-1]    = ( 1./(1. + 3.*delta_t/(4.*delta_r) + delta_t/(2.*r_grid[N-1]))
-                     *(Pi[n-1, N-1] - delta_t/2.*( (-4.*Pi[n, N-2] + Pi[n, N-3])/(2.*delta_r) 
-                       + (3.*Pi[n-1, N-1] - 4.*Pi[n-1, N-2] +Pi[n-1, N-3])/(2.*delta_r) 
-                           + Pi[n-1, N-1]/r_grid[N-1])) )
 
 
     for i in range(N):
@@ -325,10 +335,10 @@ for i in range(0, timesteps, step):
     pl.xlabel('$r$', fontsize='large')
  
     #set y limits on plots
-    ax[0,0].set_ylim(0., 1.)
+    ax[0,0].set_ylim(-0.2, 1.)
 #    ax[0,1].set_ylim(0., 1.5e7)
-#    ax[1,0].set_ylim(-10., 10.)
-#    ax[1,1].set_ylim(-10., 10.)
+    ax[1,0].set_ylim(-10., 10.)
+    ax[1,1].set_ylim(-10., 10.)
 
     #save frames, close frames, clear memory
     pl.savefig('temp_folder/%03d'%(i/step) + '.png')
