@@ -58,14 +58,6 @@ def populate_matrices(n):
 	for i in range(N):
 	    if(i == 0):
 		A[i, :] = [1 if j==i else 0 for j in range(2*N)]
-#	    elif(i == N-1):
-#	        A[i, :] = [     (-0.5*1/2*beta[n+1][j%N-2]/delta_r + 1.0*beta[n+1][j%N-1]/delta_r - 1.5*beta[n+1][j%N]/delta_r + 1/(delta_t)) if j==N-1 
-#			   else (1.0*beta[n+1][j%N]/delta_r) if j==N-2 
-#			   else (-0.5*1/2*beta[n+1][j%N]/delta_r) if j==N-3
-#			   else (-0.5*1/2*alpha[n+1][j%N]/(delta_r*psi[n+1][j%N]**2)) if j==2*N-3
-#			   else (1.0*alpha[n+1][j%N]/(delta_r*psi[n+1][j%N]**2)) if j==2*N-2 
-#			   else (-0.5*1/2*alpha[n+1][j%N-2]/(delta_r*psi[n+1][j%N]**2) + 1.0*alpha[n+1][j%N-1]/(delta_r*psi[n+1][j%N]**2) - 2.0*alpha[n+1][j%N]*psi[n+1][j%N-1]/(delta_r*psi[n+1][j%N]**3) + 0.5*alpha[n+1][j%N]*psi[n+1][j%N-2]/(delta_r*psi[n+1][j%N]**3)) if j==2*N-1 
-#			   else 0 for j in range(2*N)]
 	    elif(i == N-1): #xi BC
 		A[i, :] = [1. - delta_t/2. * (1./(2.*delta_r) + 1./r_grid[j%N]) if j==i
 			   else -delta_t/2. * (-4./(2.*delta_r)) if j==i-1
@@ -86,14 +78,6 @@ def populate_matrices(n):
 			   else 4. if j==i+1
 			   else -1. if j==i+2
 	                   else 0 for j in range(2*N)]
-#	    elif(i == 2*N-1):
-#	        A[i, :] = [     (-0.5*0.166666666666667*beta[n+1][j%N-2]*delta_r**(-1.00000000000000) + 0.5*0.666666666666667*1.00000000000000*beta[n+1][j%N-1]*delta_r**(-1.00000000000000) - 0.5*0.666666666666667*beta[n+1][j%N]*r_grid[j%N]**(-1.00000000000000) - 0.5*2.00000000000000*beta[n+1][j%N]*delta_r**(-1.00000000000000) + 1/(delta_t))  if j==2*N-1
-#	                   else (0.5*2.00000000000000*beta[n+1][j%N]*delta_r**(-1.00000000000000))  if j==2*N-2
-#			   else (-0.5*1/2*beta[n+1][j%N]*delta_r**(-1.00000000000000))  if j==2*N-3
-#	                   else (-0.5*-4.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N-1]/psi[n+1][j%N]**3 - 0.5*1.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N-2]/psi[n+1][j%N]**3 - 0.5*1/2*alpha[n+1][j%N-2]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000) + 0.5*2.00000000000000*alpha[n+1][j%N-1]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000) - 0.5*2.00000000000000*alpha[n+1][j%N]*psi[n+1][j%N]**(-2.00000000000000)*r_grid[j%N]**(-1.00000000000000) - 0.5*6.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000))  if j==N-1
-#	                   else (0.5*2.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000))  if j==N-2
-#			   else (-0.5*1/2*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000))  if j==N-3
-#	                   else 0 for j in range(2*N)]
 	    elif(i == 2*N-1): #Pi BC
                 A[i, :] = [1. - delta_t/2. * (1./(2.*delta_r) + 1./r_grid[j%N]) if j==i
                            else -delta_t/2. * (-4./(2.*delta_r)) if j==i-1
@@ -131,14 +115,6 @@ def populate_matrices(n):
                            else (0.25*alpha[n][j%N+1]/(delta_r*psi[n][j%N]**2) - 0.25*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) - 0.5*alpha[n][j%N]*psi[n][j%N+1]/(delta_r*psi[n][j%N]**3) + 0.5*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3))  if j==(N+i)
                            else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==(N+i+1)
                            else 0 for j in range(2*N)]
-#	    elif(i == N-1):
-#	        B[i, :] = [     (-1.0*beta[n][j%N-1]/delta_r + 0.25*beta[n][j%N-2]/delta_r + 1.5*beta[n][j%N]/delta_r + 1/(delta_t))  if j==N-1 
-#			   else (-1.0*beta[n][j%N]/delta_r)  if j==N-2 
-#			   else (0.25*beta[n][j%N]/delta_r)  if j==N-3
-#			   else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==2*N-3
-#			   else (-1.0*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==2*N-2 
-#			   else (-1.0*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) + 0.25*alpha[n][j%N-2]/(delta_r*psi[n][j%N]**2) + 2.0*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3) - 0.5*alpha[n][j%N]*psi[n][j%N-2]/(delta_r*psi[n][j%N]**3))  if j==2*N-1 
-#			   else 0 for j in range(2*N)]
 	    elif(i == N-1): #xi BC
                 A[i, :] = [1. + delta_t/2. * (1./(2.*delta_r) + 1./r_grid[j%N]) if j==i
                            else delta_t/2. * (-4./(2.*delta_r)) if j==i-1
@@ -180,14 +156,6 @@ def populate_matrices(n):
                            else (0.25*alpha[n][j%N+1]/(delta_r*psi[n][j%N]**2) - 0.25*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) + 1.0*alpha[n][j%N]/(psi[n][j%N]**2*r_grid[j%N]) + 0.5*alpha[n][j%N]*psi[n][j%N+1]/(delta_r*psi[n][j%N]**3) - 0.5*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3))  if j==i-N
                            else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==i-N+1
                            else 0 for j in range(2*N)]
-#	    elif(i == 2*N-1):
-#	        B[i, :] = [     (-0.333333333333333*beta[n][j%N-1]/delta_r + 0.0833333333333333*beta[n][j%N-2]/delta_r + 0.333333333333333*beta[n][j%N]/r_grid[j%N] + 1.0*beta[n][j%N]/delta_r + 1/(delta_t))  if j==2*N-1
-#	                   else (-1.0*beta[n][j%N]/delta_r)  if j==2*N-2
-#			   else (0.25*beta[n][j%N]/delta_r)  if j==2*N-3
-#	                   else (-1.0*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) + 0.25*alpha[n][j%N-2]/(delta_r*psi[n][j%N]**2) + 1.0*alpha[n][j%N]/(psi[n][j%N]**2*r_grid[j%N]) - 2.0*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3) + 0.5*alpha[n][j%N]*psi[n][j%N-2]/(delta_r*psi[n][j%N]**3) + 3.0*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==N-1
-#	                   else (-1.0*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==N-2
-#			   else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==N-3
-#	                   else 0 for j in range(2*N)]
 	    elif(i == 2*N-1): #Pi BC
                 A[i, :] = [1. + delta_t/2. * (1./(2.*delta_r) + 1./r_grid[j%N]) if j==i
                            else delta_t/2. * (-4./(2.*delta_r)) if j==i-1
@@ -223,10 +191,6 @@ def update_r_s(ans, timestep):
         else:
             Pi[timestep, i-N] = ans[i]
 
-	#establish RADIATION ZONE to prevent reflection at outer boundary
-#	Pi[timestep, N-1] = phi[timestep, N-1]/r_grid[N-1]*a(r_grid[N-1])/alpha(r_grid[N-1]) * (beta(r_grid[N-1]) - alpha(r_grid[N-1])/a(r_grid[N-1])) - Phi[timestep, N-1] #outgoing radiation condition
-#	Pi[timestep, N-2] = phi[timestep, N-2]/r_grid[N-2]*a(r_grid[N-2])/alpha(r_grid[N-2]) * (beta(r_grid[N-2]) - alpha(r_grid[N-2])/a(r_grid[N-2])) - Phi[timestep, N-2] 
-#	Pi[timestep, N-3] = phi[timestep, N-3]/r_grid[N-3]*a(r_grid[N-3])/alpha(r_grid[N-3]) * (beta(r_grid[N-3]) - alpha(r_grid[N-3])/a(r_grid[N-3])) - Phi[timestep, N-3]
     return 0
 
 for n in range(1, timesteps):
