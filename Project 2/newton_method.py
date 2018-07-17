@@ -1,9 +1,9 @@
 from sympy import *
 import numpy as np
 
-N = 3
+N = 10
 delta_r =1./(N)
-R = 1.
+R = 100.
 r_grid = np.linspace(delta_r, R, N)
 m = 5.
 
@@ -26,9 +26,11 @@ for i in range(N):
 			   else 0 for j in range(N)]
 
 Ainv = np.linalg.inv(A)
-#eqszero = np.dot(Ainv, A)
-#eqszero[np.abs(eqszero) < 1e-13] = 0
-#print eqszero
+eqszero = np.dot(Ainv, A)
+eqszero[np.abs(eqszero) < 1e-13] = 0
+print 'First verify that A^-1 A = 1'
+print 'A^-1 A =\n', eqszero
+print '-------------------------'
 
 def residual(f_n):
 	ans = np.zeros(N)
@@ -44,9 +46,15 @@ def residual(f_n):
 
 	return ans
 
-print 'n = 0:', f_n, residual(f_n)
-num_iterations = 15
-
-for n in range(num_iterations):
+print 'solve nonlinear system'
+print 'n = 0', 'max(residual) =', np.amax(residual(f_n))
+#num_iterations = 125
+tolerance = 1e-5
+res  = 1.
+n    = 0
+#for n in range(num_iterations):
+while(np.abs(res) > tolerance):
+	n   = n + 1
 	f_n = f_n - np.dot(Ainv, residual(f_n))
-	print n, f_n, np.amax(np.abs(residual(f_n)))
+	res = np.amax(np.abs(residual(f_n)))
+	print 'n =', n, 'max(residual) =', res
