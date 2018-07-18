@@ -3,8 +3,10 @@ import pylab as pl
 import subprocess
 from scipy.integrate import cumtrapz, simps
 
+from elliptics_solver import solve_elliptics
+
 #set parameters for simulation
-N = 100
+N = 50
 delta_r = 1./N
 delta_t = 0.01
 courant = delta_t / delta_r
@@ -14,7 +16,7 @@ epsilon = 0.5
 
 #define grid
 R     = 100. 
-amp   = 1.
+amp   = 0.00001
 r_0   = 50.
 delta = 10.
 
@@ -49,9 +51,21 @@ for i in range(N):
 #we are asked to define this condition only in terms of phi, xi, r; using approximation in example code
 Pi[0, :] = xi[0, :]
 
+#need to solve elliptics here for initial timestep
+#first set initial values of f_n
+f_n = np.zeros(3*N)
+f_n[0:N]     = psi[0, :] 
+f_n[N:2*N]   = beta[0, :]
+f_n[2*N:3*N] = alpha[0, :]
+f_n = solve_elliptics(f_n, xi[0, :], Pi[0, :], r_grid)
+#now set psi, beta, alpha with solution to elliptics
+psi[0, :]   = f_n[0:N]
+beta[0, :]  = f_n[N:2*N]
+alpha[0, :] = f_n[2*N:3*N]
+
+
 A = np.zeros((2*N, 2*N))
 B = np.zeros((2*N, 2*N))
-
 #populate the matrix at timestep n
 def populate_matrices(n):
 	#define matrix A
@@ -204,25 +218,38 @@ for n in range(1, timesteps):
 
     update_r_s(ans, n)
 
-    #impose regularity conditions at r = 0 (j = 0); they are:
-    #psi' = 0; alpha' = 0; beta = 0;
-    beta[n, 0]  = 0.
-    alpha[n, 0] = (4. * alpha[n, 1] - alpha[n, 2])/3.
-    psi[n, 0]   = (4. * psi[n, 1] - psi[n, 2])/3.
+#    #impose regularity conditions at r = 0 (j = 0); they are:
+#    #psi' = 0; alpha' = 0; beta = 0;
+#    beta[n, 0]  = 0.
+#    alpha[n, 0] = (4. * alpha[n, 1] - alpha[n, 2])/3.
+#    psi[n, 0]   = (4. * psi[n, 1] - psi[n, 2])/3.
+#
+#    #impose boundary conditions at r = R (j = N-1); they are:
+#    #psi' + (psi-1)/r = 0; alpha' + (alpha-1)/r = 0; beta' + beta/r = 0;
+#    psi[n, N-1]   = ( 1./(3./(2. * delta_r) + 1./r_grid[N-1]) 
+#                    * (4.*psi[n, N-2]/(2.*delta_r) 
+#                        - psi[n, N-3]/(2.*delta_r) 
+#                        + 1./r_grid[N-1]) )
+#    alpha[n, N-1] = ( 1./(3./(2. * delta_r) + 1./r_grid[N-1])
+#                    * (4.*alpha[n, N-2]/(2.*delta_r) 
+#                        - alpha[n, N-3]/(2.*delta_r) 
+#                        + 1./r_grid[N-1]) )
+#    beta[n, N-1]  = ( 1./(3./(2. * delta_r) + 1./r_grid[N-1])
+#                    * (4.*beta[n, N-2]/(2.*delta_r) 
+#                        - beta[n, N-3]/(2.*delta_r)) )
 
-    #impose boundary conditions at r = R (j = N-1); they are:
-    #psi' + (psi-1)/r = 0; alpha' + (alpha-1)/r = 0; beta' + beta/r = 0;
-    psi[n, N-1]   = ( 1./(3./(2. * delta_r) + 1./r_grid[N-1]) 
-                    * (4.*psi[n, N-2]/(2.*delta_r) 
-                        - psi[n, N-3]/(2.*delta_r) 
-                        + 1./r_grid[N-1]) )
-    alpha[n, N-1] = ( 1./(3./(2. * delta_r) + 1./r_grid[N-1])
-                    * (4.*alpha[n, N-2]/(2.*delta_r) 
-                        - alpha[n, N-3]/(2.*delta_r) 
-                        + 1./r_grid[N-1]) )
-    beta[n, N-1]  = ( 1./(3./(2. * delta_r) + 1./r_grid[N-1])
-                    * (4.*beta[n, N-2]/(2.*delta_r) 
-                        - beta[n, N-3]/(2.*delta_r)) )
+    #need to solve elliptics before populating CN matrices
+    #first set initial values of f_n
+    f_n = np.zeros(3*N)
+    f_n[0:N]     = psi[n, :]
+    f_n[N:2*N]   = beta[n, :]
+    f_n[2*N:3*N] = alpha[n, :]
+    f_n = solve_elliptics(f_n, xi[n, :], Pi[n, :], r_grid)
+    #now set psi, beta, alpha with solution to elliptics
+    psi[n, :]   = f_n[0:N]
+    beta[n, :]  = f_n[N:2*N]
+    alpha[n, :] = f_n[2*N:3*N]
+
 
 
     for i in range(N):
@@ -283,15 +310,19 @@ command0.wait()
 for i in range(0, timesteps, step):
     if(i % 50 == 0):
 	print 'saving frame ' + str(i) + ' out of ' + str(timesteps)
-    figure, ax = pl.subplots(nrows=2, ncols=2, sharex=True, sharey=False)
+    figure, ax = pl.subplots(nrows=2, ncols=3, sharex=True, sharey=False)
     ax[0,0].plot(r_grid, phi[i, :])
     ax[0,0].set_title('$$\\phi$$')
-    ax[1,0].plot(r_grid, xi[i, :])
-    ax[1,0].set_title('$$\\xi$$')
-    ax[1,1].plot(r_grid, Pi[i, :])
-    ax[1,1].set_title('$$\\Pi$$')
-    ax[0,1].plot(r_grid, phi[i, :])
-    ax[0,1].set_title('also phi')
+    ax[0,1].plot(r_grid, xi[i, :])
+    ax[0,1].set_title('$$\\xi$$')
+    ax[0,2].plot(r_grid, Pi[i, :])
+    ax[0,2].set_title('$$\\Pi$$')
+    ax[1,0].plot(r_grid, psi[i, :])
+    ax[1,0].set_title('$$\\psi$$')
+    ax[1,1].plot(r_grid, beta[i, :])
+    ax[1,1].set_title('$$\\beta$$')
+    ax[1,2].plot(r_grid, alpha[i, :])
+    ax[1,2].set_title('$$\\alpha$$')
  
     #draw x label $r$
     figure.add_subplot(111, frameon=False)
@@ -299,12 +330,13 @@ for i in range(0, timesteps, step):
     pl.xlabel('$r$', fontsize='large')
  
     #set y limits on plots
-    ax[0,0].set_ylim(-0.2, 1.)
+#    ax[0,0].set_ylim(-0.2, 1.)
 #    ax[0,1].set_ylim(0., 1.5e7)
-    ax[1,0].set_ylim(-10., 10.)
-    ax[1,1].set_ylim(-10., 10.)
+#    ax[1,0].set_ylim(-10., 10.)
+#    ax[1,1].set_ylim(-10., 10.)
 
     #save frames, close frames, clear memory
+    pl.tight_layout()
     pl.savefig('temp_folder/%03d'%(i/step) + '.png')
     pl.close()
     pl.clf()
