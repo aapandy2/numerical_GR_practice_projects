@@ -135,8 +135,8 @@ def solve_elliptics(f_n, xi, Pi, r_grid):
 	Ainv = np.linalg.inv(A)
 	eqszero = np.dot(Ainv, A)
 	eqszero[np.abs(eqszero) < 1e-13] = 0
-	print 'First verify that A^-1 A = 1'
-	print 'max(|A^-1 A - Identity|) =', np.amax(np.abs(eqszero - np.identity(np.shape(eqszero)[0])))
+#	print 'First verify that A^-1 A = 1'
+#	print 'max(|A^-1 A - Identity|) =', np.amax(np.abs(eqszero - np.identity(np.shape(eqszero)[0])))
 	print '-------------------------'
 	
 	print 'solve nonlinear system'

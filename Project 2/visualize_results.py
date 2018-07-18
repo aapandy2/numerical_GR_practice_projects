@@ -39,21 +39,10 @@ psi         = np.loadtxt('psi.txt')
 beta        = np.loadtxt('beta.txt')
 alpha       = np.loadtxt('alpha.txt')
 mass_aspect = np.loadtxt('mass_aspect.txt')
-total_mass  = np.loadtxt('total_mass.txt')
 
 step      = 1
 timesteps = np.shape(phi)[0]
 N         = np.shape(phi)[1]
-
-def plot_total_mass():
-	#this plots the total mass at each timestep
-	pl.plot(range(timesteps), total_mass)
-	pl.title('Total Mass')
-	pl.xlabel('Timestep')
-	pl.ylabel('$$m$$')
-	pl.savefig('total_mass.png')
-
-	return 0.
 
 def make_movie(plot_variables='matter'):
 
@@ -81,6 +70,14 @@ def make_movie(plot_variables='matter'):
 		    ax[1].set_title('$$\\beta$$')
 		    ax[2].plot(r_grid, alpha[i, :])
 		    ax[2].set_title('$$\\alpha$$')
+	    elif(plot_variables == 'mass_aspect'):
+		    ax[0].plot(r_grid, mass_aspect[i, :])
+		    ax[0].set_title('Mass Aspect')
+		    ax[1].axhline(np.amax(mass_aspect[i, :]))
+		    ax[1].set_title('max(Mass Aspect)')
+		    ax[2].axhline(mass_aspect[i, 0])
+		    ax[2].set_ylim(-0.1, 0.1)
+		    ax[2].set_title('m(r = 0)')
 	
 	    #draw x label $r$
 	    figure.add_subplot(111, frameon=False)
@@ -106,4 +103,6 @@ def make_movie(plot_variables='matter'):
 
 	return 0.
 
+make_movie('matter')
 make_movie('geometry')
+make_movie('mass_aspect')

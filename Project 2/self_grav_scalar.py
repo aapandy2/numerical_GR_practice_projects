@@ -1,22 +1,19 @@
 import numpy as np
-#import pylab as pl
-#import subprocess
 from scipy.integrate import cumtrapz, simps
 
 from elliptics_solver import solve_elliptics
 
 #set parameters for simulation
-N = 50
+N = 100
 delta_r = 1./N
-delta_t = 0.01
+delta_t = 0.005
 courant = delta_t / delta_r
-timesteps = 300
-#step = 1
+timesteps = 500
 epsilon = 0.5
 
 #define grid
 R     = 100. 
-amp   = 0.00001
+amp   = 0.0003
 r_0   = 50.
 delta = 10.
 
@@ -230,8 +227,6 @@ for n in range(1, timesteps):
     beta[n, :]  = f_n[N:2*N]
     alpha[n, :] = f_n[2*N:3*N]
 
-
-
     for i in range(N):
         #uses O(h^2) Crank-Nicolson time differencing
     	phi[n, i] = ( phi[n-1, i] + 0.5 * delta_t * ((alpha[n][i]/psi[n][i]**2.*Pi[n, i] 
@@ -241,7 +236,7 @@ for n in range(1, timesteps):
 
 print '-----computing mass aspect-----'
 mass_aspect = np.zeros((timesteps, N)) 
-#this computes the mass aspect function dm/dr
+#this computes the mass aspect function m(r,t)
 for n in range(timesteps):
 	for j in range(N):
 		if(j == 0):
@@ -263,12 +258,7 @@ for n in range(timesteps):
 					     - 2.*r_grid[j]**2.*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
 					       *(psi[n,j] + r_grid[j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r) ) )
 
-print '-----computing total mass-----'
-#this computes the total mass in the window \int_{2M}^{R} dm/dr dr
-total_mass = np.zeros(timesteps)
-for i in range(timesteps):
-    total_mass[i] = simps(mass_aspect[i, :], r_grid)
-
+print '-----saving datafiles-----'
 np.savetxt('r_grid.txt', r_grid)
 np.savetxt('phi.txt', phi)
 np.savetxt('xi.txt', xi)
@@ -277,84 +267,5 @@ np.savetxt('psi.txt', psi)
 np.savetxt('beta.txt', beta)
 np.savetxt('alpha.txt', alpha)
 np.savetxt('mass_aspect.txt', mass_aspect)
-np.savetxt('total_mass.txt', total_mass)
 
-## Set plot parameters to make beautiful plots
-#pl.rcParams['figure.figsize']  = 10, 10
-#pl.rcParams['lines.linewidth'] = 1.5
-#pl.rcParams['font.family']     = 'serif'
-#pl.rcParams['font.weight']     = 'bold'
-#pl.rcParams['font.size']       = 15
-#pl.rcParams['font.sans-serif'] = 'serif'
-#pl.rcParams['text.usetex']     = True
-#pl.rcParams['axes.linewidth']  = 1.5
-#pl.rcParams['axes.titlesize']  = 'large'
-#pl.rcParams['axes.labelsize']  = 'large'
-#
-#pl.rcParams['xtick.major.size'] = 8
-#pl.rcParams['xtick.minor.size'] = 4
-#pl.rcParams['xtick.major.pad']  = 8
-#pl.rcParams['xtick.minor.pad']  = 8
-#pl.rcParams['xtick.color']      = 'k'
-#pl.rcParams['xtick.labelsize']  = 'large'
-#pl.rcParams['xtick.direction']  = 'in'
-#
-#pl.rcParams['ytick.major.size'] = 8
-#pl.rcParams['ytick.minor.size'] = 4
-#pl.rcParams['ytick.major.pad']  = 8
-#pl.rcParams['ytick.minor.pad']  = 8
-#pl.rcParams['ytick.color']      = 'k'
-#pl.rcParams['ytick.labelsize']  = 'large'
-#pl.rcParams['ytick.direction']  = 'in'
-#
-###this plots the total mass at each timestep
-##pl.plot(range(timesteps), m)
-##pl.title('Total Mass')
-##pl.xlabel('Timestep')
-##pl.ylabel('$$m$$')
-##pl.savefig('total_mass.png')
-#
-##make temp folder to save frames which will be made into the movie
-#command0 = subprocess.Popen('mkdir temp_folder/'.split(), stdout=subprocess.PIPE)
-#command0.wait()
-#
-##save frames to make movie
-#for i in range(0, timesteps, step):
-#    if(i % 50 == 0):
-#	print 'saving frame ' + str(i) + ' out of ' + str(timesteps)
-#    figure, ax = pl.subplots(nrows=2, ncols=3, sharex=True, sharey=False)
-#    ax[0,0].plot(r_grid, phi[i, :])
-#    ax[0,0].set_title('$$\\phi$$')
-#    ax[0,1].plot(r_grid, xi[i, :])
-#    ax[0,1].set_title('$$\\xi$$')
-#    ax[0,2].plot(r_grid, Pi[i, :])
-#    ax[0,2].set_title('$$\\Pi$$')
-#    ax[1,0].plot(r_grid, psi[i, :])
-#    ax[1,0].set_title('$$\\psi$$')
-#    ax[1,1].plot(r_grid, beta[i, :])
-#    ax[1,1].set_title('$$\\beta$$')
-#    ax[1,2].plot(r_grid, alpha[i, :])
-#    ax[1,2].set_title('$$\\alpha$$')
-# 
-#    #draw x label $r$
-#    figure.add_subplot(111, frameon=False)
-#    pl.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
-#    pl.xlabel('$r$', fontsize='large')
-# 
-#    #set y limits on plots
-##    ax[0,0].set_ylim(-0.2, 1.)
-##    ax[0,1].set_ylim(0., 1.5e7)
-##    ax[1,0].set_ylim(-10., 10.)
-##    ax[1,1].set_ylim(-10., 10.)
-#
-#    #save frames, close frames, clear memory
-#    pl.tight_layout()
-#    pl.savefig('temp_folder/%03d'%(i/step) + '.png')
-#    pl.close()
-#    pl.clf()
-#
-##make movie
-#command1 = subprocess.Popen('ffmpeg -y -i temp_folder/%03d.png grav_scalar.m4v'.split(), stdout=subprocess.PIPE)
-#command1.wait()
-#command2 = subprocess.Popen('rm -r temp_folder/'.split(), stdout=subprocess.PIPE)
-#command2.wait()
+print '-----done-----'
