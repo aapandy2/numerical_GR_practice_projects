@@ -4,18 +4,18 @@ from scipy.integrate import cumtrapz, simps
 from elliptics_solver import solve_elliptics
 
 #set parameters for simulation
-N = 100
+N = 150
 delta_r = 1./N
 delta_t = 0.005
 courant = delta_t / delta_r
-timesteps = 500
+timesteps = 400
 epsilon = 0.5
 
 #define grid
-R     = 100. 
-amp   = 0.0003
-r_0   = 50.
-delta = 10.
+R     = 500. 
+amp   = 0.000001
+r_0   = 250.
+delta = 30.
 
 r_grid = np.linspace(delta_r, R, N)
 
@@ -230,9 +230,9 @@ for n in range(1, timesteps):
     for i in range(N):
         #uses O(h^2) Crank-Nicolson time differencing
     	phi[n, i] = ( phi[n-1, i] + 0.5 * delta_t * ((alpha[n][i]/psi[n][i]**2.*Pi[n, i] 
-                                                    + beta[n][i]*xi[n][i]) 
+                                                      + beta[n][i]*xi[n][i]) 
                                                     + (alpha[n-1][i]/psi[n-1][i]**2.*Pi[n-1, i] 
-                                                    + beta[n-1][i]*xi[n-1, i])) )
+                                                       + beta[n-1][i]*xi[n-1, i])) )
 
 print '-----computing mass aspect-----'
 mass_aspect = np.zeros((timesteps, N)) 

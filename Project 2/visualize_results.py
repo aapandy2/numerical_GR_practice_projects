@@ -1,6 +1,7 @@
 import numpy as np
 import pylab as pl
 import subprocess
+import sys
 
 # Set plot parameters to make beautiful plots
 pl.rcParams['figure.figsize']  = 16, 9
@@ -30,6 +31,9 @@ pl.rcParams['ytick.color']      = 'k'
 pl.rcParams['ytick.labelsize']  = 'large'
 pl.rcParams['ytick.direction']  = 'in'
 
+
+print '-----loading datafiles-----'
+
 #LOAD DATAFILES
 r_grid      = np.loadtxt('r_grid.txt')
 phi         = np.loadtxt('phi.txt')
@@ -39,6 +43,8 @@ psi         = np.loadtxt('psi.txt')
 beta        = np.loadtxt('beta.txt')
 alpha       = np.loadtxt('alpha.txt')
 mass_aspect = np.loadtxt('mass_aspect.txt')
+
+print '-----done loading datafiles-----'
 
 step      = 1
 timesteps = np.shape(phi)[0]
@@ -54,40 +60,45 @@ def make_movie(plot_variables='matter'):
 	for i in range(0, timesteps, step):
 	    if(i % 50 == 0):
 	        print 'saving frame ' + str(i) + ' out of ' + str(timesteps)
+		sys.stdout.flush() #testing if this flushes output to SLURM .out file
+
 	    figure, ax = pl.subplots(nrows=1, ncols=3, sharex=True, sharey=False)
 	
 	    if(plot_variables == 'matter'):
 		    ax[0].plot(r_grid, phi[i, :])
 		    ax[0].set_title('$$\\phi$$')
+		    ax[0].set_ylim(np.amin(phi), np.amax(phi))
 		    ax[1].plot(r_grid, xi[i, :])
 		    ax[1].set_title('$$\\xi$$')
+		    ax[1].set_ylim(np.amin(xi), np.amax(xi))
 		    ax[2].plot(r_grid, Pi[i, :])
 		    ax[2].set_title('$$\\Pi$$')
+                    ax[2].set_ylim(np.amin(Pi), np.amax(Pi))
 	    elif(plot_variables == 'geometry'):
 		    ax[0].plot(r_grid, psi[i, :])
 		    ax[0].set_title('$$\\psi$$')
+                    ax[0].set_ylim(np.amin(psi), np.amax(psi))
 		    ax[1].plot(r_grid, beta[i, :])
 		    ax[1].set_title('$$\\beta$$')
+                    ax[1].set_ylim(np.amin(beta), np.amax(beta))
 		    ax[2].plot(r_grid, alpha[i, :])
 		    ax[2].set_title('$$\\alpha$$')
+                    ax[2].set_ylim(np.amin(alpha), np.amax(alpha))
 	    elif(plot_variables == 'mass_aspect'):
 		    ax[0].plot(r_grid, mass_aspect[i, :])
 		    ax[0].set_title('Mass Aspect')
+                    ax[0].set_ylim(np.amin(mass_aspect), 1.01*np.amax(mass_aspect))
 		    ax[1].axhline(np.amax(mass_aspect[i, :]))
 		    ax[1].set_title('max(Mass Aspect)')
+                    ax[1].set_ylim(-0.01*np.amax(mass_aspect), 1.01*np.amax(mass_aspect))
 		    ax[2].axhline(mass_aspect[i, 0])
-		    ax[2].set_ylim(-0.1, 0.1)
 		    ax[2].set_title('m(r = 0)')
+                    ax[2].set_ylim(-0.1*np.amax(mass_aspect), 0.1*np.amax(mass_aspect))
 	
 	    #draw x label $r$
 	    figure.add_subplot(111, frameon=False)
 	    pl.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
 	    pl.xlabel('$r$', fontsize='large')
-	
-	   #set y limits on plots
-#	    ax[0].set_ylim(-0.2, 1.)
-#	    ax[1].set_ylim(0., 1.5e7)
-#	    ax[2].set_ylim(-10., 10.)
 	
 	   #save frames, close frames, clear memory
 	    pl.tight_layout()
@@ -103,6 +114,10 @@ def make_movie(plot_variables='matter'):
 
 	return 0.
 
+print '-----make matter movie-----'
 make_movie('matter')
+print '-----make geometry movie-----'
 make_movie('geometry')
+print '-----make mass aspect movie-----'
 make_movie('mass_aspect')
+print '-----done-----'

@@ -134,15 +134,15 @@ def solve_elliptics(f_n, xi, Pi, r_grid):
 	A    = jacobian(f_n, xi, Pi, r_grid)
 	Ainv = np.linalg.inv(A)
 	eqszero = np.dot(Ainv, A)
-	eqszero[np.abs(eqszero) < 1e-13] = 0
+#	eqszero[np.abs(eqszero) < 1e-13] = 0
 #	print 'First verify that A^-1 A = 1'
 #	print 'max(|A^-1 A - Identity|) =', np.amax(np.abs(eqszero - np.identity(np.shape(eqszero)[0])))
 	print '-------------------------'
 	
 	print 'solve nonlinear system'
-	print 'iteration = 0', 'max(residual) =', np.amax(residual(f_n, xi, Pi, r_grid))
-	tolerance    = 1e-5
-	res          = 1.
+	res = residual(f_n, xi, Pi, r_grid)
+	print 'iteration = 0', 'max(residual) =', np.amax(res)
+	tolerance    = 1e-9
 	iteration    = 0
 	max_iter     = 1000
 	
