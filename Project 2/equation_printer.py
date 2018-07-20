@@ -299,48 +299,51 @@ def KO_centered(KO_var):
 #
 ##debug_mode(L, R)
 #
-#L_final, R_final = CN_result(L, R, space_deriv='centered')
+#display_formatted(L, R)
 #
-#print 'KO_centered=', KO_centered('xi').expand()
+##L_final, R_final = CN_result(L, R, space_deriv='centered', print_mode='piecewise')
+#
+##print 'KO_centered=', KO_centered('xi').expand()
+#
+##print_coefficients(L_final, R_final, ['Pi[n+1][j%N+2]', 'Pi[n+1][j%N+1]', 'Pi[n+1][j%N]', 'Pi[n+1][j%N-1]', 'Pi[n+1][j%N-2]', 'xi[n+1][j%N+2]', 'xi[n+1][j%N+1]', 'xi[n+1][j%N]', 'xi[n+1][j%N-1]', 'xi[n+1][j%N-2]'])
+#
+##print_coefficients(L_final, R_final, ['Pi[n][j%N+2]', 'Pi[n][j%N+1]', 'Pi[n][j%N]', 'Pi[n][j%N-1]', 'Pi[n][j%N-2]', 'xi[n][j%N+2]', 'xi[n][j%N+1]', 'xi[n][j%N]', 'xi[n][j%N-1]', 'xi[n][j%N-2]'])
+#
+#print '---------------------------------------------------------------'
+#
+print '------------equation-2------------------------'
+
+R = 0
+L = Pi_dot - 1./(r**2. * psi**4.) * diff(r**2. * psi**4. * (beta*Pi + alpha*xi/psi**2.), r) + 2./3. * Pi * (beta.diff(r) + 2.*beta/r * (1. + 3. * r * psi.diff(r) / psi))
+R = solve((L-R), Pi_dot)[0]
+L = Pi_dot
+
+display_formatted(L, R)
+
+#debug_mode(L, R)
+
+L_final, R_final = CN_result(L, R, space_deriv='centered')
+
+#print_coefficients(L_final, R_final, ['Pi[n+1][j%N+2]', 'Pi[n+1][j%N+1]', 'Pi[n+1][j%N]', 'Pi[n+1][j%N-1]', 'Pi[n+1][j%N-2]', 'xi[n+1][j%N+2]', 'xi[n+1][j%N+1]', 'xi[n+1][j%N]', 'xi[n+1][j%N-1]', 'xi[n+1][j%N-2]'])
+
+print '---------------------------------------------------------------'
+#
+#print_coefficients(L_final, R_final, ['Pi[n][j%N+2]', 'Pi[n][j%N+1]', 'Pi[n][j%N]', 'Pi[n][j%N-1]', 'Pi[n][j%N-2]', 'xi[n][j%N+2]', 'xi[n][j%N+1]', 'xi[n][j%N]', 'xi[n][j%N-1]', 'xi[n][j%N-2]'])
+
+#print '------------equation-1------------------------'
+#
+#
+#R = 0
+#L = Pi_dot + diff(Pi, r) + Pi/r
+#R = solve((L-R), Pi_dot)[0]
+#L = Pi_dot
+#
+##debug_mode(L, R)
+#
+#display_formatted(L, R)
+#
+#L_final, R_final = CN_result(L, R, space_deriv='backward')
 #
 ##print_coefficients(L_final, R_final, ['Pi[n+1][j%N+2]', 'Pi[n+1][j%N+1]', 'Pi[n+1][j%N]', 'Pi[n+1][j%N-1]', 'Pi[n+1][j%N-2]', 'xi[n+1][j%N+2]', 'xi[n+1][j%N+1]', 'xi[n+1][j%N]', 'xi[n+1][j%N-1]', 'xi[n+1][j%N-2]'])
 #
 #print_coefficients(L_final, R_final, ['Pi[n][j%N+2]', 'Pi[n][j%N+1]', 'Pi[n][j%N]', 'Pi[n][j%N-1]', 'Pi[n][j%N-2]', 'xi[n][j%N+2]', 'xi[n][j%N+1]', 'xi[n][j%N]', 'xi[n][j%N-1]', 'xi[n][j%N-2]'])
-#
-#print '---------------------------------------------------------------'
-#
-#print '------------equation-2------------------------'
-#
-#R = 0
-#L = Pi_dot - 1./(r**2. * psi**4.) * diff(r**2. * psi**4. * (beta*Pi + alpha*xi/psi**2.), r) + 2./3. * Pi * (beta.diff(r) + 2.*beta/r * (1. + 3. * r * psi.diff(r) / psi))
-#R = solve((L-R), Pi_dot)[0]
-#L = Pi_dot
-#
-#
-##debug_mode(L, R)
-#
-#L_final, R_final = CN_result(L, R, space_deriv='backward')
-#
-#print_coefficients(L_final, R_final, ['Pi[n+1][j%N+2]', 'Pi[n+1][j%N+1]', 'Pi[n+1][j%N]', 'Pi[n+1][j%N-1]', 'Pi[n+1][j%N-2]', 'xi[n+1][j%N+2]', 'xi[n+1][j%N+1]', 'xi[n+1][j%N]', 'xi[n+1][j%N-1]', 'xi[n+1][j%N-2]'])
-#
-#print '---------------------------------------------------------------'
-#
-#print_coefficients(L_final, R_final, ['Pi[n][j%N+2]', 'Pi[n][j%N+1]', 'Pi[n][j%N]', 'Pi[n][j%N-1]', 'Pi[n][j%N-2]', 'xi[n][j%N+2]', 'xi[n][j%N+1]', 'xi[n][j%N]', 'xi[n][j%N-1]', 'xi[n][j%N-2]'])
-
-print '------------equation-1------------------------'
-
-
-R = 0
-L = Pi_dot + diff(Pi, r) + Pi/r
-R = solve((L-R), Pi_dot)[0]
-L = Pi_dot
-
-#debug_mode(L, R)
-
-display_formatted(L, R)
-
-L_final, R_final = CN_result(L, R, space_deriv='backward')
-
-#print_coefficients(L_final, R_final, ['Pi[n+1][j%N+2]', 'Pi[n+1][j%N+1]', 'Pi[n+1][j%N]', 'Pi[n+1][j%N-1]', 'Pi[n+1][j%N-2]', 'xi[n+1][j%N+2]', 'xi[n+1][j%N+1]', 'xi[n+1][j%N]', 'xi[n+1][j%N-1]', 'xi[n+1][j%N-2]'])
-
-print_coefficients(L_final, R_final, ['Pi[n][j%N+2]', 'Pi[n][j%N+1]', 'Pi[n][j%N]', 'Pi[n][j%N-1]', 'Pi[n][j%N-2]', 'xi[n][j%N+2]', 'xi[n][j%N+1]', 'xi[n][j%N]', 'xi[n][j%N-1]', 'xi[n][j%N-2]'])

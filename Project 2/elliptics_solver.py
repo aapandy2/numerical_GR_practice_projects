@@ -129,7 +129,7 @@ def residual(f_n, xi, Pi, r_grid):
 	return ans
 
 
-def solve_elliptics(f_n, xi, Pi, r_grid):
+def solve_elliptics(f_n, xi, Pi, r_grid, correction_weight=1.):
 
 	A    = jacobian(f_n, xi, Pi, r_grid)
 	Ainv = np.linalg.inv(A)
@@ -139,20 +139,20 @@ def solve_elliptics(f_n, xi, Pi, r_grid):
 #	print 'max(|A^-1 A - Identity|) =', np.amax(np.abs(eqszero - np.identity(np.shape(eqszero)[0])))
 	print '-------------------------'
 	
-	print 'solve nonlinear system'
-	res = residual(f_n, xi, Pi, r_grid)
-	print 'iteration = 0', 'max(residual) =', np.amax(res)
-	tolerance    = 1e-9
+	print 'solve nonlinear system w. correction_weight =', correction_weight
+	res = residual(f_n, xi, Pi, r_grid) * correction_weight
+	print 'iteration = 0', 'max(residual) =', np.amax(res/correction_weight)
+	tolerance    = 1e-10
 	iteration    = 0
 	max_iter     = 1000
 	
 	while(np.abs(np.amax(res)) > tolerance and iteration < max_iter):
 		iteration   = iteration + 1
-		res = residual(f_n, xi, Pi, r_grid)
+		res = residual(f_n, xi, Pi, r_grid) * correction_weight
 		jacobi = jacobian(f_n, xi, Pi, r_grid)
 		inv_jacobian = inv_matrix(jacobi)
 		f_n = f_n - np.dot(inv_jacobian, res)
-		print 'iteration =', iteration, 'max(residual) =', np.amax(np.abs(res))
+		print 'iteration =', iteration, 'max(residual) =', np.amax(np.abs(res)/correction_weight)
 
 	return f_n
 

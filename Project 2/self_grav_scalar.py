@@ -1,21 +1,24 @@
 import numpy as np
 from scipy.integrate import cumtrapz, simps
 
-from elliptics_solver import solve_elliptics
+from elliptics_solver import solve_elliptics, residual
 
 #set parameters for simulation
 N = 150
 delta_r = 1./N
-delta_t = 0.005
+delta_t = 0.01
 courant = delta_t / delta_r
-timesteps = 400
+timesteps = 300
 epsilon = 0.5
 
+correction_weight = 1.
+GEOM_COUPLING = True
+
 #define grid
-R     = 500. 
-amp   = 0.000001
-r_0   = 250.
-delta = 30.
+R     = 100. 
+amp   = 0.00001
+r_0   = 50.
+delta = 10.
 
 r_grid = np.linspace(delta_r, R, N)
 
@@ -46,23 +49,29 @@ for i in range(N):
 #need to set up "approximately" ingoing initial data; do so using the same prescription
 #as we used in Project 1, which is identical except except a->\psi^2 
 #we are asked to define this condition only in terms of phi, xi, r; using approximation in example code
-Pi[0, :] = xi[0, :]
+Pi[0, :] = xi[0, :] #ingoing initial data
+#don't do anything -> Pi = 0 -> half inward half outward
 
-#need to solve elliptics here for initial timestep
-#first set initial values of f_n
-f_n = np.zeros(3*N)
-f_n[0:N]     = psi[0, :] 
-f_n[N:2*N]   = beta[0, :]
-f_n[2*N:3*N] = alpha[0, :]
-f_n = solve_elliptics(f_n, xi[0, :], Pi[0, :], r_grid)
-#now set psi, beta, alpha with solution to elliptics
-psi[0, :]   = f_n[0:N]
-beta[0, :]  = f_n[N:2*N]
-alpha[0, :] = f_n[2*N:3*N]
+
+if(GEOM_COUPLING == True):
+	#need to solve elliptics here for initial timestep
+	#first set initial values of f_n
+	f_n = np.zeros(3*N)
+	f_n[0:N]     = psi[0, :] 
+	f_n[N:2*N]   = beta[0, :]
+	f_n[2*N:3*N] = alpha[0, :]
+	f_n = solve_elliptics(f_n, xi[0, :], Pi[0, :], r_grid, correction_weight=correction_weight)
+	#now set psi, beta, alpha with solution to elliptics
+	psi[0, :]   = f_n[0:N]
+	beta[0, :]  = f_n[N:2*N]
+	alpha[0, :] = f_n[2*N:3*N]
 
 
 A = np.zeros((2*N, 2*N))
 B = np.zeros((2*N, 2*N))
+
+psi_LHS = np.zeros((N, N))
+psi_RHS = np.zeros((N, N))
 #populate the matrix at timestep n
 def populate_matrices(n):
 	#define matrix A
@@ -74,7 +83,7 @@ def populate_matrices(n):
 			   else -delta_t/2. * (-4./(2.*delta_r)) if j==i-1
 			   else -delta_t/2. * (1./(2.*delta_r)) if j==i-2
 			   else 0 for j in range(2*N)]
-	    else:
+	    else: #TODO: REMOVE ALL CONSTANTS FROM THIS AND ADD THEM TO OTHER SIDE; LHS (A) SHOULD BE CORRECT
 	        A[i, :] = [     (-0.5*1/2*beta[n+1][j%N+1]/delta_r + 0.5*1/2*beta[n+1][j%N-1]/delta_r + 1/(delta_t)) if j==i 
 			   else (0.5*1/2*beta[n+1][j%N]/delta_r) if j==(i-1) 
 			   else (-0.5*1/2*beta[n+1][j%N]/delta_r) if j==(i+1) 
@@ -94,7 +103,7 @@ def populate_matrices(n):
                            else -delta_t/2. * (-4./(2.*delta_r)) if j==i-1
                            else -delta_t/2. * (1./(2.*delta_r)) if j==i-2
 			   else 0 for j in range(2*N)]
-	    else:
+	    else: #TODO: REMOVE ALL CONSTANTS FROM THIS AND ADD THEM TO OTHER SIDE: LHS(A) SHOULD BE CORRECT
 	        A[i, :] = [     (0.5*-0.166666666666667*beta[n+1][j%N+1]*delta_r**(-1.00000000000000) - 0.5*-0.166666666666667*beta[n+1][j%N-1]*delta_r**(-1.00000000000000) - 0.5*0.666666666666667*beta[n+1][j%N]*r_grid[j%N]**(-1.00000000000000) + 1/(delta_t))  if j==i
 	                   else (0.5*1.00000000000000*1/2*beta[n+1][j%N]*delta_r**(-1.00000000000000))  if j==i-1
 	                   else (-0.5*1/2*beta[n+1][j%N]*delta_r**(-1.00000000000000))  if j==i+1
@@ -183,6 +192,24 @@ def populate_matrices(n):
 			   else (0.25*alpha[n][j%N+1]/(delta_r*psi[n][j%N]**2) - 0.25*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) + 1.0*alpha[n][j%N]/(psi[n][j%N]**2*r_grid[j%N]) + 0.5*alpha[n][j%N]*psi[n][j%N+1]/(delta_r*psi[n][j%N]**3) - 0.5*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3))  if j==i-N
 	                   else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2))  if j==i-N+1
 	                   else 0 for j in range(2*N)]
+
+#	if(PSI_EVOL == True):
+#		for i in range(N):
+#			if(i == 0): #psi r=0 BC
+#				psi_LHS[i, :] = [-3. if j==i
+#						 else 4. if j==i+1
+#						 else -1. if j==i+2
+#						 else 0 for j in range(N)]
+#			elif(i == N-1): #psi r=R BC
+#				psi_LHS[i, :] = [3./(2.*delta_r) + 1./r_grid[j] if j==i
+#						 else ]
+#			else: #psi internal evolution equation
+#				psi_LHS[i, :] = [1. - delta_t/2. * ( beta[n+1][j]/(3.*r_grid[j]) 
+#                                                                    + (beta[n+1][j+1]-beta[n+1][j-1])/(6. * 2. * delta_r) ) if j==i
+#                                                 else -delta_t/2. * beta[n+1][j]/(2.*delta_r) if j==i+1
+#                                                 else delta_t/2. * beta[n+1][j]/(2.*delta_r) if j==i-1
+#                                                 else 0 for j in range(N)]
+
 	return 0
 
 def update_u(timestep):
@@ -215,17 +242,18 @@ for n in range(1, timesteps):
 
     update_r_s(ans, n)
 
-    #need to solve elliptics before populating CN matrices
-    #first set initial values of f_n
-    f_n = np.zeros(3*N)
-    f_n[0:N]     = psi[n, :]
-    f_n[N:2*N]   = beta[n, :]
-    f_n[2*N:3*N] = alpha[n, :]
-    f_n = solve_elliptics(f_n, xi[n, :], Pi[n, :], r_grid)
-    #now set psi, beta, alpha with solution to elliptics
-    psi[n, :]   = f_n[0:N]
-    beta[n, :]  = f_n[N:2*N]
-    alpha[n, :] = f_n[2*N:3*N]
+    if(GEOM_COUPLING == True):
+	    #need to solve elliptics before populating CN matrices
+	    #first set initial values of f_n
+	    f_n = np.zeros(3*N)
+	    f_n[0:N]     = psi[n, :]
+	    f_n[N:2*N]   = beta[n, :]
+	    f_n[2*N:3*N] = alpha[n, :]
+	    f_n = solve_elliptics(f_n, xi[n, :], Pi[n, :], r_grid, correction_weight=correction_weight)
+	    #now set psi, beta, alpha with solution to elliptics
+	    psi[n, :]   = f_n[0:N]
+	    beta[n, :]  = f_n[N:2*N]
+	    alpha[n, :] = f_n[2*N:3*N]
 
     for i in range(N):
         #uses O(h^2) Crank-Nicolson time differencing
@@ -267,5 +295,108 @@ np.savetxt('psi.txt', psi)
 np.savetxt('beta.txt', beta)
 np.savetxt('alpha.txt', alpha)
 np.savetxt('mass_aspect.txt', mass_aspect)
+
+print '-----computing residuals-----'
+phi_residual = np.zeros((timesteps, N))
+xi_residual  = np.zeros((timesteps, N))
+Pi_residual  = np.zeros((timesteps, N))
+
+psi_residual    = np.zeros((timesteps, N))
+psi_ev_residual = np.zeros((timesteps, N))
+alpha_residual  = np.zeros((timesteps, N))
+beta_residual   = np.zeros((timesteps, N))
+
+for n in range(timesteps-1):
+	f_n = np.zeros(3*N)
+        f_n[0:N]     = psi[n, :]
+        f_n[N:2*N]   = beta[n, :]
+        f_n[2*N:3*N] = alpha[n, :]
+        f_n = residual(f_n, xi[n, :], Pi[n, :], r_grid)
+        #now set psi_residual, beta_residual, alpha_residual
+        psi_residual[n, :]   = f_n[0:N]
+        beta_residual[n, :]  = f_n[N:2*N]
+        alpha_residual[n, :] = f_n[2*N:3*N]
+
+
+for n in range(timesteps-1):
+	for j in range(N):
+		if(j == 0):
+			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t 
+					       - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
+					       - 0.5*beta[n,j]*xi[n,j] 
+					       - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
+                                               - 0.5*beta[n+1,j]*xi[n+1,j]) 
+			xi_residual[n, j]  = 0.5*(xi[n, j] + xi[n+1,j])
+			Pi_residual[n, j]  = ( -Pi[n+1,j+2] + 4.*Pi[n+1,j+1] - 3.*Pi[n+1,j] 
+					       -Pi[n,j+2]   + 4.*Pi[n,j+1]   - 3.*Pi[n,j] )
+			psi_ev_residual[n, j] = ( -psi[n+1,j+2] + 4.*psi[n+1,j+1] - 3.*psi[n+1,j]
+                                               -psi[n,j+2]   + 4.*psi[n,j+1]   - 3.*psi[n,j] )
+		elif(j == N-1):
+			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t  
+                                               - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
+                                               - 0.5*beta[n,j]*xi[n,j]
+                                               - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
+                                               - 0.5*beta[n+1,j]*xi[n+1,j])
+			xi_residual[n, j] = ( (xi[n+1,j]-xi[n,j])/delta_t 
+                                           + 0.5 * ( (3.*xi[n+1,j] - 4.*xi[n+1,j-1] + xi[n+1, j-2])/(2.*delta_r) 
+                                                    + xi[n+1,j]/r_grid[j]
+						    +(3.*xi[n,j] - 4.*xi[n,j-1] + xi[n, j-2])/(2.*delta_r)  
+						    + xi[n,j]/r_grid[j]) )
+			Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
+                                           + 0.5 * ( (3.*Pi[n+1,j] - 4.*Pi[n+1,j-1] + Pi[n+1, j-2])/(2.*delta_r)
+                                                    + Pi[n+1,j]/r_grid[j]
+                                                    +(3.*Pi[n,j] - 4.*Pi[n,j-1] + Pi[n, j-2])/(2.*delta_r)
+                                                    + Pi[n,j]/r_grid[j]) )
+			psi_ev_residual[n,j] = ( (3.*psi[n,j]-4.*psi[n,j-1]+psi[n,j-2])/(2.*delta_r) + psi[n,j]/r_grid[j]
+					     +(3.*psi[n+1,j]-4.*psi[n+1,j-1]+psi[n+1,j-2])/(2.*delta_r) + psi[n+1,j]/r_grid[j] ) 
+		else:
+			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t  
+                                               - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
+                                               - 0.5*beta[n,j]*xi[n,j]
+                                               - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
+                                               - 0.5*beta[n+1,j]*xi[n+1,j])
+			xi_residual[n, j] = ( (xi[n+1,j]-xi[n,j])/delta_t
+					    -0.5*(-2.*Pi[n,j]*alpha[n,j]/psi[n,j]**3. * (psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+						  + Pi[n,j]/psi[n,j]**2. * (alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
+						  + alpha[n,j]/psi[n,j]**2. * (Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
+						  + beta[n,j] * (xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
+						  + xi[n,j] * (beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
+						  -2.*Pi[n+1,j]*alpha[n+1,j]/psi[n+1,j]**3. * (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)    
+                                                  + Pi[n+1,j]/psi[n+1,j]**2. * (alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)    
+                                                  + alpha[n+1,j]/psi[n+1,j]**2. * (Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)    
+                                                  + beta[n+1,j] * (xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)    
+                                                  + xi[n+1,j] * (beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)    )
+						)
+			Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
+					     -0.5*(2./3.)*Pi[n,j]*beta[n,j]/r_grid[j]
+					     -0.5*(1./3.)*Pi[n,j]*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
+					     -0.5*beta[n,j]*(Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
+					     -0.5*alpha[n,j]/psi[n,j]**2.*(xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
+					     -0.5*2.*alpha[n,j]*xi[n,j]/(psi[n,j]**2.*r_grid[j])
+					     -0.5*2.*alpha[n,j]*xi[n,j]/psi[n,j]**3.*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+					     -0.5*xi[n,j]/psi[n,j]**2.*(alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
+					     -0.5*(2./3.)*Pi[n+1,j]*beta[n+1,j]/r_grid[j]
+                                             -0.5*(1./3.)*Pi[n+1,j]*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
+                                             -0.5*beta[n+1,j]*(Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
+                                             -0.5*alpha[n+1,j]/psi[n+1,j]**2.*(xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
+                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/(psi[n+1,j]**2.*r_grid[j])
+                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/psi[n+1,j]**3.*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+                                             -0.5*xi[n+1,j]/psi[n+1,j]**2.*(alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
+					    )
+			psi_ev_residual[n,j] = ( (psi[n+1,j]-psi[n,j])/delta_t 
+						-0.5*( beta[n,j]*(psi[n,j]/(3.*r_grid[j]) + (psi[n,j+1]-psi[n,j-1])/(2.*delta_r) )
+						      +psi[n,j]/6.*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
+						      +beta[n+1,j]*(psi[n+1,j]/(3.*r_grid[j]) + (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r) )
+                                                      +psi[n+1,j]/6.*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)   
+							)
+					    )
+
+np.savetxt('phi_residual.txt', phi_residual)
+np.savetxt('xi_residual.txt', xi_residual)
+np.savetxt('Pi_residual.txt', Pi_residual) 
+np.savetxt('psi_residual.txt', psi_residual)
+np.savetxt('psi_ev_residual.txt', psi_ev_residual)
+np.savetxt('beta_residual.txt', beta_residual)
+np.savetxt('alpha_residual.txt', alpha_residual)
 
 print '-----done-----'
