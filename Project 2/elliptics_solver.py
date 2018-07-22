@@ -64,8 +64,8 @@ def jacobian(f_n, xi, Pi, r_grid):
 	                           else 0 for j in range(3*N)]
 		else: #beta internal eqn Jacobian
 			A[i, :] = [-2./delta_r**2. - 1./r_grid[i%N]*(2./r_grid[i%N] + 6.*(psi[i%N+1]-psi[i%N-1])/(2.*delta_r*psi[i%N]) - (alpha[i%N+1] - alpha[i%N-1])/(2.*delta_r*alpha[i%N]) ) if j==i
-				   else 1./delta_r**2. - 2./delta_r*(2./r_grid[i%N] + 6.*(psi[i%N+1]-psi[i%N-1])/(2.*delta_r*psi[i%N]) - (alpha[i%N+1] - alpha[i%N-1])/(2.*delta_r*alpha[i%N]) ) if j==i-1
-				   else 1./delta_r**2. + 2./delta_r*(2./r_grid[i%N] + 6.*(psi[i%N+1]-psi[i%N-1])/(2.*delta_r*psi[i%N]) - (alpha[i%N+1] - alpha[i%N-1])/(2.*delta_r*alpha[i%N]) ) if j==i+1
+				   else 1./delta_r**2. - 1./(2.*delta_r)*(2./r_grid[i%N] + 6.*(psi[i%N+1]-psi[i%N-1])/(2.*delta_r*psi[i%N]) - (alpha[i%N+1] - alpha[i%N-1])/(2.*delta_r*alpha[i%N]) ) if j==i-1
+				   else 1./delta_r**2. + 1./(2.*delta_r)*(2./r_grid[i%N] + 6.*(psi[i%N+1]-psi[i%N-1])/(2.*delta_r*psi[i%N]) - (alpha[i%N+1] - alpha[i%N-1])/(2.*delta_r*alpha[i%N]) ) if j==i+1
 				   else 0 for j in range(3*N)]
 	
 	for i in range(2*N, 3*N):
@@ -124,7 +124,7 @@ def residual(f_n, xi, Pi, r_grid):
 		elif(j == 3*N-1): #r=R BC: alpha' + (alpha - 1)/r = 0
 			ans[j] = (3.*alpha[j%N] - 4.*alpha[j%N-1] + alpha[j%N-2])/(2.*delta_r) + (alpha[j%N]-1)/r_grid[j%N]
 		else: #internal alpha equation
-			ans[j] = ( (alpha[j%N+1] - 2.*alpha[j%N] + alpha[j%N-1])/delta_r**2. + (alpha[j%N+1]-alpha[j%N-1])/(2.*delta_r) * (2./r_grid[j%N] + 2.*(psi[j%N+1] - psi[j%N-1])/(2.*delta_r)) - alpha[j%N]**(-1.)*(2*psi[j%N]**4./3. * ( (beta[j%N+1]-beta[j%N-1])/(2.*delta_r) - beta[j%N]/r_grid[j%N] )**2. ) - 8.*np.pi*alpha[j%N]*Pi[j%N] )
+			ans[j] = ( (alpha[j%N+1] - 2.*alpha[j%N] + alpha[j%N-1])/delta_r**2. + (alpha[j%N+1]-alpha[j%N-1])/(2.*delta_r) * (2./r_grid[j%N] + 2.*(psi[j%N+1] - psi[j%N-1])/(2.*delta_r*psi[j%N])) - alpha[j%N]**(-1.)*(2*psi[j%N]**4./3. * ( (beta[j%N+1]-beta[j%N-1])/(2.*delta_r) - beta[j%N]/r_grid[j%N] )**2. ) - 8.*np.pi*alpha[j%N]*Pi[j%N]**2. )
 
 	return ans
 

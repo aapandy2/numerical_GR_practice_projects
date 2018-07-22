@@ -145,14 +145,14 @@ def make_movie(plot_variables='matter'):
 
 	return 0.
 
-print '-----make matter movie-----'
-make_movie('matter')
+#print '-----make matter movie-----'
+#make_movie('matter')
 print '-----make matter residuals movie-----'
 make_movie('matter_residuals')
-print '-----make geometry movie-----'
-make_movie('geometry')
+#print '-----make geometry movie-----'
+#make_movie('geometry')
 print '-----make geometry residuals movie-----'
 make_movie('geometry_residuals')
-print '-----make mass aspect movie-----'
-make_movie('mass_aspect')
+#print '-----make mass aspect movie-----'
+#make_movie('mass_aspect')
 print '-----done-----'

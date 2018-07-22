@@ -9,7 +9,7 @@ delta_r = 1./N
 delta_t = 0.01
 courant = delta_t / delta_r
 timesteps = 300
-epsilon = 0.5
+epsilon = 0.
 
 correction_weight = 1.
 GEOM_COUPLING = True
