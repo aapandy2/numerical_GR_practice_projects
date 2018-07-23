@@ -142,7 +142,7 @@ def solve_elliptics(f_n, xi, Pi, r_grid, correction_weight=1.):
 	print 'solve nonlinear system w. correction_weight =', correction_weight
 	res = residual(f_n, xi, Pi, r_grid) * correction_weight
 	print 'iteration = 0', 'max(residual) =', np.amax(res/correction_weight)
-	tolerance    = 1e-10
+	tolerance    = 1e-8
 	iteration    = 0
 	max_iter     = 1000
 	

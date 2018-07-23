@@ -104,13 +104,15 @@ def make_movie(plot_variables='matter'):
 	    elif(plot_variables == 'matter_residuals'):
                     ax[0].plot(r_grid, phi_residual[i, :])
                     ax[0].set_title('$$\\phi~residual$$')
-                    ax[0].set_ylim(np.amin(phi_residual), np.amax(phi_residual))
+#                    ax[0].set_ylim(np.amin(phi_residual), np.amax(phi_residual))
                     ax[1].plot(r_grid, xi_residual[i, :])
                     ax[1].set_title('$$\\xi~residual$$')
-                    ax[1].set_ylim(np.amin(xi_residual), np.amax(xi_residual))
+#                    ax[1].set_ylim(-10.*np.mean(xi_residual), 10.*np.mean(xi_residual))
+#                    ax[1].set_ylim(np.amin(xi_residual), np.amax(xi_residual))
                     ax[2].plot(r_grid, Pi_residual[i, :])
                     ax[2].set_title('$$\\Pi~residual$$')
-                    ax[2].set_ylim(np.amin(Pi_residual), np.amax(Pi_residual))
+#                    ax[2].set_ylim(-10.*np.mean(Pi_residual), 10.*np.mean(Pi_residual))
+#                    ax[2].set_ylim(np.amin(Pi_residual), np.amax(Pi_residual))
 	    elif(plot_variables == 'geometry_residuals'):
                     ax[0].plot(r_grid, psi_residual[i, :])
                     ax[0].set_title('$$\\psi~residual$$')
@@ -145,14 +147,14 @@ def make_movie(plot_variables='matter'):
 
 	return 0.
 
-#print '-----make matter movie-----'
-#make_movie('matter')
+print '-----make matter movie-----'
+make_movie('matter')
 print '-----make matter residuals movie-----'
 make_movie('matter_residuals')
 #print '-----make geometry movie-----'
 #make_movie('geometry')
-print '-----make geometry residuals movie-----'
-make_movie('geometry_residuals')
+#print '-----make geometry residuals movie-----'
+#make_movie('geometry_residuals')
 #print '-----make mass aspect movie-----'
 #make_movie('mass_aspect')
 print '-----done-----'
