@@ -1,28 +1,5 @@
 import numpy as np
 
-#N         = 10
-#delta_r   = 1./N
-#R         = 100.
-#r_grid    = np.linspace(delta_r, R, N)
-#timesteps = 10
-#
-#n = 0
-
-#A   = np.zeros((3*N, 3*N))
-
-#xi = np.zeros((timesteps, N))
-#Pi = np.zeros((timesteps, N))
-#
-#psi_init   = np.ones(N) 
-#beta_init  = np.zeros(N)
-#alpha_init = np.ones(N) 
-#
-##set initial values of f_n
-#f_n = np.zeros(3*N)
-#f_n[0:N]     = psi_init - 0.1
-#f_n[N:2*N]   = beta_init + 0.1
-#f_n[2*N:3*N] = alpha_init - 0.1
-
 def jacobian(f_n, xi, Pi, r_grid):
 	
 	N = np.shape(r_grid)[0]
@@ -53,6 +30,14 @@ def jacobian(f_n, xi, Pi, r_grid):
 	                           + np.pi*(xi[i%N]**2. + Pi[i%N]**2.) ) if j==i
 				   else 1./delta_r**2. + 1./(delta_r * r_grid[i%N]) if j==i+1
 				   else 1./delta_r**2. - 1./(delta_r * r_grid[i%N]) if j==i-1
+				   else psi[i%N]**5./(12.*alpha[i%N]**2.) * ( (beta[i%N-1]-beta[i%N+1])/(delta_r*r_grid[i%N])  
+									     + 2.*beta[i%N]/(r_grid[i%N]**2.)) if j==i+N
+				   else psi[i%N]**5./(12.*alpha[i%N]**2.) * ( (beta[i%N-1]-beta[i%N+1])/(2.*delta_r**2.)  
+									     + 1.*beta[i%N]/(delta_r*r_grid[i%N])) if j==i+N-1
+				   else psi[i%N]**5./(12.*alpha[i%N]**2.) * ( (beta[i%N+1]-beta[i%N-1])/(2.*delta_r**2.) 
+									     - 1.*beta[i%N]/(delta_r*r_grid[i%N])) if j==i+N+1
+				   else psi[i%N]**5./(12.) * ((beta[i%N+1]-beta[i%N-1])/(2.*delta_r)
+                                       - beta[i%N]/r_grid[i%N])**2. * (-2.*alpha[i%N]**(-3.)) if j==i+2*N
 				   else 0 for j in range(3*N)]
 	for i in range(N, 2*N):
 		if(i == N): #r=0 BC: beta = 0
@@ -66,6 +51,26 @@ def jacobian(f_n, xi, Pi, r_grid):
 			A[i, :] = [-2./delta_r**2. - 1./r_grid[i%N]*(2./r_grid[i%N] + 6.*(psi[i%N+1]-psi[i%N-1])/(2.*delta_r*psi[i%N]) - (alpha[i%N+1] - alpha[i%N-1])/(2.*delta_r*alpha[i%N]) ) if j==i
 				   else 1./delta_r**2. - 1./(2.*delta_r)*(2./r_grid[i%N] + 6.*(psi[i%N+1]-psi[i%N-1])/(2.*delta_r*psi[i%N]) - (alpha[i%N+1] - alpha[i%N-1])/(2.*delta_r*alpha[i%N]) ) if j==i-1
 				   else 1./delta_r**2. + 1./(2.*delta_r)*(2./r_grid[i%N] + 6.*(psi[i%N+1]-psi[i%N-1])/(2.*delta_r*psi[i%N]) - (alpha[i%N+1] - alpha[i%N-1])/(2.*delta_r*alpha[i%N]) ) if j==i+1
+				   else ( ((beta[i%N+1]-beta[i%N-1])/(2.*delta_r) - beta[i%N]/r_grid[i%N])
+					  *(-psi[i%N]**(-2.))*6.*(psi[i%N+1]-psi[i%N-1])/(2.*delta_r)
+					 +(-2.*psi[i%N]**(-3.))*12.*np.pi*alpha[i%N]*xi[i%N]*Pi[i%N]
+				        ) if j==i-N
+				   else ( ((beta[i%N+1]-beta[i%N-1])/(2.*delta_r) - beta[i%N]/r_grid[i%N])
+                                          *(-6.)/(2.*delta_r*psi[i%N]) 
+					) if j==i-N-1
+				   else ( ((beta[i%N+1]-beta[i%N-1])/(2.*delta_r) - beta[i%N]/r_grid[i%N])
+                                          *(6.)/(2.*delta_r*psi[i%N])
+					) if j==i-N+1
+				   else ( ((beta[i%N+1]-beta[i%N-1])/(2.*delta_r) - beta[i%N]/r_grid[i%N])
+                                          *-1.*(alpha[i%N+1]-alpha[i%N-1])/(2.*delta_r)*(-alpha[i%N]**(-2.))
+					 + 12.*np.pi*xi[i%N]*Pi[i%N]/psi[i%N]**2.
+					) if j==i+N
+				   else ( ((beta[i%N+1]-beta[i%N-1])/(2.*delta_r) - beta[i%N]/r_grid[i%N])
+                                          *-1.*(-1.)/(2.*delta_r*alpha[i%N])
+					) if j==i+N-1
+				   else ( ((beta[i%N+1]-beta[i%N-1])/(2.*delta_r) - beta[i%N]/r_grid[i%N])
+                                          *-1.*(1.)/(2.*delta_r*alpha[i%N])
+                                        ) if j==i+N+1
 				   else 0 for j in range(3*N)]
 	
 	for i in range(2*N, 3*N):
@@ -80,9 +85,30 @@ def jacobian(f_n, xi, Pi, r_grid):
 	                           else 1./(2.*delta_r)             if j==i-2
 	                           else 0 for j in range(3*N)]
 		else: #alpha internal eqn Jacobian
-			A[i, :] = [-2./delta_r**2. - (-1.)*alpha[i%N]**(-2.)*(2.*psi[i%N]**4./3. * ( (beta[i%N+1] - beta[i%N-1])/(2.*delta_r) - beta[i%N]/r_grid[i%N]  )**2.) - 8. * np.pi * Pi[i%N] if j==i
+			A[i, :] = [-2./delta_r**2. - (-1.)*alpha[i%N]**(-2.)*(2.*psi[i%N]**4./3. * ( (beta[i%N+1] - beta[i%N-1])/(2.*delta_r) - beta[i%N]/r_grid[i%N]  )**2.) - 8. * np.pi * Pi[i%N]**2. if j==i
 				   else 1./delta_r**2. - 1./(2.*delta_r) * (2./r_grid[i%N] + 2.*(psi[i%N+1]-psi[i%N-1])/(2.*delta_r * psi[i%N]) ) if j==i-1
 				   else 1./delta_r**2. + 1./(2.*delta_r) * (2./r_grid[i%N] + 2.*(psi[i%N+1]-psi[i%N-1])/(2.*delta_r * psi[i%N]) ) if j==i+1
+				   else ( (alpha[i%N+1]-alpha[i%N-1])/(2.*delta_r)
+					   *2.*(psi[i%N+1]-psi[i%N-1])/(2.*delta_r)*(-psi[i%N]**(-2.))
+					 - 1./alpha[i%N]*(2.*(4.*psi[i%N]**3.)/3. 
+					   * ( (beta[i%N+1] - beta[i%N-1])/(2.*delta_r) - beta[i%N]/r_grid[i%N] )**2. )
+					) if j==i-2*N
+				   else ( (alpha[i%N+1]-alpha[i%N-1])/(2.*delta_r)*(2.*-1.)/(2.*delta_r*psi[i%N])
+					) if j==i-2*N-1
+				   else ( (alpha[i%N+1]-alpha[i%N-1])/(2.*delta_r)*(2.* 1.)/(2.*delta_r*psi[i%N])
+					) if j==i-2*N+1
+				   else ( -1./alpha[i%N]* (2.*psi[i%N]**4./3.)
+					   *( (beta[i%N-1]-beta[i%N+1])/(delta_r*r_grid[i%N])
+					     +(2.*beta[i%N])/r_grid[i%N]**2.  )
+					) if j==i-N
+				   else ( -1./alpha[i%N]* (2.*psi[i%N]**4./3.)
+                                           *( (beta[i%N-1]-beta[i%N+1])/(2.*delta_r**2.)   
+                                             +(beta[i%N])/(delta_r*r_grid[i%N])  )
+					) if j==i-N-1
+				   else ( -1./alpha[i%N]* (2.*psi[i%N]**4./3.)
+                                           *( (beta[i%N+1]-beta[i%N-1])/(2.*delta_r**2.)        
+                                             -(beta[i%N])/(delta_r*r_grid[i%N])  )
+					) if j==i-N+1
 				   else 0 for j in range(3*N)]
 
 	return A
