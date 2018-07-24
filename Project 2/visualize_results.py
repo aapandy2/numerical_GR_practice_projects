@@ -74,23 +74,23 @@ def make_movie(plot_variables='matter'):
 	    if(plot_variables == 'matter'):
 		    ax[0].plot(r_grid, phi[i, :])
 		    ax[0].set_title('$$\\phi$$')
-		    ax[0].set_ylim(np.amin(phi), np.amax(phi))
+#		    ax[0].set_ylim(np.amin(phi), np.amax(phi))
 		    ax[1].plot(r_grid, xi[i, :])
 		    ax[1].set_title('$$\\xi$$')
-		    ax[1].set_ylim(np.amin(xi), np.amax(xi))
+#		    ax[1].set_ylim(np.amin(xi), np.amax(xi))
 		    ax[2].plot(r_grid, Pi[i, :])
 		    ax[2].set_title('$$\\Pi$$')
-                    ax[2].set_ylim(np.amin(Pi), np.amax(Pi))
+#                   ax[2].set_ylim(np.amin(Pi), np.amax(Pi))
 	    elif(plot_variables == 'geometry'):
 		    ax[0].plot(r_grid, psi[i, :])
 		    ax[0].set_title('$$\\psi$$')
-                    ax[0].set_ylim(np.amin(psi), np.amax(psi))
+#                    ax[0].set_ylim(np.amin(psi), np.amax(psi))
 		    ax[1].plot(r_grid, beta[i, :])
 		    ax[1].set_title('$$\\beta$$')
-                    ax[1].set_ylim(np.amin(beta), np.amax(beta))
+#                    ax[1].set_ylim(np.amin(beta), np.amax(beta))
 		    ax[2].plot(r_grid, alpha[i, :])
 		    ax[2].set_title('$$\\alpha$$')
-                    ax[2].set_ylim(np.amin(alpha), np.amax(alpha))
+#                    ax[2].set_ylim(np.amin(alpha), np.amax(alpha))
 	    elif(plot_variables == 'mass_aspect'):
 		    ax[0].plot(r_grid, mass_aspect[i, :])
 		    ax[0].set_title('Mass Aspect')
@@ -116,16 +116,16 @@ def make_movie(plot_variables='matter'):
 	    elif(plot_variables == 'geometry_residuals'):
                     ax[0].plot(r_grid, psi_residual[i, :])
                     ax[0].set_title('$$\\psi~residual$$')
-                    ax[0].set_ylim(np.amin(psi_residual), np.amax(psi_residual))
+#                    ax[0].set_ylim(np.amin(psi_residual), np.amax(psi_residual))
 #                    ax[0].plot(r_grid, psi_ev_residual[i, :])
 #                    ax[0].set_title('$$\\psi~evolution~eqn~residual$$')
 #                    ax[0].set_ylim(np.amin(psi_ev_residual), np.amax(psi_ev_residual))
                     ax[1].plot(r_grid, beta_residual[i, :])
                     ax[1].set_title('$$\\beta~residual$$')
-                    ax[1].set_ylim(np.amin(beta_residual), np.amax(beta_residual))
+#                    ax[1].set_ylim(np.amin(beta_residual), np.amax(beta_residual))
                     ax[2].plot(r_grid, alpha_residual[i, :])
                     ax[2].set_title('$$\\alpha~residual$$')
-                    ax[2].set_ylim(np.amin(alpha_residual), np.amax(alpha_residual))
+#                    ax[2].set_ylim(np.amin(alpha_residual), np.amax(alpha_residual))
 
 	
 	    #draw x label $r$
@@ -153,8 +153,8 @@ print '-----make matter residuals movie-----'
 make_movie('matter_residuals')
 #print '-----make geometry movie-----'
 #make_movie('geometry')
-#print '-----make geometry residuals movie-----'
-#make_movie('geometry_residuals')
+print '-----make geometry residuals movie-----'
+make_movie('geometry_residuals')
 #print '-----make mass aspect movie-----'
 #make_movie('mass_aspect')
 print '-----done-----'

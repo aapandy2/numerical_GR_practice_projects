@@ -138,6 +138,9 @@ def solve_elliptics(f_n, xi, Pi, r_grid, correction_weight=1.):
 #	print 'First verify that A^-1 A = 1'
 #	print 'max(|A^-1 A - Identity|) =', np.amax(np.abs(eqszero - np.identity(np.shape(eqszero)[0])))
 	print '-------------------------'
+
+	N = np.shape(xi)[0]
+	print 'initial:', np.mean(f_n[0:N]), np.mean(f_n[N:2*N]), np.mean(f_n[2*N:3*N])
 	
 	print 'solve nonlinear system w. correction_weight =', correction_weight
 	res = residual(f_n, xi, Pi, r_grid) * correction_weight
