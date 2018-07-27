@@ -2,12 +2,12 @@ import numpy as np
 from elliptics_solver import solve_elliptics, residual
 
 #set parameters for simulation
-N = 256
+N = 150
 delta_r = 1./N
-delta_t = 0.25/256.
+delta_t = 0.01
 courant = delta_t / delta_r
-timesteps = 30 
-epsilon = 0.
+timesteps = 300
+epsilon = 0.5
 
 correction_weight = 1.
 GEOM_COUPLING = True
@@ -32,6 +32,8 @@ psi   =  np.ones((timesteps, N))
 
 #define initial data for scalar field
 phi[0, :] = amp * np.exp(-(r_grid-r_0)**2./delta**2.)
+
+#xi[0, :] = -2.*(r_grid-r_0)/delta**2. * amp*np.exp(-(r_grid-r_0)**2./delta**2.)
 
 #Note: need to set xi as the numerical derivative of phi;
 #using an analytical derivative gives incorrect result
@@ -70,127 +72,6 @@ B = np.zeros((2*N, 2*N))
 
 psi_LHS = np.zeros((N, N))
 psi_RHS = np.zeros((N, N))
-##populate the matrix at timestep n
-#def populate_matrices(n):
-#	#define matrix A
-#	for i in range(N):
-#	    if(i == 0):
-#		A[i, :] = [1 if j==i else 0 for j in range(2*N)]
-#	    elif(i == N-1): #xi BC
-#		A[i, :] = [1. + delta_t/2. * (3./(2.*delta_r) + 1./r_grid[j%N]) if j==i
-#			   else delta_t/2. * (-4./(2.*delta_r)) if j==i-1
-#			   else delta_t/2. * (1./(2.*delta_r)) if j==i-2
-#			   else 0 for j in range(2*N)]
-#	    else: #TODO: REMOVE ALL CONSTANTS FROM THIS AND ADD THEM TO OTHER SIDE; LHS (A) SHOULD BE CORRECT
-#	        A[i, :] = [     (-0.5*1./2.*beta[n+1][j%N+1]/delta_r + 0.5*1./2.*beta[n+1][j%N-1]/delta_r + 1./(delta_t)) if j==i 
-#			   else (0.5*1./2.*beta[n+1][j%N]/delta_r) if j==(i-1) 
-#			   else (-0.5*1./2.*beta[n+1][j%N]/delta_r) if j==(i+1) 
-#			   else (0.5*1./2.*alpha[n+1][j%N]/(delta_r*psi[n+1][j%N]**2)) if j==(N+i-1)
-#			   else (-0.5*1./2.*alpha[n+1][j%N+1]/(delta_r*psi[n+1][j%N]**2) + 0.5*1./2.*alpha[n+1][j%N-1]/(delta_r*psi[n+1][j%N]**2.) + 0.5*alpha[n+1][j%N]*psi[n+1][j%N+1]/(delta_r*psi[n+1][j%N]**3.) - 0.5*alpha[n+1][j%N]*psi[n+1][j%N-1]/(delta_r*psi[n+1][j%N]**3.)) if j==(N+i) 
-#			   else (-0.5*1./2.*alpha[n+1][j%N]/(delta_r*psi[n+1][j%N]**2.)) if j==(N+i+1) 
-#			   else 0 for j in range(2*N)]
-#	
-#	for i in range(N, 2*N):
-#	    if(i == N):
-#		A[i, :] = [-3. if j==i
-#			   else 4. if j==i+1
-#			   else -1. if j==i+2
-#	                   else 0 for j in range(2*N)]
-#	    elif(i == 2*N-1): #Pi BC
-#                A[i, :] = [1. + delta_t/2. * (3./(2.*delta_r) + 1./r_grid[j%N]) if j==i
-#                           else delta_t/2. * (-4./(2.*delta_r)) if j==i-1
-#                           else delta_t/2. * (1./(2.*delta_r)) if j==i-2
-#			   else 0 for j in range(2*N)]
-#	    else: #TODO: REMOVE ALL CONSTANTS FROM THIS AND ADD THEM TO OTHER SIDE: LHS(A) SHOULD BE CORRECT
-#	        A[i, :] = [     (0.5*-0.166666666666667*beta[n+1][j%N+1]*delta_r**(-1.00000000000000) - 0.5*-0.166666666666667*beta[n+1][j%N-1]*delta_r**(-1.00000000000000) - 0.5*0.666666666666667*beta[n+1][j%N]*r_grid[j%N]**(-1.00000000000000) + 1./(delta_t))  if j==i
-#	                   else (0.5*1.00000000000000*1./2.*beta[n+1][j%N]*delta_r**(-1.00000000000000))  if j==i-1
-#	                   else (-0.5*1./2.*beta[n+1][j%N]*delta_r**(-1.00000000000000))  if j==i+1
-#			   else (0.5*1.00000000000000*1./2.*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000))  if j==i-N-1
-#	                   else (0.5*1.00000000000000*1./2.*alpha[n+1][j%N-1]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000) - 0.5*1.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N+1]/psi[n+1][j%N]**3. + 0.5*1.00000000000000*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N-1]/psi[n+1][j%N]**3. - 0.5*1./2.*alpha[n+1][j%N+1]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000) - 0.5*2.00000000000000*alpha[n+1][j%N]*psi[n+1][j%N]**(-2.00000000000000)*r_grid[j%N]**(-1.00000000000000))  if j==i-N
-#	                   else (-0.5*1./2.*alpha[n+1][j%N]*delta_r**(-1.00000000000000)*psi[n+1][j%N]**(-2.00000000000000))  if j==i-N+1
-#	                   else 0 for j in range(2*N)]
-#	
-#	#define matrix B, now fully to second order accuracy
-#	for i in range(N):
-#	    if(i == 0):
-#		B[i, :] = [0 for j in range(2*N)]
-#	    elif(i == 1): #ADDED KO_ODD_FW
-#		B[i, :] = [     (0.25*beta[n][j%N+1]/delta_r - 0.25*beta[n][j%N-1]/delta_r + 1./(delta_t) - epsilon/(16.*delta_t) * (6. - 1.))  if j==i
-#                           else (-0.25*beta[n][j%N]/delta_r + epsilon/(16.*delta_t) * 4.)  if j==(i-1)
-#                           else (0.25*beta[n][j%N]/delta_r + epsilon/(16.*delta_t) * 4.)  if j==(i+1)
-#			   else (-epsilon/(16.*delta_t) * 1.) if j==(i+2)
-#                           else (-0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2.))  if j==(N+i-1)
-#                           else (0.25*alpha[n][j%N+1]/(delta_r*psi[n][j%N]**2.) - 0.25*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2.) - 0.5*alpha[n][j%N]*psi[n][j%N+1]/(delta_r*psi[n][j%N]**3.) + 0.5*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3.))  if j==(N+i)
-#                           else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2.))  if j==(N+i+1)
-#                           else 0 for j in range(2*N)]
-#	    elif(i == N-2): #normal internal equations but without KO diss
-#		B[i, :] = [     (0.25*beta[n][j%N+1]/delta_r - 0.25*beta[n][j%N-1]/delta_r + 1./(delta_t) - 0./(16.*delta_t) * (6.))  if j==i
-#                           else (-0.25*beta[n][j%N]/delta_r - 0./(16.*delta_t) * (-4.))  if j==(i-1)
-#                           else (0.25*beta[n][j%N]/delta_r - 0./(16.*delta_t) * (-4.))  if j==(i+1)
-#                           else (- 0./(16.*delta_t) * (1.)) if j==(i-2)
-#                           else (- 0./(16.*delta_t) * (1.)) if j==(i+2)
-#                           else (-0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2.))  if j==(N+i-1)
-#                           else (0.25*alpha[n][j%N+1]/(delta_r*psi[n][j%N]**2.) - 0.25*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2.) - 0.5*alpha[n][j%N]*psi[n][j%N+1]/(delta_r*psi[n][j%N]**3.) + 0.5*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3.))  if j==(N+i)
-#                           else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2.))  if j==(N+i+1)
-#                           else 0 for j in range(2*N)]
-#	    elif(i == N-1): #xi BC
-#                B[i, :] = [1. - delta_t/2. * (3./(2.*delta_r) + 1./r_grid[j%N]) if j==i
-#                           else -delta_t/2. * (-4./(2.*delta_r)) if j==i-1
-#                           else -delta_t/2. * (1./(2.*delta_r)) if j==i-2
-#			   else 0 for j in range(2*N)]
-#	    else: #ADDED DISS_KO to this
-#	        B[i, :] = [     (0.25*beta[n][j%N+1]/delta_r - 0.25*beta[n][j%N-1]/delta_r + 1./(delta_t) - epsilon/(16.*delta_t) * (6.))  if j==i 
-#			   else (-0.25*beta[n][j%N]/delta_r - epsilon/(16.*delta_t) * (-4.))  if j==(i-1) 
-#			   else (0.25*beta[n][j%N]/delta_r - epsilon/(16.*delta_t) * (-4.))  if j==(i+1) 
-#			   else (- epsilon/(16.*delta_t) * (1.)) if j==(i-2)
-#			   else (- epsilon/(16.*delta_t) * (1.)) if j==(i+2)
-#			   else (-0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2.))  if j==(N+i-1) 
-#			   else (0.25*alpha[n][j%N+1]/(delta_r*psi[n][j%N]**2.) - 0.25*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2.) - 0.5*alpha[n][j%N]*psi[n][j%N+1]/(delta_r*psi[n][j%N]**3.) + 0.5*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3.))  if j==(N+i)
-#			   else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2.))  if j==(N+i+1) 
-#			   else 0 for j in range(2*N)]
-#	
-#	for i in range(N, 2*N):
-#	    if(i == N):
-#		B[i, :] = [3. if j==i
-#			   else -4. if j==i+1
-#			   else 1. if j==i+2
-#			   else 0 for j in range(2*N)]
-#	    elif(i == N+1): #ADDED KO_EVEN_FWD TO THIS
-#		B[i, :] = [     (0.0833333333333333*beta[n][j%N+1]/delta_r - 0.0833333333333333*beta[n][j%N-1]/delta_r + 0.333333333333333*beta[n][j%N]/r_grid[j%N] + 1./(delta_t) - epsilon/(16.*delta_t) * (1. + 6.))  if j==i
-#                           else (-0.25*beta[n][j%N]/delta_r - epsilon/(16.*delta_t) * (-4.))  if j==i-1
-#                           else (0.25*beta[n][j%N]/delta_r - epsilon/(16.*delta_t) * (-4.))  if j==i+1
-#			   else (- epsilon/(16.*delta_t) * 1.) if j==i+2
-#                           else (-0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2.))  if j==i-N-1
-#                           else (0.25*alpha[n][j%N+1]/(delta_r*psi[n][j%N]**2.) - 0.25*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) + 1.0*alpha[n][j%N]/(psi[n][j%N]**2.*r_grid[j%N]) + 0.5*alpha[n][j%N]*psi[n][j%N+1]/(delta_r*psi[n][j%N]**3.) - 0.5*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3.))  if j==i-N
-#                           else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2.))  if j==i-N+1
-#                           else 0 for j in range(2*N)]
-#	    elif(i == 2*N-2): #normal internal equations except without DISS_KO
-#		B[i, :] = [     (0.0833333333333333*beta[n][j%N+1]/delta_r - 0.0833333333333333*beta[n][j%N-1]/delta_r + 0.333333333333333*beta[n][j%N]/r_grid[j%N] + 1./(delta_t) - 0./(16.*delta_t) * (6.))  if j==i
-#                           else (-0.25*beta[n][j%N]/delta_r - 0./(16.*delta_t) * (-4.))  if j==i-1
-#                           else (0.25*beta[n][j%N]/delta_r - 0./(16.*delta_t) * (-4.))  if j==i+1
-#                           else (- 0./(16.*delta_t) * (1.)) if j==(i-2)
-#                           else (- 0./(16.*delta_t) * (1.)) if j==(i+2)
-#                           else (-0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2.))  if j==i-N-1
-#                           else (0.25*alpha[n][j%N+1]/(delta_r*psi[n][j%N]**2) - 0.25*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2) + 1.0*alpha[n][j%N]/(psi[n][j%N]**2.*r_grid[j%N]) + 0.5*alpha[n][j%N]*psi[n][j%N+1]/(delta_r*psi[n][j%N]**3.) - 0.5*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3.))  if j==i-N
-#                           else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2.))  if j==i-N+1
-#                           else 0 for j in range(2*N)]
-#	    elif(i == 2*N-1): #Pi BC
-#                B[i, :] = [1. - delta_t/2. * (3./(2.*delta_r) + 1./r_grid[j%N]) if j==i
-#                           else -delta_t/2. * (-4./(2.*delta_r)) if j==i-1
-#                           else -delta_t/2. * (1./(2.*delta_r)) if j==i-2
-#			   else 0 for j in range(2*N)]
-#
-#	    else: #ADDED DISS_KO TO THIS
-#	        B[i, :] = [     (0.0833333333333333*beta[n][j%N+1]/delta_r - 0.0833333333333333*beta[n][j%N-1]/delta_r + 0.333333333333333*beta[n][j%N]/r_grid[j%N] + 1./(delta_t) - epsilon/(16.*delta_t) * (6.))  if j==i
-#	                   else (-0.25*beta[n][j%N]/delta_r - epsilon/(16.*delta_t) * (-4.))  if j==i-1
-#	                   else (0.25*beta[n][j%N]/delta_r - epsilon/(16.*delta_t) * (-4.))  if j==i+1
-#			   else (- epsilon/(16.*delta_t) * (1.)) if j==(i-2)
-#			   else (- epsilon/(16.*delta_t) * (1.)) if j==(i+2)
-#	                   else (-0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2.))  if j==i-N-1
-#			   else (0.25*alpha[n][j%N+1]/(delta_r*psi[n][j%N]**2.) - 0.25*alpha[n][j%N-1]/(delta_r*psi[n][j%N]**2.) + 1.0*alpha[n][j%N]/(psi[n][j%N]**2.*r_grid[j%N]) + 0.5*alpha[n][j%N]*psi[n][j%N+1]/(delta_r*psi[n][j%N]**3.) - 0.5*alpha[n][j%N]*psi[n][j%N-1]/(delta_r*psi[n][j%N]**3.))  if j==i-N
-#	                   else (0.25*alpha[n][j%N]/(delta_r*psi[n][j%N]**2.))  if j==i-N+1
-#	                   else 0 for j in range(2*N)]
-#
 ##	if(PSI_EVOL == True):
 ##		for i in range(N):
 ##			if(i == 0): #psi r=0 BC
@@ -207,8 +88,6 @@ psi_RHS = np.zeros((N, N))
 ##                                                 else -delta_t/2. * beta[n+1][j]/(2.*delta_r) if j==i+1
 ##                                                 else delta_t/2. * beta[n+1][j]/(2.*delta_r) if j==i-1
 ##                                                 else 0 for j in range(N)]
-#
-#	return 0
 
 #populate the matrix at timestep n
 def populate_matrices(n):
@@ -245,7 +124,8 @@ def populate_matrices(n):
 			   else 0 for j in range(2*N)]
 	    else:
 		A[i, :] = [1. - delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N]) 
-                                             + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)) if j==i
+                                             + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)
+					     + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) if j==i
 			   else -delta_t/2. * (beta[n][i%N]/(2.*delta_r)) if j==i+1
 			   else -delta_t/2. * (-beta[n][i%N]/(2.*delta_r)) if j==i-1
 			   else -delta_t/2. * (2.*alpha[n][i%N]/(r_grid[i%N]*psi[n][i%N]**2.)
@@ -304,7 +184,8 @@ def populate_matrices(n):
 			   else 0 for j in range(2*N)]
 	    elif(i == N+1): #ADDED KO_EVEN_FWD TO THIS
 		B[i, :] = [1. + delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N])
-                                             + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)) - epsilon/(16.*1.)*(6.+1.) if j==i
+                                             + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)
+					     + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) - epsilon/(16.*1.)*(6.+1.) if j==i
                            else delta_t/2. * (beta[n][i%N]/(2.*delta_r)) - epsilon/(16.*1)*(-4.) if j==i+1
                            else delta_t/2. * (-beta[n][i%N]/(2.*delta_r)) - epsilon/(16.*1)*(-4.) if j==i-1
                            else - epsilon/(16.*1.)*1. if j==i+2
@@ -316,7 +197,8 @@ def populate_matrices(n):
                            else 0 for j in range(2*N)]
 	    elif(i == 2*N-2): #internal Pi equation without KO diss.
 		B[i, :] = [1. + delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N])
-                                             + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)) if j==i
+                                             + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)
+					     + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) if j==i
                            else delta_t/2. * (beta[n][i%N]/(2.*delta_r))  if j==i+1
                            else delta_t/2. * (-beta[n][i%N]/(2.*delta_r)) if j==i-1
                            else delta_t/2. * (2.*alpha[n][i%N]/(r_grid[i%N]*psi[n][i%N]**2.)
@@ -333,7 +215,8 @@ def populate_matrices(n):
 
 	    else: #ADDED DISS_KO TO THIS
 		B[i, :] = [1. + delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N]) 
-                                             + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)) - epsilon/(16.*1)*6. if j==i
+                                             + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)
+					     + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) - epsilon/(16.*1)*6. if j==i
                            else delta_t/2. * (beta[n][i%N]/(2.*delta_r)) - epsilon/(16.*1)*(-4.) if j==i+1
                            else delta_t/2. * (-beta[n][i%N]/(2.*delta_r)) - epsilon/(16.*1)*(-4.) if j==i-1
 			   else - epsilon/(16.*1)*1. if j==i-2
@@ -491,6 +374,7 @@ for n in range(timesteps-1):
                                                 )
                         Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
                                              -0.5*(2./3.)*Pi[n,j]*beta[n,j]/r_grid[j]
+					     -0.5*(4./2.)*beta[n,j]*Pi[n,j]/psi[n,j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
                                              -0.5*(1./3.)*Pi[n,j]*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
                                              -0.5*beta[n,j]*(Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
                                              -0.5*alpha[n,j]/psi[n,j]**2.*(xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
@@ -498,6 +382,7 @@ for n in range(timesteps-1):
                                              -0.5*2.*alpha[n,j]*xi[n,j]/psi[n,j]**3.*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
                                              -0.5*xi[n,j]/psi[n,j]**2.*(alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
                                              -0.5*(2./3.)*Pi[n+1,j]*beta[n+1,j]/r_grid[j]
+					     -0.5*(4./2.)*beta[n+1,j]*Pi[n+1,j]/psi[n+1,j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
                                              -0.5*(1./3.)*Pi[n+1,j]*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
                                              -0.5*beta[n+1,j]*(Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
                                              -0.5*alpha[n+1,j]/psi[n+1,j]**2.*(xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
@@ -551,6 +436,7 @@ for n in range(timesteps-1):
                                                 )
                         Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
                                              -0.5*(2./3.)*Pi[n,j]*beta[n,j]/r_grid[j]
+					     -0.5*(4./2.)*beta[n,j]*Pi[n,j]/psi[n,j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
                                              -0.5*(1./3.)*Pi[n,j]*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
                                              -0.5*beta[n,j]*(Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
                                              -0.5*alpha[n,j]/psi[n,j]**2.*(xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
@@ -558,6 +444,7 @@ for n in range(timesteps-1):
                                              -0.5*2.*alpha[n,j]*xi[n,j]/psi[n,j]**3.*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
                                              -0.5*xi[n,j]/psi[n,j]**2.*(alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
                                              -0.5*(2./3.)*Pi[n+1,j]*beta[n+1,j]/r_grid[j]
+					     -0.5*(4./2.)*beta[n+1,j]*Pi[n+1,j]/psi[n+1,j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
                                              -0.5*(1./3.)*Pi[n+1,j]*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
                                              -0.5*beta[n+1,j]*(Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
                                              -0.5*alpha[n+1,j]/psi[n+1,j]**2.*(xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
@@ -593,6 +480,7 @@ for n in range(timesteps-1):
 						)
 			Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
 					     -0.5*(2./3.)*Pi[n,j]*beta[n,j]/r_grid[j]
+					     -0.5*(4./2.)*beta[n,j]*Pi[n,j]/psi[n,j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
 					     -0.5*(1./3.)*Pi[n,j]*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
 					     -0.5*beta[n,j]*(Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
 					     -0.5*alpha[n,j]/psi[n,j]**2.*(xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
@@ -600,6 +488,7 @@ for n in range(timesteps-1):
 					     -0.5*2.*alpha[n,j]*xi[n,j]/psi[n,j]**3.*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
 					     -0.5*xi[n,j]/psi[n,j]**2.*(alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
 					     -0.5*(2./3.)*Pi[n+1,j]*beta[n+1,j]/r_grid[j]
+					     -0.5*(4./2.)*beta[n+1,j]*Pi[n+1,j]/psi[n+1,j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
                                              -0.5*(1./3.)*Pi[n+1,j]*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
                                              -0.5*beta[n+1,j]*(Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
                                              -0.5*alpha[n+1,j]/psi[n+1,j]**2.*(xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)

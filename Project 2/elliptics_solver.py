@@ -173,7 +173,7 @@ def solve_elliptics(f_n, xi, Pi, r_grid, correction_weight=1.):
 	print 'iteration = 0', 'max(residual) =', np.amax(res/correction_weight)
 	tolerance    = 1e-8
 	iteration    = 0
-	max_iter     = 1000
+	max_iter     = 20
 	
 	while(np.abs(np.amax(res)) > tolerance and iteration < max_iter):
 		iteration   = iteration + 1
