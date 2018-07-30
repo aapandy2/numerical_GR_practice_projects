@@ -44,13 +44,13 @@ beta        = np.loadtxt('beta.txt')
 alpha       = np.loadtxt('alpha.txt')
 mass_aspect = np.loadtxt('mass_aspect.txt')
 
-xi_residual     = np.loadtxt('xi_residual.txt')
-phi_residual    = np.loadtxt('phi_residual.txt')
-Pi_residual     = np.loadtxt('Pi_residual.txt')
-psi_residual    = np.loadtxt('psi_residual.txt')
-psi_ev_residual = np.loadtxt('psi_ev_residual.txt')
-beta_residual   = np.loadtxt('beta_residual.txt')
-alpha_residual  = np.loadtxt('alpha_residual.txt')
+#xi_residual     = np.loadtxt('xi_residual.txt')
+#phi_residual    = np.loadtxt('phi_residual.txt')
+#Pi_residual     = np.loadtxt('Pi_residual.txt')
+#psi_residual    = np.loadtxt('psi_residual.txt')
+#psi_ev_residual = np.loadtxt('psi_ev_residual.txt')
+#beta_residual   = np.loadtxt('beta_residual.txt')
+#alpha_residual  = np.loadtxt('alpha_residual.txt')
 print '-----done loading datafiles-----'
 
 step      = 1
@@ -149,12 +149,12 @@ def make_movie(plot_variables='matter'):
 
 print '-----make matter movie-----'
 make_movie('matter')
-print '-----make matter residuals movie-----'
-make_movie('matter_residuals')
+#print '-----make matter residuals movie-----'
+#make_movie('matter_residuals')
 print '-----make geometry movie-----'
 make_movie('geometry')
-print '-----make geometry residuals movie-----'
-make_movie('geometry_residuals')
+#print '-----make geometry residuals movie-----'
+#make_movie('geometry_residuals')
 print '-----make mass aspect movie-----'
 make_movie('mass_aspect')
 print '-----done-----'

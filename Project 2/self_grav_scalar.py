@@ -1,20 +1,20 @@
 import numpy as np
-from elliptics_solver import solve_elliptics, residual
+from elliptics_solver import *
 
 #set parameters for simulation
-N = 150
+N = 256
 delta_r = 1./N
-delta_t = 0.01
+delta_t = 0.25/256.
 courant = delta_t / delta_r
-timesteps = 300
-epsilon = 0.5
+timesteps = 100
+epsilon = 0.3
 
 correction_weight = 1.
 GEOM_COUPLING = True
 
 #define grid
 R     = 50. 
-amp   = 0.002
+amp   = 0.01
 r_0   = 20.
 delta = 5.
 
@@ -60,7 +60,7 @@ if(GEOM_COUPLING == True):
 	f_n[0:N]     = psi[0, :] 
 	f_n[N:2*N]   = beta[0, :]
 	f_n[2*N:3*N] = alpha[0, :]
-	f_n = solve_elliptics(f_n, xi[0, :], Pi[0, :], r_grid, correction_weight=correction_weight)
+	f_n = solve_elliptics_first_ts(f_n, xi[0, :], Pi[0, :], r_grid, correction_weight=correction_weight)
 	#now set psi, beta, alpha with solution to elliptics
 	psi[0, :]   = f_n[0:N]
 	beta[0, :]  = f_n[N:2*N]
@@ -101,13 +101,13 @@ def populate_matrices(n):
                           else delta_t/2. * (1./(2.*delta_r)) if j==i-2
 			  else 0 for j in range(2*N)]
 	    else:
-		A[i, :] = [1.   -delta_t/2.* (1.*(beta[n][i+1]-beta[n][i-1])/(2.*delta_r)) if j==i
-			   else -delta_t/2.* ( beta[n][i]/(2.*delta_r) ) if j==i+1
-			   else -delta_t/2.* (-beta[n][i]/(2.*delta_r) ) if j==i-1
-			   else -delta_t/2.* ( 1./psi[n][i%N]**2. * (alpha[n][i%N+1]-alpha[n][i%N-1])/(2.*delta_r) 
-					      -2.*alpha[n][i%N]/psi[n][i%N]**3.*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r) ) if j==N+i
-			   else -delta_t/2.* (alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i+1
-			   else -delta_t/2.*(-alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i-1
+		A[i, :] = [1.   -delta_t/2.* (1.*(beta[n+1][i+1]-beta[n+1][i-1])/(2.*delta_r)) if j==i
+			   else -delta_t/2.* ( beta[n+1][i]/(2.*delta_r) ) if j==i+1
+			   else -delta_t/2.* (-beta[n+1][i]/(2.*delta_r) ) if j==i-1
+			   else -delta_t/2.* ( 1./psi[n+1][i%N]**2. * (alpha[n+1][i%N+1]-alpha[n+1][i%N-1])/(2.*delta_r) 
+					      -2.*alpha[n+1][i%N]/psi[n+1][i%N]**3.*(psi[n+1][i%N+1]-psi[n+1][i%N-1])/(2.*delta_r) ) if j==N+i
+			   else -delta_t/2.* (alpha[n+1][i%N]/psi[n+1][i%N]**2.*1./(2.*delta_r)) if j==N+i+1
+			   else -delta_t/2.*(-alpha[n+1][i%N]/psi[n+1][i%N]**2.*1./(2.*delta_r)) if j==N+i-1
 			   else 0 for j in range(2*N)]
 
 	
@@ -123,16 +123,16 @@ def populate_matrices(n):
                            else delta_t/2. * (1./(2.*delta_r)) if j==i-2
 			   else 0 for j in range(2*N)]
 	    else:
-		A[i, :] = [1. - delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N]) 
-                                             + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)
-					     + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) if j==i
-			   else -delta_t/2. * (beta[n][i%N]/(2.*delta_r)) if j==i+1
-			   else -delta_t/2. * (-beta[n][i%N]/(2.*delta_r)) if j==i-1
-			   else -delta_t/2. * (2.*alpha[n][i%N]/(r_grid[i%N]*psi[n][i%N]**2.)
-					       + 2.*alpha[n][i%N]*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r*psi[n][i%N]**3.)
-					       + 1./psi[n][i%N]**2.*(alpha[n][i%N+1]-alpha[n][i%N-1])/(2.*delta_r)) if j==i-N
-			   else -delta_t/2. * (alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N+1
-			   else -delta_t/2. *(-alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N-1
+		A[i, :] = [1. - delta_t/2. * (2.*beta[n+1][i%N]/(3.*r_grid[i%N]) 
+                                             + 1./3.*(beta[n+1][i%N+1]-beta[n+1][i%N-1])/(2.*delta_r)
+					     + 4.*beta[n+1][i%N]/(2.*psi[n+1][i%N])*(psi[n+1][i%N+1]-psi[n+1][i%N-1])/(2.*delta_r)) if j==i
+			   else -delta_t/2. * (beta[n+1][i%N]/(2.*delta_r)) if j==i+1
+			   else -delta_t/2. * (-beta[n+1][i%N]/(2.*delta_r)) if j==i-1
+			   else -delta_t/2. * (2.*alpha[n+1][i%N]/(r_grid[i%N]*psi[n+1][i%N]**2.)
+					       + 2.*alpha[n+1][i%N]*(psi[n+1][i%N+1]-psi[n+1][i%N-1])/(2.*delta_r*psi[n+1][i%N]**3.)
+					       + 1./psi[n+1][i%N]**2.*(alpha[n+1][i%N+1]-alpha[n+1][i%N-1])/(2.*delta_r)) if j==i-N
+			   else -delta_t/2. * (alpha[n+1][i%N]/psi[n+1][i%N]**2. * 1./(2.*delta_r)) if j==i-N+1
+			   else -delta_t/2. *(-alpha[n+1][i%N]/psi[n+1][i%N]**2. * 1./(2.*delta_r)) if j==i-N-1
 			   else 0 for j in range(2*N)]
 
 	
@@ -251,62 +251,130 @@ def update_r_s(ans, timestep):
 
     return 0
 
+#n = 0
+elliptic_res = np.zeros(3*N)
+matter_res   = np.zeros(2*N)
+xi_residual  = np.zeros(N)
+Pi_residual  = np.zeros(N)
+
+#initial guess for elliptics
+psi[1, :]   = psi[0, :]
+beta[1, :]  = beta[0, :]
+alpha[1, :] = alpha[0, :]
+
+#num_iter = 0
+#max_num_iter = 8
+#elliptics_tol = 1e-8
+#
+#normres = 10.
+
+def solve_system(n):
+	num_iter = 0
+	max_num_iter = 8
+	elliptics_tol = 1e-8
+
+	normres = 10. #TODO: make this the actual residual
+
+	while(num_iter <= max_num_iter and normres > elliptics_tol):
+		num_iter += 1
+	#for i in range(10):
+		#we want to work through the first iteration of the coupled matter-elliptics solver
+		#1.) elliptics, matter at n=0 are solved.
+		#2.) we want to solve matter with a guess for elliptics at n=1
+		populate_matrices(n)            #A has n+1, B has n
+		u = update_u(n)                 #populate u with xi, Pi at n = 0
+		bb = B.dot(u)                   #compute bb (all at n = 0)
+		ans = np.linalg.solve(A, bb)    #solve for xi, Pi at n=1 with elliptics guess for n=1
+		update_r_s(ans, n+1)            #update xi, Pi at n=1 with elliptics guess for n=1
+	
+		#do one Newton iteration to improve elliptics at future timestep n+1
+		f_n, elliptic_res = Newton_iteration(xi, Pi, psi, beta, alpha, r_grid, n+1, delta_t, epsilon, correction_weight)
+		psi[n+1, :]   = f_n[0:N]
+		beta[n+1, :]  = f_n[N:2*N]
+		alpha[n+1, :] = f_n[2*N:3*N]
+	
+		#confusion with n in below matter_residuals
+		xi_residual, Pi_residual = matter_residuals(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon)
+		matter_res = np.append(xi_residual, Pi_residual)
+	
+		res = np.append(elliptic_res, matter_res)
+		normres = np.amax(np.abs(res))
+		print 'inf. norm of residual:', np.amax(np.abs(elliptic_res)), np.amax(np.abs(matter_res)), normres
+
+	return 0.
+
+for n in range(timesteps-1):
+	print '-----', n, '-----'
+	solve_system(n)
+
+#for n in range(1, timesteps):
+#    populate_matrices(n-1) #TODO: not sure this works
+#
+#    u = update_u(n-1)
+#
+#    bb = B.dot(u)
+#
+#    ans = np.linalg.solve(A, bb)
+#
+#    update_r_s(ans, n)
+#
+#    print 'timestep n =', n
+#
+#    if(GEOM_COUPLING == True):
+#	    #need to solve elliptics before populating CN matrices
+#	    #first set initial values of f_n
+#	    f_n = np.zeros(3*N)
+#	    f_n[0:N]     = psi[n-1, :] #TODO: testing this
+#	    f_n[N:2*N]   = beta[n-1, :]
+#	    f_n[2*N:3*N] = alpha[n-1, :]
+#	    f_n = solve_elliptics(f_n, xi[n, :], Pi[n, :], r_grid, correction_weight=correction_weight)
+#	    #now set psi, beta, alpha with solution to elliptics
+#	    psi[n, :]   = f_n[0:N]
+#	    beta[n, :]  = f_n[N:2*N]
+#	    alpha[n, :] = f_n[2*N:3*N]
+#
+#    for i in range(N):
+#        #uses O(h^2) Crank-Nicolson time differencing
+#    	phi[n, i] = ( phi[n-1, i] + 0.5 * delta_t * ((alpha[n][i]/psi[n][i]**2.*Pi[n, i] 
+#                                                      + beta[n][i]*xi[n][i]) 
+#                                                    + (alpha[n-1][i]/psi[n-1][i]**2.*Pi[n-1, i] 
+#                                                       + beta[n-1][i]*xi[n-1, i])) )
+
 for n in range(1, timesteps):
-    populate_matrices(n-1) #TODO: not sure this works
-
-    u = update_u(n-1)
-
-    bb = B.dot(u)
-
-    ans = np.linalg.solve(A, bb)
-
-    update_r_s(ans, n)
-
-    print 'timestep n =', n
-
-    if(GEOM_COUPLING == True):
-	    #need to solve elliptics before populating CN matrices
-	    #first set initial values of f_n
-	    f_n = np.zeros(3*N)
-	    f_n[0:N]     = psi[n-1, :] #TODO: testing this
-	    f_n[N:2*N]   = beta[n-1, :]
-	    f_n[2*N:3*N] = alpha[n-1, :]
-	    f_n = solve_elliptics(f_n, xi[n, :], Pi[n, :], r_grid, correction_weight=correction_weight)
-	    #now set psi, beta, alpha with solution to elliptics
-	    psi[n, :]   = f_n[0:N]
-	    beta[n, :]  = f_n[N:2*N]
-	    alpha[n, :] = f_n[2*N:3*N]
-
-    for i in range(N):
+	for i in range(N):
         #uses O(h^2) Crank-Nicolson time differencing
-    	phi[n, i] = ( phi[n-1, i] + 0.5 * delta_t * ((alpha[n][i]/psi[n][i]**2.*Pi[n, i] 
-                                                      + beta[n][i]*xi[n][i]) 
-                                                    + (alpha[n-1][i]/psi[n-1][i]**2.*Pi[n-1, i] 
-                                                       + beta[n-1][i]*xi[n-1, i])) )
+		phi[n, i] = ( phi[n-1, i] + 0.5 * delta_t * ((alpha[n][i]/psi[n][i]**2.*Pi[n, i] 
+		                                               + beta[n][i]*xi[n][i]) 
+		                                             + (alpha[n-1][i]/psi[n-1][i]**2.*Pi[n-1, i] 
+		                                                + beta[n-1][i]*xi[n-1, i])) )
 
 print '-----computing mass aspect-----'
 mass_aspect = np.zeros((timesteps, N)) 
 #this computes the mass aspect function m(r,t)
-for n in range(timesteps):
+for n in range(timesteps-1): #TODO: make this the same as sample code
 	for j in range(N):
-		if(j == 0):
-			mass_aspect[n, j] = ( r_grid[j] * psi[n,j]**6./(18.*alpha[n,j]**2.)
-                                             *(r_grid[j]*(-3.*beta[n,j]+4.*beta[n,j+1]-beta[n,j+2])/(2.*delta_r)  
-                                               - beta[n,j] )**2.
-                                             - 2.*r_grid[j]**2.*(-3.*psi[n,j]+4.*psi[n,j+1]-psi[n,j+2])/(2.*delta_r)
-                                               *(psi[n,j] + r_grid[j]*(-3.*psi[n,j]+4.*psi[n,j+1]-psi[n,j+2])/(2.*delta_r) ) )
+#		if(j == 0):
+#			mass_aspect[n, j] = ( r_grid[j] * psi[n,j]**6./(18.*alpha[n,j]**2.)
+#                                             *(r_grid[j]*(-3.*beta[n,j]+4.*beta[n,j+1]-beta[n,j+2])/(2.*delta_r)  
+#                                               - beta[n,j] )**2.
+#                                             - 2.*r_grid[j]**2.*(-3.*psi[n,j]+4.*psi[n,j+1]-psi[n,j+2])/(2.*delta_r)
+#                                               *(psi[n,j] + r_grid[j]*(-3.*psi[n,j]+4.*psi[n,j+1]-psi[n,j+2])/(2.*delta_r) ) )
+#		elif(j == N-1):
+#			mass_aspect[n, j] = ( r_grid[j] * psi[n,j]**6./(18.*alpha[n,j]**2.)
+#                                             *(r_grid[j]*(3.*beta[n,j]-4.*beta[n,j-1]+beta[n,j-2])/(2.*delta_r) 
+#                                               - beta[n,j] )**2. 
+#                                             - 2.*r_grid[j]**2.*(3.*psi[n,j]-4.*psi[n,j-1]+psi[n,j-2])/(2.*delta_r) 
+#                                               *(psi[n,j] + r_grid[j]*(3.*psi[n,j]-4.*psi[n,j-1]+psi[n,j-2])/(2.*delta_r) ) )
+		if(j != 0 and j != N-1):
+			mass_aspect[n, j] = ( r_grid[j] * psi[n+1,j]**6./(18.*alpha[n+1,j]**2.)
+					     *(r_grid[j]*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r) 
+                                               - beta[n+1,j] )**2.
+					     - 2.*r_grid[j]**2.*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+					       *(psi[n+1,j] + r_grid[j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r) ) )
+		elif(j == 0):
+			mass_aspect[n, j] = mass_aspect[n, j+1]
 		elif(j == N-1):
-			mass_aspect[n, j] = ( r_grid[j] * psi[n,j]**6./(18.*alpha[n,j]**2.)
-                                             *(r_grid[j]*(3.*beta[n,j]-4.*beta[n,j-1]+beta[n,j-2])/(2.*delta_r) 
-                                               - beta[n,j] )**2. 
-                                             - 2.*r_grid[j]**2.*(3.*psi[n,j]-4.*psi[n,j-1]+psi[n,j-2])/(2.*delta_r) 
-                                               *(psi[n,j] + r_grid[j]*(3.*psi[n,j]-4.*psi[n,j-1]+psi[n,j-2])/(2.*delta_r) ) )
-		else:
-			mass_aspect[n, j] = ( r_grid[j] * psi[n,j]**6./(18.*alpha[n,j]**2.)
-					     *(r_grid[j]*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r) 
-                                               - beta[n,j] )**2.
-					     - 2.*r_grid[j]**2.*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
-					       *(psi[n,j] + r_grid[j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r) ) )
+			mass_aspect[n, j] = mass_aspect[n, j-1]
 
 print '-----saving datafiles-----'
 np.savetxt('r_grid.txt', r_grid)
@@ -318,199 +386,199 @@ np.savetxt('beta.txt', beta)
 np.savetxt('alpha.txt', alpha)
 np.savetxt('mass_aspect.txt', mass_aspect)
 
-print '-----computing residuals-----'
-phi_residual = np.zeros((timesteps, N))
-xi_residual  = np.zeros((timesteps, N))
-Pi_residual  = np.zeros((timesteps, N))
+#print '-----computing residuals-----'
+#phi_residual = np.zeros((timesteps, N))
+#xi_residual  = np.zeros((timesteps, N))
+#Pi_residual  = np.zeros((timesteps, N))
+#
+#psi_residual    = np.zeros((timesteps, N))
+#psi_ev_residual = np.zeros((timesteps, N))
+#alpha_residual  = np.zeros((timesteps, N))
+#beta_residual   = np.zeros((timesteps, N))
+#
+#for n in range(timesteps-1):
+#	f_n = np.zeros(3*N)
+#        f_n[0:N]     = psi[n, :]
+#        f_n[N:2*N]   = beta[n, :]
+#        f_n[2*N:3*N] = alpha[n, :]
+#        f_n = residual(f_n, xi[n, :], Pi[n, :], r_grid)
+#        #now set psi_residual, beta_residual, alpha_residual
+#        psi_residual[n, :]   = f_n[0:N]
+#        beta_residual[n, :]  = f_n[N:2*N]
+#        alpha_residual[n, :] = f_n[2*N:3*N]
 
-psi_residual    = np.zeros((timesteps, N))
-psi_ev_residual = np.zeros((timesteps, N))
-alpha_residual  = np.zeros((timesteps, N))
-beta_residual   = np.zeros((timesteps, N))
 
-for n in range(timesteps-1):
-	f_n = np.zeros(3*N)
-        f_n[0:N]     = psi[n, :]
-        f_n[N:2*N]   = beta[n, :]
-        f_n[2*N:3*N] = alpha[n, :]
-        f_n = residual(f_n, xi[n, :], Pi[n, :], r_grid)
-        #now set psi_residual, beta_residual, alpha_residual
-        psi_residual[n, :]   = f_n[0:N]
-        beta_residual[n, :]  = f_n[N:2*N]
-        alpha_residual[n, :] = f_n[2*N:3*N]
-
-
-for n in range(timesteps-1):
-	for j in range(N):
-		if(j == 0):
-			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t 
-					       - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
-					       - 0.5*beta[n,j]*xi[n,j] 
-					       - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
-                                               - 0.5*beta[n+1,j]*xi[n+1,j]) 
-			xi_residual[n, j]  = 0.5*(xi[n, j] + xi[n+1,j])
-			Pi_residual[n, j]  = ( -Pi[n+1,j+2] + 4.*Pi[n+1,j+1] - 3.*Pi[n+1,j] 
-					       -Pi[n,j+2]   + 4.*Pi[n,j+1]   - 3.*Pi[n,j] )
-			psi_ev_residual[n, j] = ( -psi[n+1,j+2] + 4.*psi[n+1,j+1] - 3.*psi[n+1,j]
-                                               -psi[n,j+2]   + 4.*psi[n,j+1]   - 3.*psi[n,j] )
-		elif(j == 1):
-			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t
-                                               - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
-                                               - 0.5*beta[n,j]*xi[n,j]
-                                               - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
-                                               - 0.5*beta[n+1,j]*xi[n+1,j])
-                        xi_residual[n, j] = ( (xi[n+1,j]-xi[n,j])/delta_t
-                                            -0.5*(-2.*Pi[n,j]*alpha[n,j]/psi[n,j]**3. * (psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
-                                                  + Pi[n,j]/psi[n,j]**2. * (alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
-                                                  + alpha[n,j]/psi[n,j]**2. * (Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
-                                                  + beta[n,j] * (xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
-                                                  + xi[n,j] * (beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
-                                                  -2.*Pi[n+1,j]*alpha[n+1,j]/psi[n+1,j]**3. * (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
-                                                  + Pi[n+1,j]/psi[n+1,j]**2. * (alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
-                                                  + alpha[n+1,j]/psi[n+1,j]**2. * (Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
-                                                  + beta[n+1,j] * (xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
-                                                  + xi[n+1,j] * (beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)    )
-                                                  +(epsilon/(16.*delta_t))*(-xi[n,j]-4*xi[n,j-1]+6*xi[n,j]-4*xi[n,j+1]+xi[n,j+2])
-                                                )
-                        Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
-                                             -0.5*(2./3.)*Pi[n,j]*beta[n,j]/r_grid[j]
-					     -0.5*(4./2.)*beta[n,j]*Pi[n,j]/psi[n,j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
-                                             -0.5*(1./3.)*Pi[n,j]*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
-                                             -0.5*beta[n,j]*(Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
-                                             -0.5*alpha[n,j]/psi[n,j]**2.*(xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
-                                             -0.5*2.*alpha[n,j]*xi[n,j]/(psi[n,j]**2.*r_grid[j])
-                                             -0.5*2.*alpha[n,j]*xi[n,j]/psi[n,j]**3.*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
-                                             -0.5*xi[n,j]/psi[n,j]**2.*(alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
-                                             -0.5*(2./3.)*Pi[n+1,j]*beta[n+1,j]/r_grid[j]
-					     -0.5*(4./2.)*beta[n+1,j]*Pi[n+1,j]/psi[n+1,j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
-                                             -0.5*(1./3.)*Pi[n+1,j]*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
-                                             -0.5*beta[n+1,j]*(Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
-                                             -0.5*alpha[n+1,j]/psi[n+1,j]**2.*(xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
-                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/(psi[n+1,j]**2.*r_grid[j])
-                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/psi[n+1,j]**3.*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
-                                             -0.5*xi[n+1,j]/psi[n+1,j]**2.*(alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
-                                             +(epsilon/(16.*delta_t))*(Pi[n,j]-4*Pi[n,j-1]+6*Pi[n,j]-4*Pi[n,j+1]+Pi[n,j+2])
-                                            )
-                        psi_ev_residual[n,j] = ( (psi[n+1,j]-psi[n,j])/delta_t
-                                                -0.5*( beta[n,j]*(psi[n,j]/(3.*r_grid[j]) + (psi[n,j+1]-psi[n,j-1])/(2.*delta_r) )
-                                                      +psi[n,j]/6.*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
-                                                      +beta[n+1,j]*(psi[n+1,j]/(3.*r_grid[j]) + (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r) )
-                                                      +psi[n+1,j]/6.*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
-                                                        )
-                                            )
-		elif(j == N-1):
-			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t  
-                                               - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
-                                               - 0.5*beta[n,j]*xi[n,j]
-                                               - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
-                                               - 0.5*beta[n+1,j]*xi[n+1,j])
-			xi_residual[n, j] = ( (xi[n+1,j]-xi[n,j])/delta_t 
-                                           + 0.5 * ( (3.*xi[n+1,j] - 4.*xi[n+1,j-1] + xi[n+1, j-2])/(2.*delta_r) 
-                                                    + xi[n+1,j]/r_grid[j]
-						    +(3.*xi[n,j] - 4.*xi[n,j-1] + xi[n, j-2])/(2.*delta_r)  
-						    + xi[n,j]/r_grid[j]) )
-			Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
-                                           + 0.5 * ( (3.*Pi[n+1,j] - 4.*Pi[n+1,j-1] + Pi[n+1, j-2])/(2.*delta_r)
-                                                    + Pi[n+1,j]/r_grid[j]
-                                                    +(3.*Pi[n,j] - 4.*Pi[n,j-1] + Pi[n, j-2])/(2.*delta_r)
-                                                    + Pi[n,j]/r_grid[j]) )
-			psi_ev_residual[n,j] = ( (3.*psi[n,j]-4.*psi[n,j-1]+psi[n,j-2])/(2.*delta_r) + psi[n,j]/r_grid[j]
-					     +(3.*psi[n+1,j]-4.*psi[n+1,j-1]+psi[n+1,j-2])/(2.*delta_r) + psi[n+1,j]/r_grid[j] )
-		elif(j == N-2):
-			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t
-                                               - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
-                                               - 0.5*beta[n,j]*xi[n,j]
-                                               - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
-                                               - 0.5*beta[n+1,j]*xi[n+1,j])
-                        xi_residual[n, j] = ( (xi[n+1,j]-xi[n,j])/delta_t
-                                            -0.5*(-2.*Pi[n,j]*alpha[n,j]/psi[n,j]**3. * (psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
-                                                  + Pi[n,j]/psi[n,j]**2. * (alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
-                                                  + alpha[n,j]/psi[n,j]**2. * (Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
-                                                  + beta[n,j] * (xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
-                                                  + xi[n,j] * (beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
-                                                  -2.*Pi[n+1,j]*alpha[n+1,j]/psi[n+1,j]**3. * (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
-                                                  + Pi[n+1,j]/psi[n+1,j]**2. * (alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
-                                                  + alpha[n+1,j]/psi[n+1,j]**2. * (Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
-                                                  + beta[n+1,j] * (xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
-                                                  + xi[n+1,j] * (beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)    )
-                                                )
-                        Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
-                                             -0.5*(2./3.)*Pi[n,j]*beta[n,j]/r_grid[j]
-					     -0.5*(4./2.)*beta[n,j]*Pi[n,j]/psi[n,j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
-                                             -0.5*(1./3.)*Pi[n,j]*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
-                                             -0.5*beta[n,j]*(Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
-                                             -0.5*alpha[n,j]/psi[n,j]**2.*(xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
-                                             -0.5*2.*alpha[n,j]*xi[n,j]/(psi[n,j]**2.*r_grid[j])
-                                             -0.5*2.*alpha[n,j]*xi[n,j]/psi[n,j]**3.*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
-                                             -0.5*xi[n,j]/psi[n,j]**2.*(alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
-                                             -0.5*(2./3.)*Pi[n+1,j]*beta[n+1,j]/r_grid[j]
-					     -0.5*(4./2.)*beta[n+1,j]*Pi[n+1,j]/psi[n+1,j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
-                                             -0.5*(1./3.)*Pi[n+1,j]*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
-                                             -0.5*beta[n+1,j]*(Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
-                                             -0.5*alpha[n+1,j]/psi[n+1,j]**2.*(xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
-                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/(psi[n+1,j]**2.*r_grid[j])
-                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/psi[n+1,j]**3.*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
-                                             -0.5*xi[n+1,j]/psi[n+1,j]**2.*(alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
-                                            )
-                        psi_ev_residual[n,j] = ( (psi[n+1,j]-psi[n,j])/delta_t
-                                                -0.5*( beta[n,j]*(psi[n,j]/(3.*r_grid[j]) + (psi[n,j+1]-psi[n,j-1])/(2.*delta_r) )
-                                                      +psi[n,j]/6.*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
-                                                      +beta[n+1,j]*(psi[n+1,j]/(3.*r_grid[j]) + (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r) )
-                                                      +psi[n+1,j]/6.*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
-                                                        )
-                                            ) 
-		else:
-			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t  
-                                               - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
-                                               - 0.5*beta[n,j]*xi[n,j]
-                                               - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
-                                               - 0.5*beta[n+1,j]*xi[n+1,j])
-			xi_residual[n, j] = ( (xi[n+1,j]-xi[n,j])/delta_t
-					    -0.5*(-2.*Pi[n,j]*alpha[n,j]/psi[n,j]**3. * (psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
-						  + Pi[n,j]/psi[n,j]**2. * (alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
-						  + alpha[n,j]/psi[n,j]**2. * (Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
-						  + beta[n,j] * (xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
-						  + xi[n,j] * (beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
-						  -2.*Pi[n+1,j]*alpha[n+1,j]/psi[n+1,j]**3. * (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)    
-                                                  + Pi[n+1,j]/psi[n+1,j]**2. * (alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)    
-                                                  + alpha[n+1,j]/psi[n+1,j]**2. * (Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)    
-                                                  + beta[n+1,j] * (xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)    
-                                                  + xi[n+1,j] * (beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)    )
-					    	  +(epsilon/(16.*delta_t))*(xi[n,j-2]-4*xi[n,j-1]+6*xi[n,j]-4*xi[n,j+1]+xi[n,j+2])
-						)
-			Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
-					     -0.5*(2./3.)*Pi[n,j]*beta[n,j]/r_grid[j]
-					     -0.5*(4./2.)*beta[n,j]*Pi[n,j]/psi[n,j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
-					     -0.5*(1./3.)*Pi[n,j]*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
-					     -0.5*beta[n,j]*(Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
-					     -0.5*alpha[n,j]/psi[n,j]**2.*(xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
-					     -0.5*2.*alpha[n,j]*xi[n,j]/(psi[n,j]**2.*r_grid[j])
-					     -0.5*2.*alpha[n,j]*xi[n,j]/psi[n,j]**3.*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
-					     -0.5*xi[n,j]/psi[n,j]**2.*(alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
-					     -0.5*(2./3.)*Pi[n+1,j]*beta[n+1,j]/r_grid[j]
-					     -0.5*(4./2.)*beta[n+1,j]*Pi[n+1,j]/psi[n+1,j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
-                                             -0.5*(1./3.)*Pi[n+1,j]*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
-                                             -0.5*beta[n+1,j]*(Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
-                                             -0.5*alpha[n+1,j]/psi[n+1,j]**2.*(xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
-                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/(psi[n+1,j]**2.*r_grid[j])
-                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/psi[n+1,j]**3.*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
-                                             -0.5*xi[n+1,j]/psi[n+1,j]**2.*(alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
-					     +(epsilon/(16.*delta_t))*(Pi[n,j-2]-4*Pi[n,j-1]+6*Pi[n,j]-4*Pi[n,j+1]+Pi[n,j+2])
-					    )
-			psi_ev_residual[n,j] = ( (psi[n+1,j]-psi[n,j])/delta_t 
-						-0.5*( beta[n,j]*(psi[n,j]/(3.*r_grid[j]) + (psi[n,j+1]-psi[n,j-1])/(2.*delta_r) )
-						      +psi[n,j]/6.*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
-						      +beta[n+1,j]*(psi[n+1,j]/(3.*r_grid[j]) + (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r) )
-                                                      +psi[n+1,j]/6.*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)   
-							)
-					    )
-
-np.savetxt('phi_residual.txt', phi_residual)
-np.savetxt('xi_residual.txt', xi_residual)
-np.savetxt('Pi_residual.txt', Pi_residual) 
-np.savetxt('psi_residual.txt', psi_residual)
-np.savetxt('psi_ev_residual.txt', psi_ev_residual)
-np.savetxt('beta_residual.txt', beta_residual)
-np.savetxt('alpha_residual.txt', alpha_residual)
+#for n in range(timesteps-1):
+#	for j in range(N):
+#		if(j == 0):
+#			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t 
+#					       - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
+#					       - 0.5*beta[n,j]*xi[n,j] 
+#					       - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
+#                                               - 0.5*beta[n+1,j]*xi[n+1,j]) 
+#			xi_residual[n, j]  = 0.5*(xi[n, j] + xi[n+1,j])
+#			Pi_residual[n, j]  = ( -Pi[n+1,j+2] + 4.*Pi[n+1,j+1] - 3.*Pi[n+1,j] 
+#					       -Pi[n,j+2]   + 4.*Pi[n,j+1]   - 3.*Pi[n,j] )
+#			psi_ev_residual[n, j] = ( -psi[n+1,j+2] + 4.*psi[n+1,j+1] - 3.*psi[n+1,j]
+#                                               -psi[n,j+2]   + 4.*psi[n,j+1]   - 3.*psi[n,j] )
+#		elif(j == 1):
+#			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t
+#                                               - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
+#                                               - 0.5*beta[n,j]*xi[n,j]
+#                                               - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
+#                                               - 0.5*beta[n+1,j]*xi[n+1,j])
+#                        xi_residual[n, j] = ( (xi[n+1,j]-xi[n,j])/delta_t
+#                                            -0.5*(-2.*Pi[n,j]*alpha[n,j]/psi[n,j]**3. * (psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+#                                                  + Pi[n,j]/psi[n,j]**2. * (alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
+#                                                  + alpha[n,j]/psi[n,j]**2. * (Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
+#                                                  + beta[n,j] * (xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
+#                                                  + xi[n,j] * (beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
+#                                                  -2.*Pi[n+1,j]*alpha[n+1,j]/psi[n+1,j]**3. * (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+#                                                  + Pi[n+1,j]/psi[n+1,j]**2. * (alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
+#                                                  + alpha[n+1,j]/psi[n+1,j]**2. * (Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
+#                                                  + beta[n+1,j] * (xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
+#                                                  + xi[n+1,j] * (beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)    )
+#                                                  +(epsilon/(16.*delta_t))*(-xi[n,j]-4*xi[n,j-1]+6*xi[n,j]-4*xi[n,j+1]+xi[n,j+2])
+#                                                )
+#                        Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
+#                                             -0.5*(2./3.)*Pi[n,j]*beta[n,j]/r_grid[j]
+#					     -0.5*(4./2.)*beta[n,j]*Pi[n,j]/psi[n,j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+#                                             -0.5*(1./3.)*Pi[n,j]*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
+#                                             -0.5*beta[n,j]*(Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
+#                                             -0.5*alpha[n,j]/psi[n,j]**2.*(xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
+#                                             -0.5*2.*alpha[n,j]*xi[n,j]/(psi[n,j]**2.*r_grid[j])
+#                                             -0.5*2.*alpha[n,j]*xi[n,j]/psi[n,j]**3.*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+#                                             -0.5*xi[n,j]/psi[n,j]**2.*(alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
+#                                             -0.5*(2./3.)*Pi[n+1,j]*beta[n+1,j]/r_grid[j]
+#					     -0.5*(4./2.)*beta[n+1,j]*Pi[n+1,j]/psi[n+1,j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*(1./3.)*Pi[n+1,j]*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*beta[n+1,j]*(Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*alpha[n+1,j]/psi[n+1,j]**2.*(xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/(psi[n+1,j]**2.*r_grid[j])
+#                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/psi[n+1,j]**3.*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*xi[n+1,j]/psi[n+1,j]**2.*(alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
+#                                             +(epsilon/(16.*delta_t))*(Pi[n,j]-4*Pi[n,j-1]+6*Pi[n,j]-4*Pi[n,j+1]+Pi[n,j+2])
+#                                            )
+#                        psi_ev_residual[n,j] = ( (psi[n+1,j]-psi[n,j])/delta_t
+#                                                -0.5*( beta[n,j]*(psi[n,j]/(3.*r_grid[j]) + (psi[n,j+1]-psi[n,j-1])/(2.*delta_r) )
+#                                                      +psi[n,j]/6.*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
+#                                                      +beta[n+1,j]*(psi[n+1,j]/(3.*r_grid[j]) + (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r) )
+#                                                      +psi[n+1,j]/6.*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
+#                                                        )
+#                                            )
+#		elif(j == N-1):
+#			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t  
+#                                               - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
+#                                               - 0.5*beta[n,j]*xi[n,j]
+#                                               - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
+#                                               - 0.5*beta[n+1,j]*xi[n+1,j])
+#			xi_residual[n, j] = ( (xi[n+1,j]-xi[n,j])/delta_t 
+#                                           + 0.5 * ( (3.*xi[n+1,j] - 4.*xi[n+1,j-1] + xi[n+1, j-2])/(2.*delta_r) 
+#                                                    + xi[n+1,j]/r_grid[j]
+#						    +(3.*xi[n,j] - 4.*xi[n,j-1] + xi[n, j-2])/(2.*delta_r)  
+#						    + xi[n,j]/r_grid[j]) )
+#			Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
+#                                           + 0.5 * ( (3.*Pi[n+1,j] - 4.*Pi[n+1,j-1] + Pi[n+1, j-2])/(2.*delta_r)
+#                                                    + Pi[n+1,j]/r_grid[j]
+#                                                    +(3.*Pi[n,j] - 4.*Pi[n,j-1] + Pi[n, j-2])/(2.*delta_r)
+#                                                    + Pi[n,j]/r_grid[j]) )
+#			psi_ev_residual[n,j] = ( (3.*psi[n,j]-4.*psi[n,j-1]+psi[n,j-2])/(2.*delta_r) + psi[n,j]/r_grid[j]
+#					     +(3.*psi[n+1,j]-4.*psi[n+1,j-1]+psi[n+1,j-2])/(2.*delta_r) + psi[n+1,j]/r_grid[j] )
+#		elif(j == N-2):
+#			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t
+#                                               - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
+#                                               - 0.5*beta[n,j]*xi[n,j]
+#                                               - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
+#                                               - 0.5*beta[n+1,j]*xi[n+1,j])
+#                        xi_residual[n, j] = ( (xi[n+1,j]-xi[n,j])/delta_t
+#                                            -0.5*(-2.*Pi[n,j]*alpha[n,j]/psi[n,j]**3. * (psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+#                                                  + Pi[n,j]/psi[n,j]**2. * (alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
+#                                                  + alpha[n,j]/psi[n,j]**2. * (Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
+#                                                  + beta[n,j] * (xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
+#                                                  + xi[n,j] * (beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
+#                                                  -2.*Pi[n+1,j]*alpha[n+1,j]/psi[n+1,j]**3. * (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+#                                                  + Pi[n+1,j]/psi[n+1,j]**2. * (alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
+#                                                  + alpha[n+1,j]/psi[n+1,j]**2. * (Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
+#                                                  + beta[n+1,j] * (xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
+#                                                  + xi[n+1,j] * (beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)    )
+#                                                )
+#                        Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
+#                                             -0.5*(2./3.)*Pi[n,j]*beta[n,j]/r_grid[j]
+#					     -0.5*(4./2.)*beta[n,j]*Pi[n,j]/psi[n,j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+#                                             -0.5*(1./3.)*Pi[n,j]*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
+#                                             -0.5*beta[n,j]*(Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
+#                                             -0.5*alpha[n,j]/psi[n,j]**2.*(xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
+#                                             -0.5*2.*alpha[n,j]*xi[n,j]/(psi[n,j]**2.*r_grid[j])
+#                                             -0.5*2.*alpha[n,j]*xi[n,j]/psi[n,j]**3.*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+#                                             -0.5*xi[n,j]/psi[n,j]**2.*(alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
+#                                             -0.5*(2./3.)*Pi[n+1,j]*beta[n+1,j]/r_grid[j]
+#					     -0.5*(4./2.)*beta[n+1,j]*Pi[n+1,j]/psi[n+1,j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*(1./3.)*Pi[n+1,j]*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*beta[n+1,j]*(Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*alpha[n+1,j]/psi[n+1,j]**2.*(xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/(psi[n+1,j]**2.*r_grid[j])
+#                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/psi[n+1,j]**3.*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*xi[n+1,j]/psi[n+1,j]**2.*(alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
+#                                            )
+#                        psi_ev_residual[n,j] = ( (psi[n+1,j]-psi[n,j])/delta_t
+#                                                -0.5*( beta[n,j]*(psi[n,j]/(3.*r_grid[j]) + (psi[n,j+1]-psi[n,j-1])/(2.*delta_r) )
+#                                                      +psi[n,j]/6.*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
+#                                                      +beta[n+1,j]*(psi[n+1,j]/(3.*r_grid[j]) + (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r) )
+#                                                      +psi[n+1,j]/6.*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
+#                                                        )
+#                                            ) 
+#		else:
+#			phi_residual[n, j] = ( (phi[n+1,j]-phi[n,j])/delta_t  
+#                                               - 0.5*alpha[n,j]/psi[n,j]**2.*Pi[n,j]
+#                                               - 0.5*beta[n,j]*xi[n,j]
+#                                               - 0.5*alpha[n+1,j]/psi[n+1,j]**2.*Pi[n+1,j]
+#                                               - 0.5*beta[n+1,j]*xi[n+1,j])
+#			xi_residual[n, j] = ( (xi[n+1,j]-xi[n,j])/delta_t
+#					    -0.5*(-2.*Pi[n,j]*alpha[n,j]/psi[n,j]**3. * (psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+#						  + Pi[n,j]/psi[n,j]**2. * (alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
+#						  + alpha[n,j]/psi[n,j]**2. * (Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
+#						  + beta[n,j] * (xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
+#						  + xi[n,j] * (beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
+#						  -2.*Pi[n+1,j]*alpha[n+1,j]/psi[n+1,j]**3. * (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)    
+#                                                  + Pi[n+1,j]/psi[n+1,j]**2. * (alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)    
+#                                                  + alpha[n+1,j]/psi[n+1,j]**2. * (Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)    
+#                                                  + beta[n+1,j] * (xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)    
+#                                                  + xi[n+1,j] * (beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)    )
+#					    	  +(epsilon/(16.*delta_t))*(xi[n,j-2]-4*xi[n,j-1]+6*xi[n,j]-4*xi[n,j+1]+xi[n,j+2])
+#						)
+#			Pi_residual[n, j] = ( (Pi[n+1,j]-Pi[n,j])/delta_t
+#					     -0.5*(2./3.)*Pi[n,j]*beta[n,j]/r_grid[j]
+#					     -0.5*(4./2.)*beta[n,j]*Pi[n,j]/psi[n,j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+#					     -0.5*(1./3.)*Pi[n,j]*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
+#					     -0.5*beta[n,j]*(Pi[n,j+1]-Pi[n,j-1])/(2.*delta_r)
+#					     -0.5*alpha[n,j]/psi[n,j]**2.*(xi[n,j+1]-xi[n,j-1])/(2.*delta_r)
+#					     -0.5*2.*alpha[n,j]*xi[n,j]/(psi[n,j]**2.*r_grid[j])
+#					     -0.5*2.*alpha[n,j]*xi[n,j]/psi[n,j]**3.*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+#					     -0.5*xi[n,j]/psi[n,j]**2.*(alpha[n,j+1]-alpha[n,j-1])/(2.*delta_r)
+#					     -0.5*(2./3.)*Pi[n+1,j]*beta[n+1,j]/r_grid[j]
+#					     -0.5*(4./2.)*beta[n+1,j]*Pi[n+1,j]/psi[n+1,j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*(1./3.)*Pi[n+1,j]*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*beta[n+1,j]*(Pi[n+1,j+1]-Pi[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*alpha[n+1,j]/psi[n+1,j]**2.*(xi[n+1,j+1]-xi[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/(psi[n+1,j]**2.*r_grid[j])
+#                                             -0.5*2.*alpha[n+1,j]*xi[n+1,j]/psi[n+1,j]**3.*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+#                                             -0.5*xi[n+1,j]/psi[n+1,j]**2.*(alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
+#					     +(epsilon/(16.*delta_t))*(Pi[n,j-2]-4*Pi[n,j-1]+6*Pi[n,j]-4*Pi[n,j+1]+Pi[n,j+2])
+#					    )
+#			psi_ev_residual[n,j] = ( (psi[n+1,j]-psi[n,j])/delta_t 
+#						-0.5*( beta[n,j]*(psi[n,j]/(3.*r_grid[j]) + (psi[n,j+1]-psi[n,j-1])/(2.*delta_r) )
+#						      +psi[n,j]/6.*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r)
+#						      +beta[n+1,j]*(psi[n+1,j]/(3.*r_grid[j]) + (psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r) )
+#                                                      +psi[n+1,j]/6.*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r)   
+#							)
+#					    )
+#
+#np.savetxt('phi_residual.txt', phi_residual)
+#np.savetxt('xi_residual.txt', xi_residual)
+#np.savetxt('Pi_residual.txt', Pi_residual) 
+#np.savetxt('psi_residual.txt', psi_residual)
+#np.savetxt('psi_ev_residual.txt', psi_ev_residual)
+#np.savetxt('beta_residual.txt', beta_residual)
+#np.savetxt('alpha_residual.txt', alpha_residual)
 
 print '-----done-----'
