@@ -302,7 +302,7 @@ def solve_elliptics_first_ts(f_n, xi, Pi, r_grid, correction_weight=1.):
 	return f_n
 
 
-def Newton_iteration(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon, correction_weight=1):
+def Newton_iteration(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon, correction_weight=1, PSI_EVOL=False):
 	N = np.shape(r_grid)[0]
 	delta_r = 1./N
 
@@ -320,7 +320,11 @@ def Newton_iteration(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon, corr
 
 	jacobi = jacobian(f_n, xi[n, :], Pi[n, :], r_grid)
 	diffvector = np.linalg.solve(jacobi, -elliptic_res)
-	f_n = f_n + diffvector #now contains updated psi, beta, alpha at timestep n
+
+	if(PSI_EVOL == True): #only update beta, alpha; keep psi unchanged
+		f_n[N:3*N] = f_n[N:3*N] + diffvector[N:3*N]
+	else: #update psi, beta, alpha
+		f_n = f_n + diffvector #now contains updated psi, beta, alpha at timestep n
 
 	return [f_n, elliptic_res/correction_weight]
 
