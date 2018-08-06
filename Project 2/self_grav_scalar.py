@@ -5,9 +5,9 @@ import sys
 #set parameters for simulation
 N = 200
 delta_r = 1./N
-delta_t = 0.0001
+delta_t = 0.01
 courant = delta_t / delta_r
-timesteps = 5
+timesteps = 50
 epsilon = 0.
 
 correction_weight = 1.
@@ -16,7 +16,7 @@ PSI_EVOL          = False
 
 #define grid
 R     = 50. 
-amp   = 0.0001
+amp   = 0.012
 r_0   = 20.
 delta = 5.
 

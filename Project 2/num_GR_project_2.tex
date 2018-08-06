@@ -59,7 +59,7 @@ where throughout this document a dot $(\dot{~})$ denotes a partial derivative wi
 
 The first equation of this system is the hyperbolic Klein-Gordon equation
 \begin{equation} \label{eq:hyperbolic_KGE}
-\dot{\Pi} - \frac{1}{r^2 \psi^4} \Big[ r^2 \psi^4 \Big( \beta \Pi + \frac{\alpha \xi}{\psi^2} \Big)\Big]' + \frac{2}{3} \Pi \Big[ \beta' + \frac{2 \beta}{r} \Big(1 + \frac{3 r \psi'}{\psi} \Big) \Big] = 0,
+\dot{\Pi} - \frac{1}{r^2 \psi^4} \Big[ r^2 \psi^4 \Big( \beta \Pi + \frac{\alpha \xi}{\psi^2} \Big)\Big]' + \frac{2}{3} \Pi \Big[ \beta' + \frac{2 \beta}{r} \Big(1 + \frac{3 r \psi'}{\redtext{2} \psi} \Big) \Big] = 0,
 \end{equation}
 followed by the hyperbolic evolution equation for $\xi$:
 \begin{equation} \label{eq:xi_evol}
@@ -77,6 +77,209 @@ and the maximal slicing condition yields an elliptic equation for $\alpha$:
 \begin{equation} \label{eq:alpha_evol}
 \alpha'' + \alpha' \Big[ \frac{2}{r} + \frac{2 \psi'}{\psi} \Big] - \alpha^{-1} \Big[ \frac{2 \psi^4}{3} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] - 8 \pi \alpha \Pi^2 = 0.
 \end{equation}
+
+\subsection{Deriving the Equations}
+It is possible to derive the equations above starting from the ADM equations (taken from Shapiro and Baumgarte).  We may begin with some basic definitions before showing the full equations.  First we define the matter source terms
+\begin{align}
+\rho &= n_a n_b T^{ab} \\
+S^i &= -\gamma^{ij} n^a T_{aj} \\
+S_{ij} &= \gamma_{ia} \gamma_{jb} T^{ab} \\
+S &= \gamma^{ij} S_{ij},
+\end{align}
+where $\gamma_{ij}$ is the spatial 3-metric, $n^a \equiv - g^{ab} \omega_b = -g^{ab} \alpha \nabla_b t$ is the unit normal to the spatial hyperslices, $T^{ab}$ is the stress-energy tensor, and $S_{ij}$ is the spatial stress-energy tensor.  It also helps to define the ADM line element
+\begin{equation} \label{eq:ADM_line_element}
+ds^2 = -\alpha^2 dt + \gamma_{ij} (dx^i + \beta^i dt) (dx^j + \beta^j dt)
+\end{equation}
+and the \textit{extrinsic curvature}
+\begin{equation}
+K_{ab} \equiv - \gamma_a^{~c} \gamma_b^{~d} \nabla_{(c} n_{d)} = - \gamma_a^{~c} \gamma_b^{~d} \nabla_c n_d.
+\end{equation}
+We'll also need the derivative operator
+\begin{equation}
+D_a f \equiv \gamma_{a}^{~b} \nabla_b f,
+\end{equation}
+for scalar $f$.
+
+The ADM equations include: the \textit{Hamiltonian constraint}
+\begin{equation}
+R + K^2 - K_{ij} K^{ij} = 16 \pi \rho;
+\end{equation}
+the \textit{momentum constraint}
+\begin{equation}
+D_j (K^{ij} - \gamma^{ij} K) = 8 \pi S^{i};
+\end{equation}
+the \textit{evolution equation for the spatial metric}
+\begin{equation} \label{eq:spatial_metric_evol}
+\partial_t \gamma_{ij} = -2 \alpha K_{ij} + D_i \beta_j + D_j \beta_i;
+\end{equation}
+and the \textit{evolution equation for the extrinsic curvature}
+\begin{equation}
+\begin{aligned}
+\partial_t K_{ij} &= \alpha (R_{ij} - 2 K_{ik} K^{k}_{~j} + K K_{ij}) - D_i D_j \alpha \\
+&- 8 \pi \alpha (S_{ij} - \frac{1}{2} \gamma_{ij} (S - \rho)) + \beta^k \partial_k K_{ij} + K_{ik} \partial_j \beta^k + K_{kj} \partial_i \beta^k.
+\end{aligned}
+\end{equation}
+
+Before we begin, we first need to find the stress-energy tensor for the scalar field, $T^{ab}$.  We may derive it beginning with the well-known Lagrangian of a massless scalar field $\Phi$:
+\begin{equation}
+\Lagr = \frac{1}{2} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi,
+\end{equation}
+so
+\begin{equation}
+\begin{aligned}
+T^{\mu}_{~\nu} &\equiv \frac{\partial \Lagr}{\partial (\partial_\mu \Phi)} \partial_\nu \Phi - \delta^\mu_\nu \Lagr \\
+T^{\mu \nu} &= g^{\gamma \nu} \frac{\partial \Lagr}{\partial (\partial_\mu \Phi)} \partial_\gamma \Phi - g^{\gamma \nu} \delta^\mu_\gamma \Lagr \\
+&= g^{\gamma \nu} \Big( \frac{1}{2} g^{\mu \nu} \delta^\mu_\nu \partial_\nu \Phi + \frac{1}{2} g^{\mu \nu} \partial_\mu \Phi \delta^\mu_\mu \Big) \partial_\gamma \Phi	 - g^{\gamma \nu} \delta^\mu_\gamma \frac{1}{2} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \\
+&= g^{\gamma \nu} \Big( \frac{1}{2} \partial^\mu \Phi + \frac{1}{2} \partial^\nu \Phi \Big) \partial_\gamma \Phi - g^{\gamma \nu} \delta^\mu_\gamma \frac{1}{2} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \\
+&= \partial^\mu \Phi \partial^\nu \Phi - \frac{1}{2} g^{\mu \nu} \partial^\gamma \Phi \partial_\gamma \Phi, \\
+\end{aligned}
+\end{equation}
+which agrees with the project description, equation 3.
+
+Now let's use equation \ref{eq:ADM_line_element} to find the metric and inverse metric.  Reading off the metric, we have
+\begin{equation}
+g_{ab} =
+\begin{pmatrix}
+-\alpha^{2} + \beta_l \beta^l & \beta_i \\
+\beta_j & \gamma_{ij}  \\
+\end{pmatrix}
+\end{equation}
+and since $g_{\mu \lambda} g^{\lambda \nu} = \delta^\nu_\mu$, the inverse metric is (\redtext{note this differs in the off-diagonal terms from B\&S})
+\begin{equation}
+g^{ab} = 
+\begin{pmatrix}
+-\alpha^{-2} & \alpha^{-2} \beta^j \\
+\alpha^{-2} \beta^i & \gamma^{ij} - \alpha^{-2} \beta^{i} \beta^{j} \\
+\end{pmatrix}.
+\end{equation}
+
+We may now compute the unit normal to the spacelike hypersurfaces:
+\begin{equation}
+\begin{aligned}
+n^a &= -g^{ab} \alpha \nabla_b t \\
+&= -g^{a t} \alpha \nabla_t t \\
+&= (\alpha^{-1}, \alpha^{-1} \beta^{j}),
+\end{aligned}
+\end{equation}
+and similarly B\&S gives $n_a = (\alpha, 0, 0, 0)$ because $n_a n^a = -1$ since $n^a$ is a timelike vector. \redtext{Prove the 1-form is as stated?}
+
+\subsubsection{Applying Spherical Symmetry}
+Now if we assume the spherically symmetric spatial metric $\gamma_{ij} = \psi^4 \mathrm{diag}(1, r^2, r^2 \sin^2 \theta)$ in which $\beta^i = (\beta, 0, 0)$, we can immediately note that the metric is independent of time and use equation \ref{eq:spatial_metric_evol} to find
+\begin{equation}
+\begin{aligned}
+\partial_t \gamma_{ij} &= -2 \alpha K_{ij} + D_i \beta_j + D_j \beta_i \\
+0 &= -2 \alpha K_{ij} + D_i \beta_j + D_j \beta_i \\
+2 \alpha K_{ij} &= D_i \beta_j + D_j \beta_i \\
+K_{rr} &= \frac{1}{2 \alpha} (D_r \beta_r + D_r \beta_r) \\
+&= \frac{1}{2 \alpha} (\gamma_{r}^{~b} \nabla_b \beta + \gamma_{r}^{~b} \nabla_b \beta) \\
+&= \frac{1}{2 \alpha} (\gamma_{r \lambda} \gamma^{\lambda b} \nabla_b \beta + \gamma_{r \lambda} \gamma^{\lambda b} \nabla_b \beta) \\
+&= \frac{1}{2 \alpha} (\delta^{b}_r \nabla_b \beta + \delta^{b}_r \nabla_b \beta) \\
+&= \frac{1}{\alpha} \nabla_r \beta \\
+&= \frac{\beta'}{\alpha}.
+\end{aligned}
+\end{equation} 
+
+Before we can continue we need to compute the matter source quantities.  Starting with $\rho$, we find
+%\begin{equation}
+%\begin{aligned}
+%\rho &= n_a n_b T^{ab} \\
+%&= n_t n_t T^{tt} + n_r n_r T^{rr} + n_\theta n_\theta T^{\theta \theta} + n_\phi n_\phi T^{\phi \phi} \\
+%&= (\alpha^{-1}) (\alpha^{-1}) T^{tt} + (\alpha^{-1} \beta^r) (\alpha^{-1} \beta^r) T^{rr} + (\alpha^{-1} \beta^\theta) (\alpha^{-1} \beta^\theta) T^{\theta \theta} + (\alpha^{-1} \beta^\phi) (\alpha^{-1} \beta^\phi) T^{\phi \phi} \\
+%&= \alpha^{-2} T^{tt} + \alpha^{-2} \beta^2 T^{rr} \\
+%&= \alpha^{-2} \Big( \partial^t \Phi \partial^t \Phi - \frac{1}{2} g^{t t} \partial^\gamma \Phi \partial_\gamma \Phi \Big) + \alpha^{-2} \beta^2 \Big( \partial^r \Phi \partial^r \Phi - \frac{1}{2} g^{r r} \partial^\gamma \Phi \partial_\gamma \Phi \Big) \\
+%&= \alpha^{-2} \Big( g^{\lambda t} g^{\rho t} \partial_\lambda \Phi \partial_\rho \Phi - \frac{1}{2} g^{t t} g^{\mu \nu} \partial_{\mu} \Phi \partial_{\nu} \Phi \Big) \\
+%&+ \alpha^{-2} \beta^2 \Big( g^{\lambda r} g^{\rho r} \partial_\lambda \Phi \partial_\rho \Phi - \frac{1}{2} g^{r r} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \Big) \\
+%&= \alpha^{-2} \Big( g^{t t} g^{t t} \partial_t \Phi \partial_t \Phi + 2 g^{r t} g^{t t} \partial_r \Phi \partial_t \Phi + g^{r t} g^{r t} \partial_r \Phi \partial_r \Phi \\
+%&- \frac{1}{2} g^{t t} g^{t t} \partial_{t} \Phi \partial_{t} \Phi - g^{t t} g^{t r} \partial_{t} \Phi \partial_{r} \Phi - \frac{1}{2} g^{t t} g^{r r} \partial_{r} \Phi \partial_{r} \Phi \Big) \\
+%&+ \alpha^{-2} \beta^2 \Big( g^{t r} g^{t r} \partial_t \Phi \partial_t \Phi + 2 g^{t r} g^{r r} \partial_t \Phi \partial_r \Phi + g^{r r} g^{r r} \partial_r \Phi \partial_r \Phi \\
+%&- \frac{1}{2} g^{r r} g^{t t} \partial_t \Phi \partial_t \Phi - g^{r r} g^{t r} \partial_t \Phi \partial_r \Phi - \frac{1}{2} g^{r r} g^{r r} \partial_r \Phi \partial_r \Phi \Big) \\
+%&= \alpha^{-2} \Big( \frac{1}{2} g^{t t} g^{t t} \partial_t \Phi \partial_t \Phi + g^{r t} g^{t t} \partial_r \Phi \partial_t \Phi + g^{r t} g^{r t} \partial_r \Phi \partial_r \Phi - \frac{1}{2} g^{t t} g^{r r} \partial_{r} \Phi \partial_{r} \Phi \Big) \\
+%&+ \alpha^{-2} \beta^2 \Big( g^{t r} g^{t r} \partial_t \Phi \partial_t \Phi + g^{t r} g^{r r} \partial_t \Phi \partial_r \Phi + \frac{1}{2} g^{r r} g^{r r} \partial_r \Phi \partial_r \Phi - \frac{1}{2} g^{r r} g^{t t} \partial_t \Phi \partial_t \Phi \Big) \\
+%&= \alpha^{-2} \Big( \frac{1}{2} g^{t t} g^{t t} \dot{\Phi}^2 + g^{r t} g^{t t} \Phi' \dot{\Phi} + g^{r t} g^{r t} \Phi'^2 - \frac{1}{2} g^{t t} g^{r r} \Phi'^2 \Big) \\
+%&+ \alpha^{-2} \beta^2 \Big( g^{t r} g^{t r} \dot{\Phi}^2 + g^{t r} g^{r r} \dot{\Phi} \Phi' + \frac{1}{2} g^{r r} g^{r r} \Phi'^2 - \frac{1}{2} g^{r r} g^{t t} \dot{\Phi}^2 \Big) \\
+%\end{aligned}
+%\end{equation}
+\begin{equation}
+\begin{aligned}
+\rho &= n_a n_b T^{ab} \\
+&= n_t n_t T^{tt} + n_r n_r T^{rr} + n_\theta n_\theta T^{\theta \theta} + n_\phi n_\phi T^{\phi \phi} \\
+&= \alpha^{2} T^{tt} \\
+&= \alpha^{2} \Big( \partial^t \Phi \partial^t \Phi - \frac{1}{2} g^{t t} \partial^\gamma \Phi \partial_\gamma \Phi \Big) \\
+&= \alpha^{2} \Big( g^{\lambda t} g^{\rho t} \partial_\lambda \Phi \partial_\rho \Phi - \frac{1}{2} g^{t t} g^{\mu \nu} \partial_{\mu} \Phi \partial_{\nu} \Phi \Big) \\
+&= \alpha^{2} \Big( g^{t t} g^{t t} \partial_t \Phi \partial_t \Phi + 2 g^{r t} g^{t t} \partial_r \Phi \partial_t \Phi + g^{r t} g^{r t} \partial_r \Phi \partial_r \Phi \\
+&- \frac{1}{2} g^{t t} g^{t t} \partial_{t} \Phi \partial_{t} \Phi - g^{t t} g^{t r} \partial_{t} \Phi \partial_{r} \Phi - \frac{1}{2} g^{t t} g^{r r} \partial_{r} \Phi \partial_{r} \Phi \Big) \\
+&= \alpha^{2} \Big( \frac{1}{2} g^{t t} g^{t t} \partial_t \Phi \partial_t \Phi + g^{r t} g^{t t} \partial_r \Phi \partial_t \Phi + g^{r t} g^{r t} \partial_r \Phi \partial_r \Phi - \frac{1}{2} g^{t t} g^{r r} \partial_{r} \Phi \partial_{r} \Phi \Big) \\
+&= \alpha^{2} \Big( \frac{1}{2} (-\alpha^{-2}) (-\alpha^{-2}) \dot{\Phi}^2 + (\alpha^{-2} \beta) (-\alpha^{-2}) \Phi' \dot{\Phi} \\
+&+ (\alpha^{-2} \beta) (\alpha^{-2} \beta) \Phi'^2 - \frac{1}{2} (-\alpha^{-2}) (\gamma^{rr} - \alpha^{-2} \beta^2) \Phi'^2 \Big) \\
+&= \frac{1}{2} \alpha^{-2} \dot{\Phi}^2 - \beta \alpha^{-2} \Phi' \dot{\Phi} + \frac{1}{2} \alpha^{-2} \beta^2 \Phi'^2 + \frac{1}{2} \psi^4 \Phi'^2. \\
+\end{aligned}
+\end{equation}
+
+Now we can compute the Ricci tensor.  In the ADM formalism Christoffel symbols with upper index zero are equal to zero, resulting in the equation
+\begin{equation}
+R_{ij} = \partial_k \Gamma^k_{ij} - \partial_j \Gamma^k_{ik} + \Gamma^k_{ij} \Gamma^l_{kl} - \Gamma^k_{il} \Gamma^l_{jk},
+\end{equation}
+where the Christoffel symbols are
+\begin{equation}
+\Gamma^i_{jk} = \frac{1}{2} \gamma^{il} (\partial_k \gamma_{lj} + \partial_j \gamma_{lk} - \partial_l \gamma_{jk}).
+\end{equation}
+
+For our spatial metric the surviving connection coefficients are
+\begin{equation}
+\begin{aligned}
+\Gamma^{\theta}_{r \theta} &= \frac{1}{2} \gamma^{\theta \theta} (\partial_r \gamma_{\theta \theta}) \\
+&= \frac{1}{2} \frac{1}{\psi^4 r^2} (\partial_r \psi^4 r^2) \\
+&= \frac{1}{2} \frac{1}{\psi^4 r^2} (4 \psi^3 \psi' r^2 + 2 \psi^4 r) \\
+&= \frac{2 \psi'}{\psi}  + \frac{1}{r} \\
+\Gamma^{\phi}_{r \phi} &= \frac{1}{2} \gamma^{\phi \phi} (\partial_r \gamma_{\phi \phi}) \\
+&= \frac{1}{2} \frac{1}{\psi^4 r^2 \sin^2 \theta} (\partial_r \psi^4 r^2 \sin^2 \theta) \\
+&= \frac{1}{2} \frac{1}{\psi^4 r^2} (4 \psi^3 \psi' r^2 + 2 \psi^4 r) \\
+&= \frac{2 \psi'}{\psi} + \frac{1}{r} \\
+\Gamma^r_{\theta \theta} &= \frac{1}{2} \gamma^{r r} (- \partial_r \gamma_{\theta \theta}) \\
+&= \frac{1}{2 \psi^4} (- \partial_r \psi^4 r^2 ) \\
+&= \frac{1}{2 \psi^4} (- 4 \psi^3 \psi' r^2 - 2 \psi^4 r ) \\
+&= - \frac{2 \psi' r^2}{\psi} - r \\
+\Gamma^r_{\phi \phi} &= \frac{1}{2} \gamma^{r r} ( - \partial_r \gamma_{\phi \phi}) \\
+&= \frac{1}{2 \psi^4} ( - \partial_r \psi^4 r^2 \sin^2 \theta) \\
+&= \frac{1}{2 \psi^4} ( - 4 \psi^3 \psi' r^2 - 2 \psi^4 r ) \sin^2 \theta \\
+&= - \Big( \frac{2 \psi' r^2}{\psi} + r \Big) \sin^2 \theta, \\
+\end{aligned}
+\end{equation}
+and the Ricci tensor is
+\begin{equation}
+\begin{aligned}
+R_{rr} &= \partial_k \Gamma^k_{rr} - \partial_r \Gamma^k_{rk} + \Gamma^k_{rr} \Gamma^l_{kl} - \Gamma^k_{rl} \Gamma^l_{rk} \\
+&= - \partial_r \Gamma^k_{rk} - \Gamma^k_{rl} \Gamma^l_{rk} \\
+&= - \partial_r \Gamma^\theta_{r\theta} - \partial_r \Gamma^\phi_{r\phi} - \Gamma^\theta_{r\theta} \Gamma^\theta_{r\theta} - \Gamma^\phi_{r\phi} \Gamma^\phi_{r\phi} \\
+&= - 2 \partial_r \Big( \frac{2 \psi'}{\psi}  + \frac{1}{r} \Big) - 2 \Big(\frac{2 \psi'}{\psi}  + \frac{1}{r}\Big)^2 \\
+&= - 2 \Big( \frac{2 \psi''}{\psi} - \frac{2 \psi'^2}{\psi^2}  - \frac{1}{r^2} \Big) - 2 \Big(\frac{2 \psi'}{\psi}  + \frac{1}{r}\Big)^2; \\
+\end{aligned}
+\end{equation}
+similarly
+\begin{equation}
+\begin{aligned}
+R_{\theta \theta} &= \partial_k \Gamma^k_{\theta \theta} - \partial_\theta \Gamma^k_{\theta k} + \Gamma^k_{\theta \theta} \Gamma^l_{kl} - \Gamma^k_{\theta l} \Gamma^l_{\theta k} \\
+&= \partial_r \Gamma^r_{\theta \theta} + \Gamma^r_{\theta \theta} \Gamma^\theta_{r\theta} + \Gamma^r_{\theta \theta} \Gamma^\phi_{r\phi} - \Gamma^\theta_{\theta r} \Gamma^r_{\theta \theta} - \Gamma^r_{\theta \theta} \Gamma^\theta_{\theta r} \\
+&= \partial_r \Big( - \frac{2 \psi' r^2}{\psi} - r \Big) + 2 \Big(- \frac{2 \psi' r^2}{\psi} - r \Big) \Big( \frac{2 \psi'}{\psi}  + \frac{1}{r} \Big) - 2 \Big( \frac{2 \psi'}{\psi}  + \frac{1}{r} \Big) \Big( - \frac{2 \psi' r^2}{\psi} - r \Big) \\
+&=  - \frac{4 \psi' r}{\psi} - \frac{2 \psi'' r^2}{\psi} + \frac{2 \psi'^2 r^2}{\psi^2} - 1 \\
+\end{aligned}
+\end{equation}
+and
+\begin{equation}
+\begin{aligned}
+R_{\phi \phi} &= \partial_k \Gamma^k_{\phi \phi} - \partial_j \Gamma^k_{\phi k} + \Gamma^k_{\phi \phi} \Gamma^l_{kl} - \Gamma^k_{\phi l} \Gamma^l_{\phi k} \\
+&= \partial_r \Gamma^r_{\phi \phi} - 0 + \Gamma^r_{\phi \phi} \Gamma^\theta_{r \theta} + \Gamma^r_{\phi \phi} \Gamma^\phi_{r \phi} - \Gamma^r_{\phi \phi} \Gamma^\phi_{\phi r} - \Gamma^\phi_{\phi r} \Gamma^r_{\phi \phi}\\
+&= - \sin^2 \theta \, \partial_r \Big( \frac{2 \psi' r^2}{\psi} + r \Big) \\
+&= - \sin^2 \theta \, \Big( \frac{4 \psi' r}{\psi} + \frac{2 \psi'' r^2}{\psi} - \frac{2 \psi' r^2}{\psi^2} + 1 \Big); \\
+\end{aligned}
+\end{equation}
+the other components are zero.
+
+
+%\begin{equation}
+%T_{\mu \nu} = \nabla_\mu \Phi \nabla_\nu \Phi - \frac{1}{2} g_{\mu \nu} \nabla_{\gamma} \phi \nabla^{\gamma} \phi,
+%\end{equation}
+
 
 \section{Problem 1}
 This problem asks us to verify the boundary conditions on the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$) at $r = 0$, to ensure that they are regular and finite there.
