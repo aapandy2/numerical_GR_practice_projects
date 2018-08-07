@@ -3,20 +3,20 @@ from elliptics_solver import *
 import sys
 
 #set parameters for simulation
-N = 200
+N = 256
 delta_r = 1./N
-delta_t = 0.01
+delta_t = 0.001
 courant = delta_t / delta_r
 timesteps = 50
 epsilon = 0.
 
 correction_weight = 1.
 GEOM_COUPLING     = True
-PSI_EVOL          = False
+PSI_EVOL          = True
 
 #define grid
 R     = 50. 
-amp   = 0.012
+amp   = 0.001
 r_0   = 20.
 delta = 5.
 
@@ -69,64 +69,68 @@ if(GEOM_COUPLING == True):
 	alpha[0, :] = f_n[2*N:3*N]
 
 
-A = np.zeros((2*N, 2*N))
-B = np.zeros((2*N, 2*N))
+if(PSI_EVOL == True):
+    A = np.zeros((3*N, 3*N))
+    B = np.zeros((3*N, 3*N))
+else:
+    A = np.zeros((2*N, 2*N))
+    B = np.zeros((2*N, 2*N))
 
-psi_LHS = np.zeros((N, N))
-psi_RHS = np.zeros((N, N))
 #populate the matrix at timestep n
 def populate_matrices(n):
-	#define matrix A
-	for i in range(N):
-	    if(i == 0):
-		A[i, :] = [1 if j==i else 0 for j in range(2*N)]
-	    elif(i == N-1): #xi BC
-		A[i, :] = [1. + delta_t/2. * (3./(2.*delta_r) + 1./r_grid[i%N]) if j==i
+
+    if(PSI_EVOL == False):
+        #define matrix A
+        for i in range(N):
+            if(i == 0):
+        	A[i, :] = [1 if j==i else 0 for j in range(2*N)]
+            elif(i == N-1): #xi BC
+        	A[i, :] = [1. + delta_t/2. * (3./(2.*delta_r) + 1./r_grid[i%N]) if j==i
                           else delta_t/2. * (-4./(2.*delta_r)) if j==i-1
                           else delta_t/2. * (1./(2.*delta_r)) if j==i-2
-			  else 0 for j in range(2*N)]
-	    else:
-		A[i, :] = [1.   -delta_t/2.* (1.*(beta[n+1][i+1]-beta[n+1][i-1])/(2.*delta_r)) if j==i
-			   else -delta_t/2.* ( beta[n+1][i]/(2.*delta_r) ) if j==i+1
-			   else -delta_t/2.* (-beta[n+1][i]/(2.*delta_r) ) if j==i-1
-			   else -delta_t/2.* ( 1./psi[n+1][i%N]**2. * (alpha[n+1][i%N+1]-alpha[n+1][i%N-1])/(2.*delta_r) 
-					      -2.*alpha[n+1][i%N]/psi[n+1][i%N]**3.*(psi[n+1][i%N+1]-psi[n+1][i%N-1])/(2.*delta_r) ) if j==N+i
-			   else -delta_t/2.* (alpha[n+1][i%N]/psi[n+1][i%N]**2.*1./(2.*delta_r)) if j==N+i+1
-			   else -delta_t/2.*(-alpha[n+1][i%N]/psi[n+1][i%N]**2.*1./(2.*delta_r)) if j==N+i-1
-			   else 0 for j in range(2*N)]
-
-	
-	for i in range(N, 2*N):
-	    if(i == N):
-		A[i, :] = [-3. if j==i
-			   else 4. if j==i+1
-			   else -1. if j==i+2
-	                   else 0 for j in range(2*N)]
-	    elif(i == 2*N-1): #Pi BC
+        		  else 0 for j in range(2*N)]
+            else:
+        	A[i, :] = [1.   -delta_t/2.* (1.*(beta[n+1][i+1]-beta[n+1][i-1])/(2.*delta_r)) if j==i
+        		   else -delta_t/2.* ( beta[n+1][i]/(2.*delta_r) ) if j==i+1
+        		   else -delta_t/2.* (-beta[n+1][i]/(2.*delta_r) ) if j==i-1
+        		   else -delta_t/2.* ( 1./psi[n+1][i%N]**2. * (alpha[n+1][i%N+1]-alpha[n+1][i%N-1])/(2.*delta_r) 
+        				      -2.*alpha[n+1][i%N]/psi[n+1][i%N]**3.*(psi[n+1][i%N+1]-psi[n+1][i%N-1])/(2.*delta_r) ) if j==N+i
+        		   else -delta_t/2.* (alpha[n+1][i%N]/psi[n+1][i%N]**2.*1./(2.*delta_r)) if j==N+i+1
+        		   else -delta_t/2.*(-alpha[n+1][i%N]/psi[n+1][i%N]**2.*1./(2.*delta_r)) if j==N+i-1
+        		   else 0 for j in range(2*N)]
+        
+        
+        for i in range(N, 2*N):
+            if(i == N):
+        	A[i, :] = [-3. if j==i
+        		   else 4. if j==i+1
+        		   else -1. if j==i+2
+                           else 0 for j in range(2*N)]
+            elif(i == 2*N-1): #Pi BC
                 A[i, :] = [1. + delta_t/2. * (3./(2.*delta_r) + 1./r_grid[i%N]) if j==i
                            else delta_t/2. * (-4./(2.*delta_r)) if j==i-1
                            else delta_t/2. * (1./(2.*delta_r)) if j==i-2
-			   else 0 for j in range(2*N)]
-	    else:
-		A[i, :] = [1. - delta_t/2. * (2.*beta[n+1][i%N]/(3.*r_grid[i%N]) 
+        		   else 0 for j in range(2*N)]
+            else:
+        	A[i, :] = [1. - delta_t/2. * (2.*beta[n+1][i%N]/(3.*r_grid[i%N]) 
                                              + 1./3.*(beta[n+1][i%N+1]-beta[n+1][i%N-1])/(2.*delta_r)
-					     + 4.*beta[n+1][i%N]/(2.*psi[n+1][i%N])*(psi[n+1][i%N+1]-psi[n+1][i%N-1])/(2.*delta_r)) if j==i
-			   else -delta_t/2. * (beta[n+1][i%N]/(2.*delta_r)) if j==i+1
-			   else -delta_t/2. * (-beta[n+1][i%N]/(2.*delta_r)) if j==i-1
-			   else -delta_t/2. * (2.*alpha[n+1][i%N]/(r_grid[i%N]*psi[n+1][i%N]**2.)
-					       + 2.*alpha[n+1][i%N]*(psi[n+1][i%N+1]-psi[n+1][i%N-1])/(2.*delta_r*psi[n+1][i%N]**3.)
-					       + 1./psi[n+1][i%N]**2.*(alpha[n+1][i%N+1]-alpha[n+1][i%N-1])/(2.*delta_r)) if j==i-N
-			   else -delta_t/2. * (alpha[n+1][i%N]/psi[n+1][i%N]**2. * 1./(2.*delta_r)) if j==i-N+1
-			   else -delta_t/2. *(-alpha[n+1][i%N]/psi[n+1][i%N]**2. * 1./(2.*delta_r)) if j==i-N-1
-			   else 0 for j in range(2*N)]
-
-	
-	#define matrix B, now fully to second order accuracy
-	for i in range(N):
-	    if(i == 0):
-		B[i, :] = [0 for j in range(2*N)]
-	    elif(i == 1): #ADDED KO_ODD_FW
-		B[i, :] = [1. + delta_t/2. * (1.*(beta[n][i+1]-beta[n][i-1])/(2.*delta_r)) - epsilon/(16.*1)*(6.-1.) if j==i
+        				     + 4.*beta[n+1][i%N]/(2.*psi[n+1][i%N])*(psi[n+1][i%N+1]-psi[n+1][i%N-1])/(2.*delta_r)) if j==i
+        		   else -delta_t/2. * (beta[n+1][i%N]/(2.*delta_r)) if j==i+1
+        		   else -delta_t/2. * (-beta[n+1][i%N]/(2.*delta_r)) if j==i-1
+        		   else -delta_t/2. * (2.*alpha[n+1][i%N]/(r_grid[i%N]*psi[n+1][i%N]**2.)
+        				       + 2.*alpha[n+1][i%N]*(psi[n+1][i%N+1]-psi[n+1][i%N-1])/(2.*delta_r*psi[n+1][i%N]**3.)
+        				       + 1./psi[n+1][i%N]**2.*(alpha[n+1][i%N+1]-alpha[n+1][i%N-1])/(2.*delta_r)) if j==i-N
+        		   else -delta_t/2. * (alpha[n+1][i%N]/psi[n+1][i%N]**2. * 1./(2.*delta_r)) if j==i-N+1
+        		   else -delta_t/2. *(-alpha[n+1][i%N]/psi[n+1][i%N]**2. * 1./(2.*delta_r)) if j==i-N-1
+        		   else 0 for j in range(2*N)]
+        
+        
+        #define matrix B, now fully to second order accuracy
+        for i in range(N):
+            if(i == 0):
+        	B[i, :] = [0 for j in range(2*N)]
+            elif(i == 1): #ADDED KO_ODD_FW
+        	B[i, :] = [1. + delta_t/2. * (1.*(beta[n][i+1]-beta[n][i-1])/(2.*delta_r)) - epsilon/(16.*1)*(6.-1.) if j==i
                            else delta_t/2.* ( beta[n][i]/(2.*delta_r) ) - epsilon/(16.*1)*(-4.) if j==i+1
                            else delta_t/2.* (-beta[n][i]/(2.*delta_r) ) - epsilon/(16.*1)*(-4.) if j==i-1
                            else - epsilon/(16.*1)*1 if j==i+2
@@ -135,8 +139,8 @@ def populate_matrices(n):
                            else delta_t/2.* (alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i+1
                            else delta_t/2.*(-alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i-1
                            else 0 for j in range(2*N)]
-	    elif(i == N-2):#internal xi eqn without KO diss.
-		B[i, :] = [1. + delta_t/2. * (1.*(beta[n][i+1]-beta[n][i-1])/(2.*delta_r)) if j==i
+            elif(i == N-2):#internal xi eqn without KO diss.
+        	B[i, :] = [1. + delta_t/2. * (1.*(beta[n][i+1]-beta[n][i-1])/(2.*delta_r)) if j==i
                            else delta_t/2.* ( beta[n][i]/(2.*delta_r) )  if j==i+1
                            else delta_t/2.* (-beta[n][i]/(2.*delta_r) )  if j==i-1
                            else delta_t/2.* ( 1./psi[n][i%N]**2. * (alpha[n][i%N+1]-alpha[n][i%N-1])/(2.*delta_r)
@@ -144,33 +148,33 @@ def populate_matrices(n):
                            else delta_t/2.* (alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i+1
                            else delta_t/2.*(-alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i-1
                            else 0 for j in range(2*N)]
-	    elif(i == N-1): #xi BC
+            elif(i == N-1): #xi BC
                 B[i, :] = [1.   -delta_t/2. * (3./(2.*delta_r) + 1./r_grid[i%N]) if j==i
                            else -delta_t/2. * (-4./(2.*delta_r)) if j==i-1
                            else -delta_t/2. * (1./(2.*delta_r)) if j==i-2
-			   else 0 for j in range(2*N)]
-	    else: #ADDED DISS_KO to this
-		B[i, :] = [1. + delta_t/2. * (1.*(beta[n][i+1]-beta[n][i-1])/(2.*delta_r)) - epsilon/(16.*1)*6. if j==i
+        		   else 0 for j in range(2*N)]
+            else: #ADDED DISS_KO to this
+        	B[i, :] = [1. + delta_t/2. * (1.*(beta[n][i+1]-beta[n][i-1])/(2.*delta_r)) - epsilon/(16.*1)*6. if j==i
                            else delta_t/2.* ( beta[n][i]/(2.*delta_r) ) - epsilon/(16.*1)*(-4.) if j==i+1
                            else delta_t/2.* (-beta[n][i]/(2.*delta_r) ) - epsilon/(16.*1)*(-4.) if j==i-1
-			   else - epsilon/(16.*1)*1. if j==i-2
-			   else - epsilon/(16.*1)*1 if j==i+2
+        		   else - epsilon/(16.*1)*1. if j==i-2
+        		   else - epsilon/(16.*1)*1 if j==i+2
                            else delta_t/2.* ( 1./psi[n][i%N]**2. * (alpha[n][i%N+1]-alpha[n][i%N-1])/(2.*delta_r)
                                               -2.*alpha[n][i%N]/psi[n][i%N]**3.*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r) ) if j==N+i
                            else delta_t/2.* (alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i+1
                            else delta_t/2.*(-alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i-1
                            else 0 for j in range(2*N)]
-	
-	for i in range(N, 2*N):
-	    if(i == N):
-		B[i, :] = [3. if j==i
-			   else -4. if j==i+1
-			   else 1. if j==i+2
-			   else 0 for j in range(2*N)]
-	    elif(i == N+1): #ADDED KO_EVEN_FWD TO THIS
-		B[i, :] = [1. + delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N])
+        
+        for i in range(N, 2*N):
+            if(i == N):
+        	B[i, :] = [3. if j==i
+        		   else -4. if j==i+1
+        		   else 1. if j==i+2
+        		   else 0 for j in range(2*N)]
+            elif(i == N+1): #ADDED KO_EVEN_FWD TO THIS
+        	B[i, :] = [1. + delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N])
                                              + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)
-					     + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) - epsilon/(16.*1.)*(6.+1.) if j==i
+        				     + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) - epsilon/(16.*1.)*(6.+1.) if j==i
                            else delta_t/2. * (beta[n][i%N]/(2.*delta_r)) - epsilon/(16.*1)*(-4.) if j==i+1
                            else delta_t/2. * (-beta[n][i%N]/(2.*delta_r)) - epsilon/(16.*1)*(-4.) if j==i-1
                            else - epsilon/(16.*1.)*1. if j==i+2
@@ -180,10 +184,10 @@ def populate_matrices(n):
                            else delta_t/2. * (alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N+1
                            else delta_t/2. *(-alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N-1
                            else 0 for j in range(2*N)]
-	    elif(i == 2*N-2): #internal Pi equation without KO diss.
-		B[i, :] = [1. + delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N])
+            elif(i == 2*N-2): #internal Pi equation without KO diss.
+        	B[i, :] = [1. + delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N])
                                              + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)
-					     + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) if j==i
+        				     + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) if j==i
                            else delta_t/2. * (beta[n][i%N]/(2.*delta_r))  if j==i+1
                            else delta_t/2. * (-beta[n][i%N]/(2.*delta_r)) if j==i-1
                            else delta_t/2. * (2.*alpha[n][i%N]/(r_grid[i%N]*psi[n][i%N]**2.)
@@ -192,84 +196,237 @@ def populate_matrices(n):
                            else delta_t/2. * (alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N+1
                            else delta_t/2. *(-alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N-1
                            else 0 for j in range(2*N)]
-	    elif(i == 2*N-1): #Pi BC
+            elif(i == 2*N-1): #Pi BC
                 B[i, :] = [1.   -delta_t/2. * (3./(2.*delta_r) + 1./r_grid[i%N]) if j==i
                            else -delta_t/2. * (-4./(2.*delta_r)) if j==i-1
                            else -delta_t/2. * (1./(2.*delta_r)) if j==i-2
-			   else 0 for j in range(2*N)]
-
-	    else: #ADDED DISS_KO TO THIS
-		B[i, :] = [1. + delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N]) 
+        		   else 0 for j in range(2*N)]
+        
+            else: #ADDED DISS_KO TO THIS
+        	B[i, :] = [1. + delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N]) 
                                              + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)
-					     + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) - epsilon/(16.*1)*6. if j==i
+        				     + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) - epsilon/(16.*1)*6. if j==i
                            else delta_t/2. * (beta[n][i%N]/(2.*delta_r)) - epsilon/(16.*1)*(-4.) if j==i+1
                            else delta_t/2. * (-beta[n][i%N]/(2.*delta_r)) - epsilon/(16.*1)*(-4.) if j==i-1
-			   else - epsilon/(16.*1)*1. if j==i-2
-			   else - epsilon/(16.*1)*1. if j==i+2
+        		   else - epsilon/(16.*1)*1. if j==i-2
+        		   else - epsilon/(16.*1)*1. if j==i+2
                            else delta_t/2. * (2.*alpha[n][i%N]/(r_grid[i%N]*psi[n][i%N]**2.)
                                                + 2.*alpha[n][i%N]*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r*psi[n][i%N]**3.)
-					       + 1./psi[n][i%N]**2.*(alpha[n][i%N+1]-alpha[n][i%N-1])/(2.*delta_r)) if j==i-N
+        				       + 1./psi[n][i%N]**2.*(alpha[n][i%N+1]-alpha[n][i%N-1])/(2.*delta_r)) if j==i-N
                            else delta_t/2. * (alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N+1
                            else delta_t/2. *(-alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N-1
                            else 0 for j in range(2*N)]
 
+    elif(PSI_EVOL == True):
+        #define matrix A
+        for i in range(N):
+            if(i == 0):
+                A[i, :] = [1 if j==i else 0 for j in range(3*N)]
+            elif(i == N-1): #xi BC
+                A[i, :] = [1. + delta_t/2. * (3./(2.*delta_r) + 1./r_grid[i%N]) if j==i
+                          else delta_t/2. * (-4./(2.*delta_r)) if j==i-1
+                          else delta_t/2. * (1./(2.*delta_r)) if j==i-2
+                          else 0 for j in range(3*N)]
+            else:
+                A[i, :] = [1.   -delta_t/2.* (1.*(beta[n+1][i+1]-beta[n+1][i-1])/(2.*delta_r)) if j==i
+                           else -delta_t/2.* ( beta[n+1][i]/(2.*delta_r) ) if j==i+1
+                           else -delta_t/2.* (-beta[n+1][i]/(2.*delta_r) ) if j==i-1
+                           else -delta_t/2.* ( 1./psi[n+1][i%N]**2. * (alpha[n+1][i%N+1]-alpha[n+1][i%N-1])/(2.*delta_r)
+                                              -2.*alpha[n+1][i%N]/psi[n+1][i%N]**3.*(psi[n+1][i%N+1]-psi[n+1][i%N-1])/(2.*delta_r) ) if j==N+i
+                           else -delta_t/2.* (alpha[n+1][i%N]/psi[n+1][i%N]**2.*1./(2.*delta_r)) if j==N+i+1
+                           else -delta_t/2.*(-alpha[n+1][i%N]/psi[n+1][i%N]**2.*1./(2.*delta_r)) if j==N+i-1
+                           else 0 for j in range(3*N)]
 
-        if(PSI_EVOL == True):
-                for i in range(N):
-                        if(i == 0): #psi r=0 BC
-                                psi_LHS[i, :] = [-3. if j==i
-                                                 else 4. if j==i+1
-                                                 else -1. if j==i+2
-                                                 else 0 for j in range(N)]
-                        elif(i == N-1): #psi r=R BC
-                                psi_LHS[i, :] = [3./(2.*delta_r) + 1./r_grid[j] if j==i
-                                                 else -4./(2.*delta_r) if j==i-1
-						 else 1./(2.*delta_r) if j==i-2
-						 else 0 for j in range(N)]
-                        else: #psi internal evolution equation
-                                psi_LHS[i, :] = [1. - delta_t/2. * ( beta[n+1][j]/(3.*r_grid[j]) 
-                                                                    + (beta[n+1][j+1]-beta[n+1][j-1])/(6. * 2. * delta_r) ) if j==i
-                                                 else -delta_t/2. * beta[n+1][j]/(2.*delta_r) if j==i+1
-                                                 else delta_t/2. * beta[n+1][j]/(2.*delta_r) if j==i-1
-                                                 else 0 for j in range(N)]
-		for i in range(N):
-			if(i == 0): #psi r=0 BC
-				psi_RHS[i, :] = [3. if j==1
-						 else -4. if j==i+1
-						 else 1. if j==i+2
-						 else 0 for j in range(N)]
-			elif(i == 1): #psi internal eq. with DISS_EVEN_KO
-				psi_RHS[i, :] = [1. + delta_t/2. * ( beta[n][j]/(3.*r_grid[j])
-                                                                    + (beta[n][j+1]-beta[n][j-1])/(6. * 2. * delta_r) ) if j==i
-                                                 else delta_t/2. * beta[n][j]/(2.*delta_r) if j==i+1
-                                                 else -delta_t/2. * beta[n][j]/(2.*delta_r) if j==i-1
-                                                 else 0 for j in range(N)]
-			elif(i == N-2): #psi internal eq. with no KO dissipation
-				psi_RHS[i, :] = [1. + delta_t/2. * ( beta[n][j]/(3.*r_grid[j])
-                                                                    + (beta[n][j+1]-beta[n][j-1])/(6. * 2. * delta_r) ) if j==i
-                                                 else delta_t/2. * beta[n][j]/(2.*delta_r) if j==i+1
-                                                 else -delta_t/2. * beta[n][j]/(2.*delta_r) if j==i-1
-                                                 else 0 for j in range(N)]
-			elif(i == N-1): #psi r=R BC
-				psi_RHS[i, :] = [0 for j in range(N)]
-			else: #psi internal eq. with KO_DISS
-				psi_RHS[i, :] = [1. + delta_t/2. * ( beta[n][j]/(3.*r_grid[j])
-                                                                    + (beta[n][j+1]-beta[n][j-1])/(6. * 2. * delta_r) ) if j==i
-                                                 else delta_t/2. * beta[n][j]/(2.*delta_r) if j==i+1
-                                                 else -delta_t/2. * beta[n][j]/(2.*delta_r) if j==i-1
-                                                 else 0 for j in range(N)]
+
+        for i in range(N, 2*N):
+            if(i == N):
+                A[i, :] = [-3. if j==i
+                           else 4. if j==i+1
+                           else -1. if j==i+2
+                           else 0 for j in range(3*N)]
+            elif(i == 2*N-1): #Pi BC
+                A[i, :] = [1. + delta_t/2. * (3./(2.*delta_r) + 1./r_grid[i%N]) if j==i
+                           else delta_t/2. * (-4./(2.*delta_r)) if j==i-1
+                           else delta_t/2. * (1./(2.*delta_r)) if j==i-2
+                           else 0 for j in range(3*N)]
+            else:
+                A[i, :] = [1. - delta_t/2. * (2.*beta[n+1][i%N]/(3.*r_grid[i%N])
+                                             + 1./3.*(beta[n+1][i%N+1]-beta[n+1][i%N-1])/(2.*delta_r)
+                                             + 4.*beta[n+1][i%N]/(2.*psi[n+1][i%N])*(psi[n+1][i%N+1]-psi[n+1][i%N-1])/(2.*delta_r)) if j==i
+                           else -delta_t/2. * (beta[n+1][i%N]/(2.*delta_r)) if j==i+1
+                           else -delta_t/2. * (-beta[n+1][i%N]/(2.*delta_r)) if j==i-1
+                           else -delta_t/2. * (2.*alpha[n+1][i%N]/(r_grid[i%N]*psi[n+1][i%N]**2.)
+                                               + 2.*alpha[n+1][i%N]*(psi[n+1][i%N+1]-psi[n+1][i%N-1])/(2.*delta_r*psi[n+1][i%N]**3.)
+                                               + 1./psi[n+1][i%N]**2.*(alpha[n+1][i%N+1]-alpha[n+1][i%N-1])/(2.*delta_r)) if j==i-N
+                           else -delta_t/2. * (alpha[n+1][i%N]/psi[n+1][i%N]**2. * 1./(2.*delta_r)) if j==i-N+1
+                           else -delta_t/2. *(-alpha[n+1][i%N]/psi[n+1][i%N]**2. * 1./(2.*delta_r)) if j==i-N-1
+                           else 0 for j in range(3*N)]
+
+        #define matrix B, now fully to second order accuracy
+        for i in range(N):
+            if(i == 0):
+                B[i, :] = [0 for j in range(3*N)]
+            elif(i == 1): #ADDED KO_ODD_FW
+                B[i, :] = [1. + delta_t/2. * (1.*(beta[n][i+1]-beta[n][i-1])/(2.*delta_r)) - epsilon/(16.*1)*(6.-1.) if j==i
+                           else delta_t/2.* ( beta[n][i]/(2.*delta_r) ) - epsilon/(16.*1)*(-4.) if j==i+1
+                           else delta_t/2.* (-beta[n][i]/(2.*delta_r) ) - epsilon/(16.*1)*(-4.) if j==i-1
+                           else - epsilon/(16.*1)*1 if j==i+2
+                           else delta_t/2.* ( 1./psi[n][i%N]**2. * (alpha[n][i%N+1]-alpha[n][i%N-1])/(2.*delta_r)
+                                              -2.*alpha[n][i%N]/psi[n][i%N]**3.*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r) ) if j==N+i
+                           else delta_t/2.* (alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i+1
+                           else delta_t/2.*(-alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i-1
+                           else 0 for j in range(3*N)]
+            elif(i == N-2):#internal xi eqn without KO diss.
+                B[i, :] = [1. + delta_t/2. * (1.*(beta[n][i+1]-beta[n][i-1])/(2.*delta_r)) if j==i
+                           else delta_t/2.* ( beta[n][i]/(2.*delta_r) )  if j==i+1
+                           else delta_t/2.* (-beta[n][i]/(2.*delta_r) )  if j==i-1
+                           else delta_t/2.* ( 1./psi[n][i%N]**2. * (alpha[n][i%N+1]-alpha[n][i%N-1])/(2.*delta_r)
+                                              -2.*alpha[n][i%N]/psi[n][i%N]**3.*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r) ) if j==N+i
+                           else delta_t/2.* (alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i+1
+                           else delta_t/2.*(-alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i-1
+                           else 0 for j in range(3*N)]
+            elif(i == N-1): #xi BC
+                B[i, :] = [1.   -delta_t/2. * (3./(2.*delta_r) + 1./r_grid[i%N]) if j==i
+                           else -delta_t/2. * (-4./(2.*delta_r)) if j==i-1
+                           else -delta_t/2. * (1./(2.*delta_r)) if j==i-2
+                           else 0 for j in range(3*N)]
+            else: #ADDED DISS_KO to this
+                B[i, :] = [1. + delta_t/2. * (1.*(beta[n][i+1]-beta[n][i-1])/(2.*delta_r)) - epsilon/(16.*1)*6. if j==i
+                           else delta_t/2.* ( beta[n][i]/(2.*delta_r) ) - epsilon/(16.*1)*(-4.) if j==i+1
+                           else delta_t/2.* (-beta[n][i]/(2.*delta_r) ) - epsilon/(16.*1)*(-4.) if j==i-1
+                           else - epsilon/(16.*1)*1. if j==i-2
+                           else - epsilon/(16.*1)*1 if j==i+2
+                           else delta_t/2.* ( 1./psi[n][i%N]**2. * (alpha[n][i%N+1]-alpha[n][i%N-1])/(2.*delta_r)
+                                              -2.*alpha[n][i%N]/psi[n][i%N]**3.*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r) ) if j==N+i
+                           else delta_t/2.* (alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i+1
+                           else delta_t/2.*(-alpha[n][i%N]/psi[n][i%N]**2.*1./(2.*delta_r)) if j==N+i-1
+                           else 0 for j in range(3*N)]
+
+        for i in range(N, 2*N):
+            if(i == N):
+                B[i, :] = [3. if j==i
+                           else -4. if j==i+1
+                           else 1. if j==i+2
+                           else 0 for j in range(3*N)]
+            elif(i == N+1): #ADDED KO_EVEN_FWD TO THIS
+                B[i, :] = [1. + delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N])
+                                             + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)
+                                             + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) - epsilon/(16.*1.)*(6.+1.) if j==i
+                           else delta_t/2. * (beta[n][i%N]/(2.*delta_r)) - epsilon/(16.*1)*(-4.) if j==i+1
+                           else delta_t/2. * (-beta[n][i%N]/(2.*delta_r)) - epsilon/(16.*1)*(-4.) if j==i-1
+                           else - epsilon/(16.*1.)*1. if j==i+2
+                           else delta_t/2. * (2.*alpha[n][i%N]/(r_grid[i%N]*psi[n][i%N]**2.)
+                                               + 2.*alpha[n][i%N]*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r*psi[n][i%N]**3.)
+                                               + 1./psi[n][i%N]**2.*(alpha[n][i%N+1]-alpha[n][i%N-1])/(2.*delta_r)) if j==i-N
+                           else delta_t/2. * (alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N+1
+                           else delta_t/2. *(-alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N-1
+                           else 0 for j in range(3*N)]
+            elif(i == 2*N-2): #internal Pi equation without KO diss.
+                B[i, :] = [1. + delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N])
+                                             + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)
+                                             + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) if j==i
+                           else delta_t/2. * (beta[n][i%N]/(2.*delta_r))  if j==i+1
+                           else delta_t/2. * (-beta[n][i%N]/(2.*delta_r)) if j==i-1
+                           else delta_t/2. * (2.*alpha[n][i%N]/(r_grid[i%N]*psi[n][i%N]**2.)
+                                               + 2.*alpha[n][i%N]*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r*psi[n][i%N]**3.)
+                                               + 1./psi[n][i%N]**2.*(alpha[n][i%N+1]-alpha[n][i%N-1])/(2.*delta_r)) if j==i-N
+                           else delta_t/2. * (alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N+1
+                           else delta_t/2. *(-alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N-1
+                           else 0 for j in range(3*N)]
+            elif(i == 2*N-1): #Pi BC
+                B[i, :] = [1.   -delta_t/2. * (3./(2.*delta_r) + 1./r_grid[i%N]) if j==i
+                           else -delta_t/2. * (-4./(2.*delta_r)) if j==i-1
+                           else -delta_t/2. * (1./(2.*delta_r)) if j==i-2
+                           else 0 for j in range(3*N)]
+
+            else: #ADDED DISS_KO TO THIS
+                B[i, :] = [1. + delta_t/2. * (2.*beta[n][i%N]/(3.*r_grid[i%N])
+                                             + 1./3.*(beta[n][i%N+1]-beta[n][i%N-1])/(2.*delta_r)
+                                             + 4.*beta[n][i%N]/(2.*psi[n][i%N])*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r)) - epsilon/(16.*1)*6. if j==i
+                           else delta_t/2. * (beta[n][i%N]/(2.*delta_r)) - epsilon/(16.*1)*(-4.) if j==i+1
+                           else delta_t/2. * (-beta[n][i%N]/(2.*delta_r)) - epsilon/(16.*1)*(-4.) if j==i-1
+                           else - epsilon/(16.*1)*1. if j==i-2
+                           else - epsilon/(16.*1)*1. if j==i+2
+                           else delta_t/2. * (2.*alpha[n][i%N]/(r_grid[i%N]*psi[n][i%N]**2.)
+                                               + 2.*alpha[n][i%N]*(psi[n][i%N+1]-psi[n][i%N-1])/(2.*delta_r*psi[n][i%N]**3.)
+                                               + 1./psi[n][i%N]**2.*(alpha[n][i%N+1]-alpha[n][i%N-1])/(2.*delta_r)) if j==i-N
+                           else delta_t/2. * (alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N+1
+                           else delta_t/2. *(-alpha[n][i%N]/psi[n][i%N]**2. * 1./(2.*delta_r)) if j==i-N-1
+                           else 0 for j in range(3*N)]
+
+
+
+ #       if(PSI_EVOL == True):
+        for i in range(2*N, 3*N):
+                if(i == 2*N): #psi r=0 BC
+                        A[i, :] = [-3. if j==i
+                                         else 4. if j==i+1
+                                         else -1. if j==i+2
+                                         else 0 for j in range(3*N)]
+                elif(i == 3*N-1): #psi r=R BC
+                        A[i, :] = [3./(2.*delta_r) + 1./r_grid[i%N] if j==i
+                                         else -4./(2.*delta_r) if j==i-1
+        				 else 1./(2.*delta_r) if j==i-2
+        				 else 0 for j in range(3*N)]
+                else: #psi internal evolution equation
+                        A[i, :] = [1. - delta_t/2. * ( beta[n+1][i%N]/(3.*r_grid[i%N]) 
+                                                            + (beta[n+1][i%N+1]-beta[n+1][i%N-1])/(6. * 2. * delta_r) ) if j==i
+                                         else -delta_t/2. * beta[n+1][i%N]/(2.*delta_r) if j==i+1
+                                         else delta_t/2. * beta[n+1][i%N]/(2.*delta_r) if j==i-1
+                                         else 0 for j in range(3*N)]
+        for i in range(2*N, 3*N):
+        	if(i == 2*N): #psi r=0 BC
+        		B[i, :] = [3. if j==i
+        			   else -4. if j==i+1
+        			   else 1. if j==i+2
+        			   else 0 for j in range(3*N)]
+        	elif(i == 2*N+1): #psi internal eq. with DISS_EVEN_KO
+        		B[i, :] = [1. + delta_t/2. * ( beta[n][i%N]/(3.*r_grid[i%N])
+                                                            + (beta[n][i%N+1]-beta[n][i%N-1])/(6. * 2. * delta_r) ) if j==i
+                                   else delta_t/2. * beta[n][i%N]/(2.*delta_r) if j==i+1
+                                   else -delta_t/2. * beta[n][i%N]/(2.*delta_r) if j==i-1
+                                   else 0 for j in range(3*N)]
+        	elif(i == 3*N-2): #psi internal eq. with no KO dissipation
+        		B[i, :] = [1. + delta_t/2. * ( beta[n][i%N]/(3.*r_grid[i%N])
+                                                      + (beta[n][i%N+1]-beta[n][i%N-1])/(6. * 2. * delta_r) ) if j==i
+                                   else delta_t/2. * beta[n][i%N]/(2.*delta_r) if j==i+1
+                                   else -delta_t/2. * beta[n][i%N]/(2.*delta_r) if j==i-1
+                                   else 0 for j in range(3*N)]
+        	elif(i == 3*N-1): #psi r=R BC
+#        		B[i, :] = [0 for j in range(3*N)]
+                        B[i, :] = [-3./(2.*delta_r) - 1./r_grid[i%N] if j==i
+                                         else 4./(2.*delta_r) if j==i-1
+                                         else -1./(2.*delta_r) if j==i-2
+                                         else 0 for j in range(3*N)]
+        	else: #psi internal eq. with KO_DISS
+        		B[i, :] = [1. + delta_t/2. * ( beta[n][i%N]/(3.*r_grid[i%N])
+                                                      + (beta[n][i%N+1]-beta[n][i%N-1])/(6. * 2. * delta_r) ) if j==i
+                                   else delta_t/2. * beta[n][i%N]/(2.*delta_r) if j==i+1
+                                   else -delta_t/2. * beta[n][i%N]/(2.*delta_r) if j==i-1
+                                   else 0 for j in range(3*N)]
 
 	return 0
 
 
 
 def update_u(timestep):
-    u = np.zeros(2*N)
+
+    if(PSI_EVOL == False):
+        u = np.zeros(2*N)
+    else:
+        u = np.zeros(3*N)
+
     for i in range(2*N):
         if(i < N):
             u[i] = xi[timestep, i]
         else:
             u[i] = Pi[timestep, i-N]
+
+    if(PSI_EVOL == True):
+        for i in range(2*N, 3*N):
+            u[i] = psi[timestep, i-2*N]
+
+
     return u
 
 #update xi and Pi using the solved-for vector ans, which is u at timestep [timestep]
@@ -279,6 +436,11 @@ def update_r_s(ans, timestep):
             xi[timestep, i] = ans[i]
         else:
             Pi[timestep, i-N] = ans[i]
+
+    if(PSI_EVOL == True):
+        for i in range(2*N, 3*N):
+            psi[timestep, i-2*N] = ans[i]
+
 
     return 0
 
@@ -299,11 +461,18 @@ alpha[1, :] = alpha[0, :]
 #
 #normres = 10.
 
+if(PSI_EVOL == True):
+    #need to add constant term for psi r=R outer boundary
+    c = np.zeros(3*N)
+    c[3*N-1] = 2./r_grid[N-1]
+else:
+    c = np.zeros(2*N)
+
 #TODO: modify this to solve elliptics to tolerance after each hyperbolic iteration
 def solve_system(n):
 	num_iter = 0
 	max_num_iter = 40
-	tol = 9e-8
+	tol = 1e-8
 
 	normres = 10. #TODO: make this the actual residual
 
@@ -314,15 +483,14 @@ def solve_system(n):
 		#1.) elliptics, matter at n=0 are solved.
 		#2.) we want to solve matter with a guess for elliptics at n=1
 		populate_matrices(n)            #A has n+1, B has n
-		u = update_u(n)                 #populate u with xi, Pi at n = 0
-		bb = B.dot(u)                   #compute bb (all at n = 0)
-		ans = np.linalg.solve(A, bb)    #solve for xi, Pi at n=1 with elliptics guess for n=1
+                u = update_u(n)                 #populate u with xi, Pi at n = 0
+                bb = B.dot(u)                   #compute bb (all at n = 0)
+		ans = np.linalg.solve(A, bb+c)  #solve for xi, Pi at n=1 with elliptics guess for n=1
 		update_r_s(ans, n+1)            #update xi, Pi at n=1 with elliptics guess for n=1
 
-		if(PSI_EVOL == True):
-			bb = psi_RHS.dot(psi[n, :])
-			psi[n+1, :] = np.linalg.solve(psi_LHS, bb)
-
+#		if(PSI_EVOL == True):
+#			bb = psi_RHS.dot(psi[n, :])
+#			psi[n+1, :] = np.linalg.solve(psi_LHS, bb)
 
 		if(GEOM_COUPLING == True):
 			num_iter_elliptic = 0
@@ -332,10 +500,14 @@ def solve_system(n):
 			while(num_iter_elliptic <= max_num_iter and elliptic_res_norm > tol):
 				f_n, elliptic_res = Newton_iteration(xi, Pi, psi, beta, alpha, r_grid, n+1, delta_t, epsilon, correction_weight, PSI_EVOL)
 				if(PSI_EVOL == False):
-					psi[n+1, :]   = f_n[0:N]
-				beta[n+1, :]  = f_n[N:2*N]
+					psi[n+1, :]   = f_n[0:N] #THE WRONG PSI MAY BE IN RESIDUAL
+#                                psi[n+1, :]   = f_n[0:N] 
+                                beta[n+1, :]  = f_n[N:2*N]
 				alpha[n+1, :] = f_n[2*N:3*N]
-				elliptic_res_norm = np.amax(np.abs(elliptic_res))
+                                if(PSI_EVOL == False):
+                                    elliptic_res_norm = np.amax(np.abs(elliptic_res))
+                                else:
+                                    elliptic_res_norm = np.amax(np.abs(elliptic_res[N:3*N]))
 				num_iter_elliptic += 1
 				print 'elliptic iteration:', num_iter_elliptic, 'elliptic res:', elliptic_res_norm
 		else:
@@ -344,10 +516,14 @@ def solve_system(n):
 		#confusion with n in below matter_residuals
 		xi_residual, Pi_residual = matter_residuals(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon)
 		matter_res = np.append(xi_residual, Pi_residual)
-	
-		res = np.append(elliptic_res, matter_res)
+
+                if(PSI_EVOL == False):
+                    res = np.append(elliptic_res, matter_res)
+                else:
+                    res = np.append(elliptic_res[N:3*N], matter_res)
 		normres = np.amax(np.abs(res))
-		print 'inf. norm of full residual:', np.amax(np.abs(elliptic_res)), np.amax(np.abs(matter_res)), normres
+#		print 'inf. norm of full residual:', np.amax(np.abs(elliptic_res)), np.amax(np.abs(matter_res)), normres
+                print 'inf. norm of full residual:', normres
 
 	return 0.
 

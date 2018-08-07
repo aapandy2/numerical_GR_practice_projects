@@ -82,9 +82,9 @@ def make_movie(plot_variables='matter'):
 		    ax[2].set_title('$$\\Pi$$')
                     ax[2].set_ylim(np.amin(Pi), np.amax(Pi))
 	    elif(plot_variables == 'geometry'):
-		    ax[0].plot(r_grid, psi[i, :])
+                    ax[0].plot(r_grid, psi[i, :])
 		    ax[0].set_title('$$\\psi$$')
-                    ax[0].set_ylim(np.amin(psi), np.amax(psi))
+#                    ax[0].set_ylim(np.amin(psi), np.amax(psi))
 		    ax[1].plot(r_grid, beta[i, :])
 		    ax[1].set_title('$$\\beta$$')
                     ax[1].set_ylim(np.amin(beta), np.amax(beta))
@@ -92,7 +92,7 @@ def make_movie(plot_variables='matter'):
 		    ax[2].set_title('$$\\alpha$$')
                     ax[2].set_ylim(np.amin(alpha), np.amax(alpha))
 	    elif(plot_variables == 'mass_aspect'):
-		    ax[0].plot(r_grid, mass_aspect[i, :])
+                    ax[0].plot(r_grid, mass_aspect[i, :])
 		    ax[0].set_title('Mass Aspect')
                     ax[0].set_ylim(np.amin(mass_aspect), 1.01*np.amax(mass_aspect))
 		    ax[1].axhline(np.amax(mass_aspect[i, :]))
