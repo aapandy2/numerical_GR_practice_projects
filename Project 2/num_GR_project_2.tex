@@ -275,6 +275,42 @@ R_{\phi \phi} &= \partial_k \Gamma^k_{\phi \phi} - \partial_j \Gamma^k_{\phi k} 
 \end{equation}
 the other components are zero.
 
+Now we can do $S_{ij}$:
+\begin{equation}
+\begin{aligned}
+S_{rr} &= \gamma_{ra} \gamma_{rb} T^{ab} \\
+&= \gamma_{rr} \gamma_{rr} T^{rr} + \gamma_{r \theta} \gamma_{r\theta} T^{\theta \theta} + \gamma_{r\phi} \gamma_{r\phi} T^{\phi \phi} \\
+&= (1) (1) T^{rr} \\
+&= \partial^r \Phi \partial^r \Phi - \frac{1}{2} g^{r r} \partial^\gamma \Phi \partial_\gamma \Phi \\
+&= g^{\mu r} g^{\nu r} \partial_\mu \Phi \partial_\nu \Phi - \frac{1}{2} g^{r r} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \\
+&= g^{t r} g^{t r} \partial_t \Phi \partial_t \Phi + 2 g^{t r} g^{r r} \partial_t \Phi \partial_r \Phi + g^{r r} g^{r r} \partial_r \Phi \partial_r \Phi \\
+&- \frac{1}{2} g^{r r} g^{t t} \partial_t \Phi \partial_t \Phi - \frac{1}{2} 2 g^{r r} g^{t r} \partial_t \Phi \partial_r \Phi - \frac{1}{2} g^{r r} g^{r r} \partial_r \Phi \partial_r \Phi\\
+&= g^{t r} g^{t r} \partial_t \Phi \partial_t \Phi + g^{t r} g^{r r} \partial_t \Phi \partial_r \Phi + \frac{1}{2} g^{r r} g^{r r} \partial_r \Phi \partial_r \Phi - \frac{1}{2} g^{r r} g^{t t} \partial_t \Phi \partial_t \Phi \\
+&= (\alpha^{-2} \beta)^2 \dot{\Phi}^2 + (\alpha^{-2} \beta) (\psi^{-4} - \alpha^{-2} \beta^2) \dot{\Phi} \Phi' \\
+&+ \frac{1}{2} (\psi^{-4} - \alpha^{-2} \beta^2)^2 \Phi'^2 - \frac{1}{2} (\psi^{-4} - \alpha^{-2} \beta^2) (-\alpha^{-2}) \dot{\Phi}^2 \\
+\end{aligned}
+\end{equation}
+and
+\begin{equation}
+\begin{aligned}
+S_{\theta \theta} &= \gamma_{\theta a} \gamma_{\theta b} T^{ab} \\
+&= \gamma_{\theta \theta} \gamma_{\theta \theta} T^{\theta \theta} \\
+&= (r^2) (r^2) T^{\theta \theta} \\
+&= (r^2) (r^2) \Big(  \partial^\theta \Phi \partial^\theta \Phi - \frac{1}{2} g^{\theta \theta} \partial^\gamma \Phi \partial_\gamma \Phi \Big) \\
+&= r^4 \Big( - \frac{1}{2} r^{-2} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \Big) \\
+&= - \frac{1}{2} r^2 \Big( g^{t t} \partial_t \Phi \partial_t \Phi + 2 g^{t r} \partial_t \Phi \partial_r \Phi + g^{r r} \partial_r \Phi \partial_r \Phi \Big) \\
+\end{aligned}
+\end{equation}
+and
+\begin{equation}
+\begin{aligned}
+S_{\phi \phi} &= \gamma_{\phi a} \gamma_{\phi b} T^{ab} \\
+&= \gamma_{\phi \phi} \gamma_{\phi \phi} T^{\phi \phi} \\
+&= (r^2 \sin^2 \theta) (r^2 \sin^2 \theta) \Big( \partial^\phi \Phi \partial^\phi \Phi - \frac{1}{2} g^{\phi \phi} \partial^\gamma \Phi \partial_\gamma \Phi  \Big) \\
+&= - \frac{1}{2} \frac{1}{r^2 \sin^2 \theta} r^4 \sin^4 \theta \Big( g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi  \Big) \\
+&= - \frac{1}{2} r^2 \sin^2 \theta \Big( g^{t t} \partial_t \Phi \partial_t \Phi + 2 g^{r t} \partial_r \Phi \partial_t \Phi + g^{r r} \partial_r \Phi \partial_r \Phi \Big) \\
+\end{aligned}
+\end{equation}
 
 %\begin{equation}
 %T_{\mu \nu} = \nabla_\mu \Phi \nabla_\nu \Phi - \frac{1}{2} g_{\mu \nu} \nabla_{\gamma} \phi \nabla^{\gamma} \phi,
