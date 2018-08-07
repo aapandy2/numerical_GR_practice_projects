@@ -1,4 +1,5 @@
 import numpy as np
+import pylab as pl
 from elliptics_solver import *
 import sys
 
@@ -12,11 +13,11 @@ epsilon = 0.
 
 correction_weight = 1.
 GEOM_COUPLING     = True
-PSI_EVOL          = True
+PSI_EVOL          = False
 
 #define grid
 R     = 50. 
-amp   = 0.001
+amp   = 0.02
 r_0   = 20.
 delta = 5.
 
@@ -64,8 +65,9 @@ if(GEOM_COUPLING == True):
 	f_n[2*N:3*N] = alpha[0, :]
 	f_n = solve_elliptics_first_ts(f_n, xi[0, :], Pi[0, :], r_grid, correction_weight=correction_weight)
 	#now set psi, beta, alpha with solution to elliptics
-	psi[0, :]   = f_n[0:N]
-	beta[0, :]  = f_n[N:2*N]
+#	psi[0, :]   = f_n[0:N]
+        psi[0, :]   = np.abs(f_n[0:N]) #TODO: testing this; REMOVE LATER
+        beta[0, :]  = f_n[N:2*N]
 	alpha[0, :] = f_n[2*N:3*N]
 
 
@@ -508,6 +510,7 @@ def solve_system(n):
                                     elliptic_res_norm = np.amax(np.abs(elliptic_res))
                                 else:
                                     elliptic_res_norm = np.amax(np.abs(elliptic_res[N:3*N]))
+
 				num_iter_elliptic += 1
 				print 'elliptic iteration:', num_iter_elliptic, 'elliptic res:', elliptic_res_norm
 		else:
@@ -611,26 +614,26 @@ np.savetxt('beta.txt', beta)
 np.savetxt('alpha.txt', alpha)
 np.savetxt('mass_aspect.txt', mass_aspect)
 
-#print '-----computing residuals-----'
+print '-----computing residuals-----'
 #phi_residual = np.zeros((timesteps, N))
 #xi_residual  = np.zeros((timesteps, N))
 #Pi_residual  = np.zeros((timesteps, N))
-#
-#psi_residual    = np.zeros((timesteps, N))
-#psi_ev_residual = np.zeros((timesteps, N))
-#alpha_residual  = np.zeros((timesteps, N))
-#beta_residual   = np.zeros((timesteps, N))
-#
-#for n in range(timesteps-1):
-#	f_n = np.zeros(3*N)
-#        f_n[0:N]     = psi[n, :]
-#        f_n[N:2*N]   = beta[n, :]
-#        f_n[2*N:3*N] = alpha[n, :]
-#        f_n = residual(f_n, xi[n, :], Pi[n, :], r_grid)
-#        #now set psi_residual, beta_residual, alpha_residual
-#        psi_residual[n, :]   = f_n[0:N]
-#        beta_residual[n, :]  = f_n[N:2*N]
-#        alpha_residual[n, :] = f_n[2*N:3*N]
+
+psi_residual    = np.zeros((timesteps, N))
+psi_ev_residual = np.zeros((timesteps, N))
+alpha_residual  = np.zeros((timesteps, N))
+beta_residual   = np.zeros((timesteps, N))
+
+for n in range(timesteps-1):
+	f_n = np.zeros(3*N)
+        f_n[0:N]     = psi[n, :]
+        f_n[N:2*N]   = beta[n, :]
+        f_n[2*N:3*N] = alpha[n, :]
+        f_n = residual(f_n, xi[n, :], Pi[n, :], r_grid)
+        #now set psi_residual, beta_residual, alpha_residual
+        psi_residual[n, :]   = f_n[0:N]
+        beta_residual[n, :]  = f_n[N:2*N]
+        alpha_residual[n, :] = f_n[2*N:3*N]
 
 
 #for n in range(timesteps-1):
@@ -801,9 +804,9 @@ np.savetxt('mass_aspect.txt', mass_aspect)
 #np.savetxt('phi_residual.txt', phi_residual)
 #np.savetxt('xi_residual.txt', xi_residual)
 #np.savetxt('Pi_residual.txt', Pi_residual) 
-#np.savetxt('psi_residual.txt', psi_residual)
-#np.savetxt('psi_ev_residual.txt', psi_ev_residual)
-#np.savetxt('beta_residual.txt', beta_residual)
-#np.savetxt('alpha_residual.txt', alpha_residual)
+np.savetxt('psi_residual.txt', psi_residual)
+np.savetxt('psi_ev_residual.txt', psi_ev_residual)
+np.savetxt('beta_residual.txt', beta_residual)
+np.savetxt('alpha_residual.txt', alpha_residual)
 
 print '-----done-----'

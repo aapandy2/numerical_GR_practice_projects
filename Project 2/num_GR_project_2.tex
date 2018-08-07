@@ -316,6 +316,80 @@ S_{\phi \phi} &= \gamma_{\phi a} \gamma_{\phi b} T^{ab} \\
 %T_{\mu \nu} = \nabla_\mu \Phi \nabla_\nu \Phi - \frac{1}{2} g_{\mu \nu} \nabla_{\gamma} \phi \nabla^{\gamma} \phi,
 %\end{equation}
 
+\subsection{Checking the Mass Aspect}
+We need to find the mass aspect in our coordinates, starting with the equation
+\begin{equation}
+m(r, t) = \frac{R}{2} (1 - g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R),
+\end{equation}
+where $R = r \psi^2$.  Using the inverse metric above, we can expand the derivative term of the mass aspect out
+\begin{equation}
+\begin{aligned}
+g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R &= g^{tt} \partial_t R \partial_t R + 2 g^{rt} \partial_t R \partial_r R + g^{rr} \partial_r R \partial_r R \\
+&= (-\alpha^{-2}) \partial_t R \partial_t R + 2 (\alpha^{-2} \beta) \partial_t R \partial_r R + (\psi^{-4} - \alpha^{-2} \beta^2) \partial_r R \partial_r R \\
+&= (-\alpha^{-2}) [\partial_t (r \psi^2)]^2 + 2 (\alpha^{-2} \beta) \partial_t (r \psi^2) \partial_r (r \psi^2) \\
+&+ (\psi^{-4} - \alpha^{-2} \beta^2) [\partial_r (r \psi^2)]^2 \\
+&= -\alpha^{-2} r^2 [2 \psi \dot{\psi}]^2 + 2 (\alpha^{-2} \beta) r (2 \psi \dot{\psi}) (\psi^2 + 2 r \psi \psi') \\
+&+ (\psi^{-4} - \alpha^{-2} \beta^2) [\psi^2 + 2 r \psi \psi']^2 \\
+&= -4 \alpha^{-2} r^2 \psi^2 \dot{\psi}^2 + 4 \alpha^{-2} \beta r \psi \dot{\psi} (\psi^2 + 2 r \psi \psi') \\
+&+ (\psi^{-4} - \alpha^{-2} \beta^2) [\psi^4 + 2 r \psi^3 \psi' + 4 r^2 \psi^2 \psi'^2] \\
+&= -4 \alpha^{-2} r^2 \psi^2 \dot{\psi}^2 + 4 \alpha^{-2} \beta r \dot{\psi} \psi^3 + 8 r^2 \alpha^{-2} \beta \psi^2 \dot{\psi} \psi' \\
+&+ [\psi^{-4} \psi^4 + \psi^{-4} 2 r \psi^3 \psi' + \psi^{-4} 4 r^2 \psi^2 \psi'^2] \\
+&- [\alpha^{-2} \beta^2 \psi^4 + \alpha^{-2} \beta^2 2 r \psi^3 \psi' + \alpha^{-2} \beta^2 4 r^2 \psi^2 \psi'^2] \\
+&= -4 \alpha^{-2} r^2 \psi^2 \dot{\psi}^2 + 4 \alpha^{-2} \beta r \dot{\psi} \psi^3 + 8 r^2 \alpha^{-2} \beta \psi^2 \dot{\psi} \psi' \\
+&+ 1 + \psi^{-1} 2 r \psi' + \psi^{-2} 4 r^2 \psi'^2 \\
+&+ -\alpha^{-2} \beta^2 \psi^4 - \alpha^{-2} \beta^2 2 r \psi^3 \psi' - \alpha^{-2} \beta^2 4 r^2 \psi^2 \psi'^2 \\
+\end{aligned}
+\end{equation}
+we can now notice that the provided mass aspect function does not depend on $\dot{\psi}$; we can eliminate it using the evolution equation for $\psi$:
+\begin{equation}
+\dot{\psi} = \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6}
+\end{equation}
+so
+\begin{equation}
+\begin{aligned}
+g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R &= -4 \alpha^{-2} r^2 \psi^2 \Big[ \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6} \Big]^2 \\
+&+ 4 \alpha^{-2} \beta r \Big[ \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6} \Big] \psi^3 \\
+&+ 8 r^2 \alpha^{-2} \beta \psi^2 \Big[ \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6} \Big] \psi' \\
+&+ 1 + \psi^{-1} 2 r \psi' + \psi^{-2} 4 r^2 \psi'^2 \\
+&+ -\alpha^{-2} \beta^2 \psi^4 - \alpha^{-2} \beta^2 2 r \psi^3 \psi' - \alpha^{-2} \beta^2 4 r^2 \psi^2 \psi'^2 \\
+&= -4 \alpha^{-2} r^2 \psi^2 \Big[ \beta^2 \Big( \frac{\psi}{3 r} + \psi' \Big)^2 + \frac{\psi^2 \beta'^2}{36} + 2 \beta \Big(\frac{\psi}{3r} + \psi'\Big) \frac{\psi \beta'}{6} \Big] \\
+&+ 4 \alpha^{-2} \beta r \Big[ \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6} \Big] \psi^3 \\
+&+ 8 r^2 \alpha^{-2} \beta \psi^2 \Big[ \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6} \Big] \psi' \\
+&+ 1 + \psi^{-1} 2 r \psi' + \psi^{-2} 4 r^2 \psi'^2 \\
+&+ -\alpha^{-2} \beta^2 \psi^4 - \alpha^{-2} \beta^2 2 r \psi^3 \psi' - \alpha^{-2} \beta^2 4 r^2 \psi^2 \psi'^2 \\
+&= - \frac{4 \alpha^{-2} \beta^2 \psi^4}{9} - \frac{8 \alpha^{-2} r \psi^3 \beta^2  \psi'}{3} - 4 \alpha^{-2} r^2 \psi^2 \beta^2 \psi'^2  \\
+&- \frac{4 \alpha^{-2} r^2 \psi^4 \beta'^2}{36} - \frac{8 \alpha^{-2} r \psi^4 \beta \beta'}{18} - \frac{8 \alpha^{-2} r^2 \psi^3 \beta \psi' \beta'}{6} \\
+&+ \frac{4 \alpha^{-2} \beta^2 \psi^4}{3} + 4 \alpha^{-2} \beta^2 r \psi^3 \psi' + \frac{4 \alpha^{-2} \beta r \psi^4 \beta'}{6}   \\
+&+ \frac{8 r \alpha^{-2} \beta^2 \psi^3 \psi'}{3} + 8 r^2 \alpha^{-2} \beta^2 \psi^2 \psi'^2 + \frac{8 r^2 \alpha^{-2} \beta \psi^3 \psi' \beta'}{6} \\
+&+ 1 + \psi^{-1} 2 r \psi' + \psi^{-2} 4 r^2 \psi'^2 \\
+&+ -\alpha^{-2} \beta^2 \psi^4 - \alpha^{-2} \beta^2 2 r \psi^3 \psi' - \alpha^{-2} \beta^2 4 r^2 \psi^2 \psi'^2 \\
+\end{aligned}
+\end{equation}
+simplifying further we have
+\begin{equation}
+\begin{aligned}
+&=-\alpha^{-2} \beta^2 \psi^4 - \frac{4 \alpha^{-2} \beta^2 \psi^4}{9} + \frac{4 \alpha^{-2} \beta^2 \psi^4}{3} \\
+&- \frac{8 \alpha^{-2} r \psi^3 \beta^2  \psi'}{3} - \alpha^{-2} \beta^2 2 r \psi^3 \psi' + 4 \alpha^{-2} \beta^2 r \psi^3 \psi' + \frac{8 r \alpha^{-2} \beta^2 \psi^3 \psi'}{3}\\
+&- 4 \alpha^{-2} r^2 \psi^2 \beta^2 \psi'^2  - \alpha^{-2} \beta^2 4 r^2 \psi^2 \psi'^2 + 8 r^2 \alpha^{-2} \beta^2 \psi^2 \psi'^2 \\
+&- \frac{4 \alpha^{-2} r^2 \psi^4 \beta'^2}{36} \\
+&- \frac{8 \alpha^{-2} r \psi^4 \beta \beta'}{18} + \frac{4 \alpha^{-2} \beta r \psi^4 \beta'}{6} \\
+&- \frac{8 \alpha^{-2} r^2 \psi^3 \beta \psi' \beta'}{6} + \frac{8 r^2 \alpha^{-2} \beta \psi^3 \psi' \beta'}{6} \\
+&+ 1 + \frac{2 r \psi'}{\psi} + \frac{4 r^2 \psi'^2}{\psi^2} \\
+&=-\frac{\alpha^{-2} \beta^2 \psi^4}{9} + 2 r \alpha^{-2} \beta^2 \psi^3 \psi' - \frac{\alpha^{-2} r^2 \psi^4 \beta'^2}{9} + \frac{4 \alpha^{-2} \beta r \psi^4 \beta'}{18} \\
+&+ 1 + \frac{2 r \psi'}{\psi} + \frac{4 r^2 \psi'^2}{\psi^2} \\
+\end{aligned}
+\end{equation}
+so
+\begin{equation}
+\begin{aligned}
+m(r, t) &= \frac{R}{2} (1 - g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R) \\
+&= - \Big( -\frac{r \alpha^{-2} \beta^2 \psi^6}{18} + r^2 \psi^5 \alpha^{-2} \beta^2 \psi' - \frac{\alpha^{-2} r^3 \psi^6 \beta'^2}{18} + \frac{2 \alpha^{-2} \beta r^2 \psi^6 \beta'}{18} \\
+&+ r \psi r \psi' + 2 r r^2 \psi'^2  \Big) \\
+&= \frac{r \psi^6}{18 \alpha^2} \Big( \beta^2 + r^2 \beta'^2 - 2 \beta r \beta' \Big) - r \psi r \psi' - 2 r r^2 \psi'^2 - r^2 \psi^5 \alpha^{-2} \beta^2 \psi' \\
+&= \frac{r \psi^6}{18 \alpha^2} (\beta - r \beta')^2 - 2 r^2 \psi' \Big( \frac{\psi}{2} + r \psi' \Big) - r^2 \psi^5 \alpha^{-2} \beta^2 \psi' \\
+\end{aligned}
+\end{equation}
+
 
 \section{Problem 1}
 This problem asks us to verify the boundary conditions on the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$) at $r = 0$, to ensure that they are regular and finite there.
