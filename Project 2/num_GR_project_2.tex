@@ -41,45 +41,8 @@
 	\date{June 20th, 2018}
 	\maketitle
 
-\section{Background}
-In this project we now aim to solve the equations of motion for a self-gravitating scalar field in spherical symmetry.  The key difference between this project and the previous one is that we now care about how the scalar field modifies the spacetime it occupies, whereas in the previous project we used a static Schwarzschild spacetime.
-
-The spherically symmetric line element in isotropic (conformally flat) form is given by
-\begin{equation} \label{eq:line_element}
-ds^2 = -(\alpha^2 - \psi^4 \beta^2) dt^2 + 2 \psi^4 \beta dr dt + \psi^4 [dr^2 + r^2 (d\theta^2 + \sin^2 \theta d\phi^2)],
-\end{equation}
-where $\alpha(r, t)$ is called the \textit{lapse function}, $\beta(r, t)$ is the \textit{shift} (which comes from the norm of the \textit{shift vector} $\beta^i$ when we don't have spherical symmetry), and $\psi(r, t)$ is the \textit{conformal factor}.
-
-In this formalism, the Klein-Gordon equation for the scalar field $\Phi(r, t)$ may be written in terms of auxiliary variables $\xi$ and $\Pi$, defined to be:
-\begin{align}
-\xi(r, t) &= \Phi' \label{eq:xi_defn} \\
-\Pi(r, t) &= \frac{\psi^2}{\alpha}(\dot{\Phi} - \beta \xi), \label{eq:Pi_defn} 
-\end{align}
-where throughout this document a dot $(\dot{~})$ denotes a partial derivative with respect to $t$, and a prime $(')$ denotes a partial derivative with respect to $r$.  Using these auxiliary variables, we can derive a closed system of equations for the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$).
-
-The first equation of this system is the hyperbolic Klein-Gordon equation
-\begin{equation} \label{eq:hyperbolic_KGE}
-\dot{\Pi} - \frac{1}{r^2 \psi^4} \Big[ r^2 \psi^4 \Big( \beta \Pi + \frac{\alpha \xi}{\psi^2} \Big)\Big]' + \frac{2}{3} \Pi \Big[ \beta' + \frac{2 \beta}{r} \Big(1 + \frac{3 r \psi'}{\redtext{2} \psi} \Big) \Big] = 0,
-\end{equation}
-followed by the hyperbolic evolution equation for $\xi$:
-\begin{equation} \label{eq:xi_evol}
-\dot{\xi} - \Big( \frac{\alpha \Pi}{\psi^2} + \beta \xi \Big)' = 0,
-\end{equation}
-the Hamiltonian constraint equation, which we will use as an elliptic constraint for $\psi$
-\begin{equation} \label{eq:psi_evol}
-\psi'' + \psi' \frac{2}{r} + \frac{\psi^5}{12} \Big[ \frac{1}{\alpha} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] + \pi \psi [\xi^2 + \Pi^2] = 0,
-\end{equation}
-the momentum constraint equation, an elliptic equation for $\beta$
-\begin{equation} \label{eq:beta_evol}
-\beta'' + \Big( \beta' - \frac{\beta}{r} \Big) \Big[ \frac{2}{r} + \frac{6 \psi'}{\psi} - \frac{\alpha'}{\alpha} \Big] + \frac{12 \pi \alpha \xi \Pi}{\psi^2} = 0,
-\end{equation}
-and the maximal slicing condition yields an elliptic equation for $\alpha$:
-\begin{equation} \label{eq:alpha_evol}
-\alpha'' + \alpha' \Big[ \frac{2}{r} + \frac{2 \psi'}{\psi} \Big] - \alpha^{-1} \Big[ \frac{2 \psi^4}{3} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] - 8 \pi \alpha \Pi^2 = 0.
-\end{equation}
-
-\subsection{Deriving the Equations}
-It is possible to derive the equations above starting from the ADM equations (taken from Shapiro and Baumgarte).  We may begin with some basic definitions before showing the full equations.  First we define the matter source terms
+\section{Deriving the Equations}
+It is possible to derive the equations in the handout starting from the ADM equations (taken from Shapiro and Baumgarte).  We may begin with some basic definitions before showing the full equations.  First we define the matter source terms
 \begin{align}
 \rho &= n_a n_b T^{ab} \\
 S^i &= -\gamma^{ij} n^a T_{aj} \\
@@ -144,7 +107,7 @@ g_{ab} =
 \beta_j & \gamma_{ij}  \\
 \end{pmatrix}
 \end{equation}
-and since $g_{\mu \lambda} g^{\lambda \nu} = \delta^\nu_\mu$, the inverse metric is (\redtext{note this differs in the off-diagonal terms from B\&S})
+and since $g_{\mu \lambda} g^{\lambda \nu} = \delta^\nu_\mu$, the inverse metric is (\redtext{note this differs in the off-diagonal terms from B\&S, but agrees with online lecture notes})
 \begin{equation}
 g^{ab} = 
 \begin{pmatrix}
@@ -163,42 +126,108 @@ n^a &= -g^{ab} \alpha \nabla_b t \\
 \end{equation}
 and similarly B\&S gives $n_a = (\alpha, 0, 0, 0)$ because $n_a n^a = -1$ since $n^a$ is a timelike vector. \redtext{Prove the 1-form is as stated?}
 
-\subsubsection{Applying Spherical Symmetry}
-Now if we assume the spherically symmetric spatial metric $\gamma_{ij} = \psi^4 \mathrm{diag}(1, r^2, r^2 \sin^2 \theta)$ in which $\beta^i = (\beta, 0, 0)$, we can immediately note that the metric is independent of time and use equation \ref{eq:spatial_metric_evol} to find
+%\subsection{Applying Spherical Symmetry}
+Now we assume the spherically symmetric spatial metric $\gamma_{ij} = \psi^4 \mathrm{diag}(1, r^2, r^2 \sin^2 \theta)$ in which $\beta^i = (\beta, 0, 0)$.  We can now use equation \ref{eq:spatial_metric_evol} to find the extrinsic curvature
+%\begin{equation}
+%\begin{aligned}
+%\partial_t \gamma_{ij} &= -2 \alpha K_{ij} + D_i \beta_j + D_j \beta_i \\
+%\partial_t \gamma_{rr} &= -2 \alpha K_{rr} + D_r \beta + D_r \beta \\
+%\partial_t (\psi^4) &= -2 \alpha K_{rr} + 2 \gamma_{r}^{~b} \nabla_b \beta \\
+%&= -2 \alpha K_{rr} + 2 \gamma^{\mu b} \gamma_{r \mu} \nabla_b \beta \\
+%&= -2 \alpha K_{rr} + 2 \gamma^{\mu r} \gamma_{r \mu} \nabla_r \beta \\
+%&= -2 \alpha K_{rr} + 2 \gamma^{r r} \gamma_{r r} \nabla_r \beta \\
+%4 \psi^3 \dot{\psi} &= -2 \alpha K_{rr} + 2 \beta' \\
+%K_{rr} &= \frac{1}{\alpha} (\beta' - 2 \psi^3 \dot{\psi}); \\
+%\end{aligned}
+%\end{equation}
 \begin{equation}
 \begin{aligned}
 \partial_t \gamma_{ij} &= -2 \alpha K_{ij} + D_i \beta_j + D_j \beta_i \\
-0 &= -2 \alpha K_{ij} + D_i \beta_j + D_j \beta_i \\
-2 \alpha K_{ij} &= D_i \beta_j + D_j \beta_i \\
-K_{rr} &= \frac{1}{2 \alpha} (D_r \beta_r + D_r \beta_r) \\
-&= \frac{1}{2 \alpha} (\gamma_{r}^{~b} \nabla_b \beta + \gamma_{r}^{~b} \nabla_b \beta) \\
-&= \frac{1}{2 \alpha} (\gamma_{r \lambda} \gamma^{\lambda b} \nabla_b \beta + \gamma_{r \lambda} \gamma^{\lambda b} \nabla_b \beta) \\
-&= \frac{1}{2 \alpha} (\delta^{b}_r \nabla_b \beta + \delta^{b}_r \nabla_b \beta) \\
-&= \frac{1}{\alpha} \nabla_r \beta \\
-&= \frac{\beta'}{\alpha}.
+&= -2 \alpha K_{ij} + \gamma_{i}^{~l} \gamma_{j}^{~m} \nabla_l \beta_m + \gamma_j^{~m} \gamma_i^{~l} \nabla_m \beta_l \\
+&= -2 \alpha K_{ij} + \gamma^{n l} \gamma_{i n} \gamma^{p m} \gamma_{j p} \nabla_l \beta_m + \gamma^{n m} \gamma_{j n} \gamma^{p l} \gamma_{i p} \nabla_m \beta_l \\
+\partial_t \gamma_{r r} &= -2 \alpha K_{rr} + \gamma^{n l} \gamma_{r n} \gamma^{p m} \gamma_{r p} \nabla_l \beta_m + \gamma^{n m} \gamma_{r n} \gamma^{p l} \gamma_{r p} \nabla_m \beta_l \\
+&= -2 \alpha K_{rr} + \gamma^{r r} \gamma_{r r} \gamma^{r r} \gamma_{r r} \nabla_r \beta_r + \gamma^{r r} \gamma_{r r} \gamma^{r r} \gamma_{r r} \nabla_r \beta_r \\
+&= -2 \alpha K_{rr} + 2 \nabla_r \beta_r \\
+&= -2 \alpha K_{rr} + 2 (\partial_r \beta_r - \Gamma^{\lambda}_{rr} \beta_\lambda) \\
+&= -2 \alpha K_{rr} + 2 \Big[ \partial_r (\gamma_{rr} \beta^r) - \Gamma^{\lambda}_{rr} (\gamma_{\lambda q} \beta^{q}) \Big] \\
+&= -2 \alpha K_{rr} + 2 \Big[ \partial_r (\gamma_{rr} \beta) - \Gamma^{r}_{rr} (\gamma_{r r} \beta) \Big] \\
+&= -2 \alpha K_{rr} + 2 \Big[ 4 \psi^3 \psi' \beta + \psi^4 \beta' - (2\psi' \psi^{-1}) (\psi^4 \beta) \Big] \\
+\partial_t (\psi^4) &= -2 \alpha K_{rr} + 4 \psi^3 \psi' \beta + 2 \psi^4 \beta' \\
+K_{rr} &= \frac{1}{\alpha} \Big( 2 \psi^3 \psi' \beta + \psi^4 \beta' - 2 \psi^3 \dot{\psi} \Big) \\
+%&= -2 \alpha K_{ij} + D_i (\gamma_{kj} \beta^{k}) + D_j (\gamma_{ik} \beta^{k}) \\
+%\partial_t \gamma_{rr} &= -2 \alpha K_{rr} + D_r (\gamma_{kr} \beta^{k}) + D_r (\gamma_{rk} \beta^{k}) \\
+%&= -2 \alpha K_{rr} + \gamma_{r}^{~b} \nabla_{b} (\gamma_{rr} \beta^{r}) + \gamma_{r}^{~b} \nabla_b (\gamma_{rr} \beta^{r}) \\
+%&= -2 \alpha K_{rr} + 2 \gamma^{ab} \gamma_{ra} \nabla_{b} (\gamma_{rr} \beta^{r}) \\
+%&= -2 \alpha K_{rr} + 2 \gamma^{rr} \gamma_{rr} \nabla_{r} (\gamma_{rr} \beta^{r}) \\
+%\partial_t \psi^4 &= -2 \alpha K_{rr} + 2 \partial_{r} (\psi^4 \beta) \\
+%4 \psi^3 \dot{\psi} &= -2 \alpha K_{rr} + 2 (4 \psi^3 \psi' \beta + \psi^4 \beta') \\
+%K_{rr} &= \frac{1}{\alpha} \Big( 4 \psi^3 \psi' \beta + \psi^4 \beta' - 2 \psi^3 \dot{\psi} \Big) \\
 \end{aligned}
-\end{equation} 
+\end{equation}
+similarly
+\begin{equation}
+\begin{aligned}
+\partial_t \gamma_{\theta \theta} &= -2 \alpha K_{\theta \theta} + D_\theta \beta_\theta + D_\theta \beta_\theta \\
+r^2 4 \psi^3 \dot{\psi} &= -2 \alpha K_{\theta \theta}\\
+K_{\theta \theta} &= - \frac{2 r^2 \psi^3 \dot{\psi}}{\alpha},
+\end{aligned}
+\end{equation}
+and
+\begin{equation}
+\begin{aligned}
+\partial_t \gamma_{\phi \phi} &= -2 \alpha K_{\phi \phi} + D_\phi \beta_\phi + D_\phi \beta_\phi \\
+\partial_t (\psi^4 r^2 \sin^2 \theta) &= -2 \alpha K_{\phi \phi} \\
+r^2 \sin^2 \theta 4 \psi^3 \dot{\psi} &= -2 \alpha K_{\phi \phi} \\
+K_{\phi \phi} &= - \frac{2 r^2 \sin^2 \theta \psi^3 \dot{\psi}}{\alpha}. \\
+\end{aligned}
+\end{equation}
+We also need the trace of the extrinsic curvature:
+\begin{equation}
+\begin{aligned}
+K &= \gamma^{ij} K_{ij} \\
+&= \gamma^{rr} K_{rr} + \gamma^{\theta \theta} K_{\theta \theta} + \gamma^{\phi \phi} K_{\phi \phi} \\
+&= \psi^{-4} K_{rr} + \psi^{-4} r^{-2} K_{\theta \theta} + \psi^{-4} r^{-2} \sin^{-2} \theta K_{\phi \phi} \\
+&= \psi^{-4} \frac{1}{\alpha} \Big( 2 \psi^3 \psi' \beta + \psi^4 \beta' - 2 \psi^3 \dot{\psi} \Big)  - \psi^{-4} r^{-2} \frac{2 r^2 \psi^3 \dot{\psi}}{\alpha} \\
+&- \psi^{-4} r^{-2} \sin^{-2} \theta \frac{2 r^2 \sin^2 \theta \psi^3 \dot{\psi}}{\alpha} \\
+&= \frac{2 \psi' \beta}{\psi \alpha} + \frac{\beta'}{\alpha} - \frac{6 \dot{\psi}}{\psi \alpha}. \\
+\end{aligned}
+\end{equation}
+We can compute a straightforward sanity check using a common contraction of one of the ADM equations which also yields the trace of the extrinsic curvature (note below $\gamma = \mathrm{det}[\gamma_{ij}]$):
+\begin{equation}
+\begin{aligned}
+\partial_t \ln(\gamma^{1/2}) &= -\alpha K + D_i \beta^i \\
+\partial_t \ln( [\psi^4 \psi^4 r^2 \psi^4 r^2 \sin^2 \theta]^{1/2} ) &= -\alpha K + D_i \beta^i \\
+\partial_t \ln( \psi^6 r^2 \sin \theta ) &= -\alpha K + D_i \beta^i \\
+\frac{6 \psi^5 \dot{\psi} r^2 \sin^2 \theta}{\psi^6 r^2 \sin^2 \theta} &= -\alpha K + D_i \beta^i \\
+\frac{6 \dot{\psi}}{\psi} &= -\alpha K + D_r (\beta^r) \\
+&= -\alpha K + \gamma_r^{~b} \nabla_b (\beta^r) \\
+&= -\alpha K + \gamma^{a b} \gamma_{r a} \nabla_b (\beta^r) \\
+&= -\alpha K + \gamma^{r r} \gamma_{r r} \nabla_r (\beta^r) \\
+&= -\alpha K + \gamma^{r r} \gamma_{r r} (\partial_r \beta^r + \Gamma_{r \lambda}^{r} \beta^\lambda) \\
+&= -\alpha K + \beta' + \frac{2 \psi'}{\psi} \beta \\
+-\alpha K &= \frac{6 \dot{\psi}}{\psi} - \beta' - \frac{2 \psi'}{\psi} \beta \\
+K &= \frac{\beta'}{\alpha} + \frac{2 \beta \psi'}{\psi \alpha} -\frac{6 \dot{\psi}}{\psi \alpha}, \\
+\end{aligned}
+\end{equation}
+which agrees with our result above.
 
-Before we can continue we need to compute the matter source quantities.  Starting with $\rho$, we find
-%\begin{equation}
-%\begin{aligned}
-%\rho &= n_a n_b T^{ab} \\
-%&= n_t n_t T^{tt} + n_r n_r T^{rr} + n_\theta n_\theta T^{\theta \theta} + n_\phi n_\phi T^{\phi \phi} \\
-%&= (\alpha^{-1}) (\alpha^{-1}) T^{tt} + (\alpha^{-1} \beta^r) (\alpha^{-1} \beta^r) T^{rr} + (\alpha^{-1} \beta^\theta) (\alpha^{-1} \beta^\theta) T^{\theta \theta} + (\alpha^{-1} \beta^\phi) (\alpha^{-1} \beta^\phi) T^{\phi \phi} \\
-%&= \alpha^{-2} T^{tt} + \alpha^{-2} \beta^2 T^{rr} \\
-%&= \alpha^{-2} \Big( \partial^t \Phi \partial^t \Phi - \frac{1}{2} g^{t t} \partial^\gamma \Phi \partial_\gamma \Phi \Big) + \alpha^{-2} \beta^2 \Big( \partial^r \Phi \partial^r \Phi - \frac{1}{2} g^{r r} \partial^\gamma \Phi \partial_\gamma \Phi \Big) \\
-%&= \alpha^{-2} \Big( g^{\lambda t} g^{\rho t} \partial_\lambda \Phi \partial_\rho \Phi - \frac{1}{2} g^{t t} g^{\mu \nu} \partial_{\mu} \Phi \partial_{\nu} \Phi \Big) \\
-%&+ \alpha^{-2} \beta^2 \Big( g^{\lambda r} g^{\rho r} \partial_\lambda \Phi \partial_\rho \Phi - \frac{1}{2} g^{r r} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \Big) \\
-%&= \alpha^{-2} \Big( g^{t t} g^{t t} \partial_t \Phi \partial_t \Phi + 2 g^{r t} g^{t t} \partial_r \Phi \partial_t \Phi + g^{r t} g^{r t} \partial_r \Phi \partial_r \Phi \\
-%&- \frac{1}{2} g^{t t} g^{t t} \partial_{t} \Phi \partial_{t} \Phi - g^{t t} g^{t r} \partial_{t} \Phi \partial_{r} \Phi - \frac{1}{2} g^{t t} g^{r r} \partial_{r} \Phi \partial_{r} \Phi \Big) \\
-%&+ \alpha^{-2} \beta^2 \Big( g^{t r} g^{t r} \partial_t \Phi \partial_t \Phi + 2 g^{t r} g^{r r} \partial_t \Phi \partial_r \Phi + g^{r r} g^{r r} \partial_r \Phi \partial_r \Phi \\
-%&- \frac{1}{2} g^{r r} g^{t t} \partial_t \Phi \partial_t \Phi - g^{r r} g^{t r} \partial_t \Phi \partial_r \Phi - \frac{1}{2} g^{r r} g^{r r} \partial_r \Phi \partial_r \Phi \Big) \\
-%&= \alpha^{-2} \Big( \frac{1}{2} g^{t t} g^{t t} \partial_t \Phi \partial_t \Phi + g^{r t} g^{t t} \partial_r \Phi \partial_t \Phi + g^{r t} g^{r t} \partial_r \Phi \partial_r \Phi - \frac{1}{2} g^{t t} g^{r r} \partial_{r} \Phi \partial_{r} \Phi \Big) \\
-%&+ \alpha^{-2} \beta^2 \Big( g^{t r} g^{t r} \partial_t \Phi \partial_t \Phi + g^{t r} g^{r r} \partial_t \Phi \partial_r \Phi + \frac{1}{2} g^{r r} g^{r r} \partial_r \Phi \partial_r \Phi - \frac{1}{2} g^{r r} g^{t t} \partial_t \Phi \partial_t \Phi \Big) \\
-%&= \alpha^{-2} \Big( \frac{1}{2} g^{t t} g^{t t} \dot{\Phi}^2 + g^{r t} g^{t t} \Phi' \dot{\Phi} + g^{r t} g^{r t} \Phi'^2 - \frac{1}{2} g^{t t} g^{r r} \Phi'^2 \Big) \\
-%&+ \alpha^{-2} \beta^2 \Big( g^{t r} g^{t r} \dot{\Phi}^2 + g^{t r} g^{r r} \dot{\Phi} \Phi' + \frac{1}{2} g^{r r} g^{r r} \Phi'^2 - \frac{1}{2} g^{r r} g^{t t} \dot{\Phi}^2 \Big) \\
-%\end{aligned}
-%\end{equation}
+\subsection{Checking the $\psi$ Hyperbolic Equation}
+We are told that using our remaining coordinate freedom to choose \textit{maximal slicing} results in the equation $K = 0$, so
+\begin{equation}
+\begin{aligned}
+0 &= \frac{\beta'}{\alpha} + \frac{2 \beta \psi'}{\psi \alpha} -\frac{6 \dot{\psi}}{\psi \alpha} \\
+&= \beta' + \frac{2 \beta \psi'}{\psi} -\frac{6 \dot{\psi}}{\psi} \\
+&= \beta' \psi + 2 \beta \psi' - 6 \dot{\psi} \\
+&= \frac{\beta' \psi}{6} + \frac{\beta \psi'}{3} - \dot{\psi}, \\
+\end{aligned}
+\end{equation}
+rearranging once more gives
+\begin{equation}
+\boxed{\dot{\psi} = \frac{\beta' \psi}{6} + \frac{\beta \psi'}{3}}
+\end{equation}
+which differs from the project handout.
+
+Now we can compute the matter source quantities.  Starting with $\rho$, we find
 \begin{equation}
 \begin{aligned}
 \rho &= n_a n_b T^{ab} \\
@@ -211,7 +240,9 @@ Before we can continue we need to compute the matter source quantities.  Startin
 &= \alpha^{2} \Big( \frac{1}{2} g^{t t} g^{t t} \partial_t \Phi \partial_t \Phi + g^{r t} g^{t t} \partial_r \Phi \partial_t \Phi + g^{r t} g^{r t} \partial_r \Phi \partial_r \Phi - \frac{1}{2} g^{t t} g^{r r} \partial_{r} \Phi \partial_{r} \Phi \Big) \\
 &= \alpha^{2} \Big( \frac{1}{2} (-\alpha^{-2}) (-\alpha^{-2}) \dot{\Phi}^2 + (\alpha^{-2} \beta) (-\alpha^{-2}) \Phi' \dot{\Phi} \\
 &+ (\alpha^{-2} \beta) (\alpha^{-2} \beta) \Phi'^2 - \frac{1}{2} (-\alpha^{-2}) (\gamma^{rr} - \alpha^{-2} \beta^2) \Phi'^2 \Big) \\
-&= \frac{1}{2} \alpha^{-2} \dot{\Phi}^2 - \beta \alpha^{-2} \Phi' \dot{\Phi} + \frac{1}{2} \alpha^{-2} \beta^2 \Phi'^2 + \frac{1}{2} \psi^4 \Phi'^2. \\
+&= \frac{1}{2} \alpha^{-2} \dot{\Phi}^2 - \beta \alpha^{-2} \Phi' \dot{\Phi} + \alpha^{-2} \beta^2 \Phi'^2 + \frac{1}{2} (\psi^{-4} - \alpha^{-2} \beta^2) \Phi'^2 \\
+&= \frac{1}{2} \alpha^{-2} \dot{\Phi}^2 - \beta \alpha^{-2} \Phi' \dot{\Phi} + \frac{1}{2} \alpha^{-2} \beta^2 \Phi'^2 + \frac{1}{2} \psi^{-4} \Phi'^2 \\
+%&= \frac{1}{2} \alpha^{-2} \dot{\Phi}^2 - \beta \alpha^{-2} \Phi' \dot{\Phi} + \frac{1}{2} \alpha^{-2} \beta^2 \Phi'^2 + \frac{1}{2} \psi^4 \Phi'^2. \\
 \end{aligned}
 \end{equation}
 
@@ -227,6 +258,12 @@ where the Christoffel symbols are
 For our spatial metric the surviving connection coefficients are
 \begin{equation}
 \begin{aligned}
+\Gamma^{r}_{rr} &= \frac{1}{2} \gamma^{rl} (\partial_r \gamma_{lr} + \partial_r \gamma_{lr} - \partial_l \gamma_{rr})\\
+&= \frac{1}{2} \gamma^{rr} (\partial_r \gamma_{rr} + \partial_r \gamma_{rr} - \partial_r \gamma_{rr})\\
+&= \frac{1}{2} \gamma^{rr} (\partial_r \gamma_{rr})\\
+&= \frac{1}{2} \psi^{-4} (\partial_r \psi^4)\\
+&= \frac{1}{2} \psi^{-4} (4 \psi^3 \psi')\\
+&= \frac{2 \psi'}{\psi}\\
 \Gamma^{\theta}_{r \theta} &= \frac{1}{2} \gamma^{\theta \theta} (\partial_r \gamma_{\theta \theta}) \\
 &= \frac{1}{2} \frac{1}{\psi^4 r^2} (\partial_r \psi^4 r^2) \\
 &= \frac{1}{2} \frac{1}{\psi^4 r^2} (4 \psi^3 \psi' r^2 + 2 \psi^4 r) \\
@@ -245,35 +282,48 @@ For our spatial metric the surviving connection coefficients are
 &= - \Big( \frac{2 \psi' r^2}{\psi} + r \Big) \sin^2 \theta, \\
 \end{aligned}
 \end{equation}
-and the Ricci tensor is
-\begin{equation}
-\begin{aligned}
-R_{rr} &= \partial_k \Gamma^k_{rr} - \partial_r \Gamma^k_{rk} + \Gamma^k_{rr} \Gamma^l_{kl} - \Gamma^k_{rl} \Gamma^l_{rk} \\
-&= - \partial_r \Gamma^k_{rk} - \Gamma^k_{rl} \Gamma^l_{rk} \\
-&= - \partial_r \Gamma^\theta_{r\theta} - \partial_r \Gamma^\phi_{r\phi} - \Gamma^\theta_{r\theta} \Gamma^\theta_{r\theta} - \Gamma^\phi_{r\phi} \Gamma^\phi_{r\phi} \\
-&= - 2 \partial_r \Big( \frac{2 \psi'}{\psi}  + \frac{1}{r} \Big) - 2 \Big(\frac{2 \psi'}{\psi}  + \frac{1}{r}\Big)^2 \\
-&= - 2 \Big( \frac{2 \psi''}{\psi} - \frac{2 \psi'^2}{\psi^2}  - \frac{1}{r^2} \Big) - 2 \Big(\frac{2 \psi'}{\psi}  + \frac{1}{r}\Big)^2; \\
-\end{aligned}
-\end{equation}
-similarly
-\begin{equation}
-\begin{aligned}
-R_{\theta \theta} &= \partial_k \Gamma^k_{\theta \theta} - \partial_\theta \Gamma^k_{\theta k} + \Gamma^k_{\theta \theta} \Gamma^l_{kl} - \Gamma^k_{\theta l} \Gamma^l_{\theta k} \\
-&= \partial_r \Gamma^r_{\theta \theta} + \Gamma^r_{\theta \theta} \Gamma^\theta_{r\theta} + \Gamma^r_{\theta \theta} \Gamma^\phi_{r\phi} - \Gamma^\theta_{\theta r} \Gamma^r_{\theta \theta} - \Gamma^r_{\theta \theta} \Gamma^\theta_{\theta r} \\
-&= \partial_r \Big( - \frac{2 \psi' r^2}{\psi} - r \Big) + 2 \Big(- \frac{2 \psi' r^2}{\psi} - r \Big) \Big( \frac{2 \psi'}{\psi}  + \frac{1}{r} \Big) - 2 \Big( \frac{2 \psi'}{\psi}  + \frac{1}{r} \Big) \Big( - \frac{2 \psi' r^2}{\psi} - r \Big) \\
-&=  - \frac{4 \psi' r}{\psi} - \frac{2 \psi'' r^2}{\psi} + \frac{2 \psi'^2 r^2}{\psi^2} - 1 \\
-\end{aligned}
-\end{equation}
-and
-\begin{equation}
-\begin{aligned}
-R_{\phi \phi} &= \partial_k \Gamma^k_{\phi \phi} - \partial_j \Gamma^k_{\phi k} + \Gamma^k_{\phi \phi} \Gamma^l_{kl} - \Gamma^k_{\phi l} \Gamma^l_{\phi k} \\
-&= \partial_r \Gamma^r_{\phi \phi} - 0 + \Gamma^r_{\phi \phi} \Gamma^\theta_{r \theta} + \Gamma^r_{\phi \phi} \Gamma^\phi_{r \phi} - \Gamma^r_{\phi \phi} \Gamma^\phi_{\phi r} - \Gamma^\phi_{\phi r} \Gamma^r_{\phi \phi}\\
-&= - \sin^2 \theta \, \partial_r \Big( \frac{2 \psi' r^2}{\psi} + r \Big) \\
-&= - \sin^2 \theta \, \Big( \frac{4 \psi' r}{\psi} + \frac{2 \psi'' r^2}{\psi} - \frac{2 \psi' r^2}{\psi^2} + 1 \Big); \\
-\end{aligned}
-\end{equation}
-the other components are zero.
+%and the Ricci tensor is
+%\begin{equation}
+%\begin{aligned}
+%R_{rr} &= \partial_k \Gamma^k_{rr} - \partial_r \Gamma^k_{rk} + \Gamma^k_{rr} \Gamma^l_{kl} - \Gamma^k_{rl} \Gamma^l_{rk} \\
+%&= - \partial_r \Gamma^k_{rk} - \Gamma^k_{rl} \Gamma^l_{rk} \\
+%&= - \partial_r \Gamma^\theta_{r\theta} - \partial_r \Gamma^\phi_{r\phi} - \Gamma^\theta_{r\theta} \Gamma^\theta_{r\theta} - \Gamma^\phi_{r\phi} \Gamma^\phi_{r\phi} \\
+%&= - 2 \partial_r \Big( \frac{2 \psi'}{\psi}  + \frac{1}{r} \Big) - 2 \Big(\frac{2 \psi'}{\psi}  + \frac{1}{r}\Big)^2 \\
+%&= - 2 \Big( \frac{2 \psi''}{\psi} - \frac{2 \psi'^2}{\psi^2}  - \frac{1}{r^2} \Big) - 2 \Big(\frac{2 \psi'}{\psi}  + \frac{1}{r}\Big)^2; \\
+%\end{aligned}
+%\end{equation}
+%similarly
+%\begin{equation}
+%\begin{aligned}
+%R_{\theta \theta} &= \partial_k \Gamma^k_{\theta \theta} - \partial_\theta \Gamma^k_{\theta k} + \Gamma^k_{\theta \theta} \Gamma^l_{kl} - \Gamma^k_{\theta l} \Gamma^l_{\theta k} \\
+%&= \partial_r \Gamma^r_{\theta \theta} + \Gamma^r_{\theta \theta} \Gamma^\theta_{r\theta} + \Gamma^r_{\theta \theta} \Gamma^\phi_{r\phi} - \Gamma^\theta_{\theta r} \Gamma^r_{\theta \theta} - \Gamma^r_{\theta \theta} \Gamma^\theta_{\theta r} \\
+%&= \partial_r \Big( - \frac{2 \psi' r^2}{\psi} - r \Big) + 2 \Big(- \frac{2 \psi' r^2}{\psi} - r \Big) \Big( \frac{2 \psi'}{\psi}  + \frac{1}{r} \Big) - 2 \Big( \frac{2 \psi'}{\psi}  + \frac{1}{r} \Big) \Big( - \frac{2 \psi' r^2}{\psi} - r \Big) \\
+%&=  - \frac{4 \psi' r}{\psi} - \frac{2 \psi'' r^2}{\psi} + \frac{2 \psi'^2 r^2}{\psi^2} - 1 \\
+%\end{aligned}
+%\end{equation}
+%and
+%\begin{equation}
+%\begin{aligned}
+%R_{\phi \phi} &= \partial_k \Gamma^k_{\phi \phi} - \partial_j \Gamma^k_{\phi k} + \Gamma^k_{\phi \phi} \Gamma^l_{kl} - \Gamma^k_{\phi l} \Gamma^l_{\phi k} \\
+%&= \partial_r \Gamma^r_{\phi \phi} - 0 + \Gamma^r_{\phi \phi} \Gamma^\theta_{r \theta} + \Gamma^r_{\phi \phi} \Gamma^\phi_{r \phi} - \Gamma^r_{\phi \phi} \Gamma^\phi_{\phi r} - \Gamma^\phi_{\phi r} \Gamma^r_{\phi \phi}\\
+%&= - \sin^2 \theta \, \partial_r \Big( \frac{2 \psi' r^2}{\psi} + r \Big) \\
+%&= - \sin^2 \theta \, \Big( \frac{4 \psi' r}{\psi} + \frac{2 \psi'' r^2}{\psi} - \frac{2 \psi' r^2}{\psi^2} + 1 \Big); \\
+%\end{aligned}
+%\end{equation}
+%the other components are zero.  If we compute $R = R^{\mu}_{~\mu} = g^{\mu \nu} R_{\mu \nu}$ we get
+%\begin{equation}
+%\begin{aligned}
+%R &= g^{\mu \nu} R_{\mu \nu} \\
+%&= g^{tt} R_{tt} + g^{rr} R_{rr} + g^{\theta \theta} R_{\theta \theta} + g^{\phi \phi} R_{\phi \phi} \\
+%&= 0 + (\psi^{-4} - \alpha^{-2} \beta^2) R_{rr} + \psi^{-4} r^{-2} R_{\theta \theta} + \psi^{-4} r^{-2} \sin^{-2} \theta R_{\phi \phi} \\
+%&=  (\psi^{-4} - \alpha^{-2} \beta^2) \Big[- 2 \Big( \frac{2 \psi''}{\psi} - \frac{2 \psi'^2}{\psi^2}  - \frac{1}{r^2} \Big) - 2 \Big(\frac{2 \psi'}{\psi}  + \frac{1}{r}\Big)^2\Big] \\
+%&+ \psi^{-4} r^{-2} \Big[ - \frac{4 \psi' r}{\psi} - \frac{2 \psi'' r^2}{\psi} + \frac{2 \psi'^2 r^2}{\psi^2} - 1 \Big] \\
+%&+ \psi^{-4} r^{-2} \sin^{-2} \Big[ - \sin^2 \theta \, \Big( \frac{4 \psi' r}{\psi} + \frac{2 \psi'' r^2}{\psi} - \frac{2 \psi' r^2}{\psi^2} + 1 \Big) \Big] \\
+%&=  (\psi^{-4} - \alpha^{-2} \beta^2) \Big[- \Big( \frac{4 \psi''}{\psi} - \frac{4 \psi'^2}{\psi^2}  - \frac{2}{r^2} \Big) - \Big(\frac{8 \psi'^2}{\psi^2}  + \frac{8 \psi'}{\psi r} + \frac{2}{r^2} \Big) \Big] \\
+%&+ 2 \psi^{-4} \Big[ - \frac{4 \psi'}{\psi r} - \frac{2 \psi''}{\psi} + \frac{2 \psi'^2 }{\psi^2} - \frac{1}{r^{2}} \Big] \\
+%&=  \psi^{-4} \Big[ -\frac{8 \psi''}{\psi} - \frac{16 \psi'}{\psi r} - \frac{2}{r^{2}} \Big] - \alpha^{-2} \beta^2 \Big[ -\frac{4 \psi''}{\psi} - \frac{4 \psi'^2}{\psi^2}  - \frac{8 \psi'}{\psi r} \Big]. \\
+%\end{aligned}
+%\end{equation}
 
 Now we can do $S_{ij}$:
 \begin{equation}
@@ -312,11 +362,32 @@ S_{\phi \phi} &= \gamma_{\phi a} \gamma_{\phi b} T^{ab} \\
 \end{aligned}
 \end{equation}
 
-%\begin{equation}
-%T_{\mu \nu} = \nabla_\mu \Phi \nabla_\nu \Phi - \frac{1}{2} g_{\mu \nu} \nabla_{\gamma} \phi \nabla^{\gamma} \phi,
-%\end{equation}
+\subsection{Computing the Hamiltonian Constraint Equation}
+Now we can derive the Hamiltonian constraint equation.  Beginning with the ADM equation, we have
+\begin{equation}
+\begin{aligned}
+16 \pi \rho &= R + K^2 - K_{ij} K^{ij}\\
+&= \psi^{-4} \Big[ -\frac{8 \psi''}{\psi} - \frac{16 \psi'}{\psi r} - \frac{2}{r^{2}} \Big] - \alpha^{-2} \beta^2 \Big[ -\frac{4 \psi''}{\psi} - \frac{4 \psi'^2}{\psi^2}  - \frac{8 \psi'}{\psi r} \Big] \\
+&+ \Big[ \frac{\psi^{-4} \beta'}{\alpha} - \frac{6 \dot{\psi}}{\alpha \psi} \Big]^2 - K_{ij} K^{ij} \\
+&= \psi^{-4} \Big[ -\frac{8 \psi''}{\psi} - \frac{16 \psi'}{\psi r} - \frac{2}{r^{2}} \Big] - \alpha^{-2} \beta^2 \Big[ -\frac{4 \psi''}{\psi} - \frac{4 \psi'^2}{\psi^2}  - \frac{8 \psi'}{\psi r} \Big] \\
+&+ \frac{\psi^{-8} \beta'^2}{\alpha^2} - \frac{12 \beta' \dot{\psi}}{\alpha^2 \psi^5} + \frac{36 \dot{\psi}^2}{\alpha^2 \psi^2} - \gamma^{\mu i} \gamma^{\nu j} K_{ij} K_{\mu \nu} \\
+&= \psi^{-4} \Big[ -\frac{8 \psi''}{\psi} - \frac{16 \psi'}{\psi r} - \frac{2}{r^{2}} \Big] - \alpha^{-2} \beta^2 \Big[ -\frac{4 \psi''}{\psi} - \frac{4 \psi'^2}{\psi^2}  - \frac{8 \psi'}{\psi r} \Big] \\
+&+ \frac{\psi^{-8} \beta'^2}{\alpha^2} - \frac{12 \beta' \dot{\psi}}{\alpha^2 \psi^5} + \frac{36 \dot{\psi}^2}{\alpha^2 \psi^2} \\
+&- \frac{\psi^{-8} \beta'^2}{\alpha^2} + 4 \frac{\psi^{-5} \beta' \dot{\psi}}{\alpha^2} - 4 \frac{\psi^{-2} \dot{\psi}^2}{\alpha^2} - \frac{8 \dot{\psi}^2}{\alpha^2 \psi^{2}} \\
+&= -\frac{8 \psi^{-4} \psi''}{\psi} - \frac{16 \psi^{-4} \psi'}{\psi r} - \frac{2 \psi^{-4}}{r^{2}} + \frac{4 \alpha^{-2} \beta^2 \psi''}{\psi} + \frac{4 \alpha^{-2} \beta^2 \psi'^2}{\psi^2}  + \frac{8 \alpha^{-2} \beta^2 \psi'}{\psi r} \\
+&+ \frac{\psi^{-8} \beta'^2}{\alpha^2} - \frac{12 \beta' \dot{\psi}}{\alpha^2 \psi^5} + \frac{36 \dot{\psi}^2}{\alpha^2 \psi^2} - \frac{\psi^{-8} \beta'^2}{\alpha^2} + 4 \frac{\psi^{-5} \beta' \dot{\psi}}{\alpha^2} - 4 \frac{\psi^{-2} \dot{\psi}^2}{\alpha^2} - \frac{8 \dot{\psi}^2}{\alpha^2 \psi^{2}} \\
+\end{aligned}
+\end{equation}
+so
+\begin{equation}
+\begin{aligned}
+&= -\frac{8 \psi^{-4} \psi''}{\psi} - \frac{16 \psi^{-4} \psi'}{\psi r} - \frac{2 \psi^{-4}}{r^{2}} + \frac{4 \alpha^{-2} \beta^2 \psi''}{\psi} + \frac{4 \alpha^{-2} \beta^2 \psi'^2}{\psi^2}  + \frac{8 \alpha^{-2} \beta^2 \psi'}{\psi r} \\
+&+ \frac{\psi^{-8} \beta'^2}{\alpha^2} - \frac{12 \beta' \dot{\psi}}{\alpha^2 \psi^5} + \frac{36 \dot{\psi}^2}{\alpha^2 \psi^2} - \frac{\psi^{-8} \beta'^2}{\alpha^2} + 4 \frac{\psi^{-5} \beta' \dot{\psi}}{\alpha^2} - 4 \frac{\psi^{-2} \dot{\psi}^2}{\alpha^2} - \frac{8 \dot{\psi}^2}{\alpha^2 \psi^{2}} \\
+\end{aligned}
+\end{equation}
 
-\subsection{Checking the Mass Aspect}
+
+\subsection{Computing the Mass Aspect}
 We need to find the mass aspect in our coordinates, starting with the equation
 \begin{equation}
 m(r, t) = \frac{R}{2} (1 - g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R),
@@ -391,6 +462,42 @@ m(r, t) &= \frac{R}{2} (1 - g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R) \\
 \end{aligned}
 \end{equation}
 
+\section{Background}
+In this project we now aim to solve the equations of motion for a self-gravitating scalar field in spherical symmetry.  The key difference between this project and the previous one is that we now care about how the scalar field modifies the spacetime it occupies, whereas in the previous project we used a static Schwarzschild spacetime.
+
+The spherically symmetric line element in isotropic (conformally flat) form is given by
+\begin{equation} \label{eq:line_element}
+ds^2 = -(\alpha^2 - \psi^4 \beta^2) dt^2 + 2 \psi^4 \beta dr dt + \psi^4 [dr^2 + r^2 (d\theta^2 + \sin^2 \theta d\phi^2)],
+\end{equation}
+where $\alpha(r, t)$ is called the \textit{lapse function}, $\beta(r, t)$ is the \textit{shift} (which comes from the norm of the \textit{shift vector} $\beta^i$ when we don't have spherical symmetry), and $\psi(r, t)$ is the \textit{conformal factor}.
+
+In this formalism, the Klein-Gordon equation for the scalar field $\Phi(r, t)$ may be written in terms of auxiliary variables $\xi$ and $\Pi$, defined to be:
+\begin{align}
+\xi(r, t) &= \Phi' \label{eq:xi_defn} \\
+\Pi(r, t) &= \frac{\psi^2}{\alpha}(\dot{\Phi} - \beta \xi), \label{eq:Pi_defn} 
+\end{align}
+where throughout this document a dot $(\dot{~})$ denotes a partial derivative with respect to $t$, and a prime $(')$ denotes a partial derivative with respect to $r$.  Using these auxiliary variables, we can derive a closed system of equations for the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$).
+
+The first equation of this system is the hyperbolic Klein-Gordon equation
+\begin{equation} \label{eq:hyperbolic_KGE}
+\dot{\Pi} - \frac{1}{r^2 \psi^4} \Big[ r^2 \psi^4 \Big( \beta \Pi + \frac{\alpha \xi}{\psi^2} \Big)\Big]' + \frac{2}{3} \Pi \Big[ \beta' + \frac{2 \beta}{r} \Big(1 + \frac{3 r \psi'}{\redtext{2} \psi} \Big) \Big] = 0,
+\end{equation}
+followed by the hyperbolic evolution equation for $\xi$:
+\begin{equation} \label{eq:xi_evol}
+\dot{\xi} - \Big( \frac{\alpha \Pi}{\psi^2} + \beta \xi \Big)' = 0,
+\end{equation}
+the Hamiltonian constraint equation, which we will use as an elliptic constraint for $\psi$
+\begin{equation} \label{eq:psi_evol}
+\psi'' + \psi' \frac{2}{r} + \frac{\psi^5}{12} \Big[ \frac{1}{\alpha} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] + \pi \psi [\xi^2 + \Pi^2] = 0,
+\end{equation}
+the momentum constraint equation, an elliptic equation for $\beta$
+\begin{equation} \label{eq:beta_evol}
+\beta'' + \Big( \beta' - \frac{\beta}{r} \Big) \Big[ \frac{2}{r} + \frac{6 \psi'}{\psi} - \frac{\alpha'}{\alpha} \Big] + \frac{12 \pi \alpha \xi \Pi}{\psi^2} = 0,
+\end{equation}
+and the maximal slicing condition yields an elliptic equation for $\alpha$:
+\begin{equation} \label{eq:alpha_evol}
+\alpha'' + \alpha' \Big[ \frac{2}{r} + \frac{2 \psi'}{\psi} \Big] - \alpha^{-1} \Big[ \frac{2 \psi^4}{3} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] - 8 \pi \alpha \Pi^2 = 0.
+\end{equation}
 
 \section{Problem 1}
 This problem asks us to verify the boundary conditions on the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$) at $r = 0$, to ensure that they are regular and finite there.

@@ -4,12 +4,12 @@ from elliptics_solver import *
 import sys
 
 #set parameters for simulation
-N = 256
+N = 150
 delta_r = 1./N
-delta_t = 0.001
+delta_t = 0.01
 courant = delta_t / delta_r
-timesteps = 50
-epsilon = 0.
+timesteps = 10
+epsilon = 0.3
 
 correction_weight = 1.
 GEOM_COUPLING     = True
@@ -65,8 +65,8 @@ if(GEOM_COUPLING == True):
 	f_n[2*N:3*N] = alpha[0, :]
 	f_n = solve_elliptics_first_ts(f_n, xi[0, :], Pi[0, :], r_grid, correction_weight=correction_weight)
 	#now set psi, beta, alpha with solution to elliptics
-#	psi[0, :]   = f_n[0:N]
-        psi[0, :]   = np.abs(f_n[0:N]) #TODO: testing this; REMOVE LATER
+	psi[0, :]   = -f_n[0:N]
+#        psi[0, :]   = np.abs(f_n[0:N]) #TODO: testing this; REMOVE LATER
         beta[0, :]  = f_n[N:2*N]
 	alpha[0, :] = f_n[2*N:3*N]
 
@@ -503,6 +503,7 @@ def solve_system(n):
 				f_n, elliptic_res = Newton_iteration(xi, Pi, psi, beta, alpha, r_grid, n+1, delta_t, epsilon, correction_weight, PSI_EVOL)
 				if(PSI_EVOL == False):
 					psi[n+1, :]   = f_n[0:N] #THE WRONG PSI MAY BE IN RESIDUAL
+#					psi[n+1, :] = np.abs(f_n[0:N])
 #                                psi[n+1, :]   = f_n[0:N] 
                                 beta[n+1, :]  = f_n[N:2*N]
 				alpha[n+1, :] = f_n[2*N:3*N]
