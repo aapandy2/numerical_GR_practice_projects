@@ -65,7 +65,7 @@ if(GEOM_COUPLING == True):
 	f_n[2*N:3*N] = alpha[0, :]
 	f_n = solve_elliptics_first_ts(f_n, xi[0, :], Pi[0, :], r_grid, correction_weight=correction_weight)
 	#now set psi, beta, alpha with solution to elliptics
-	psi[0, :]   = -f_n[0:N]
+	psi[0, :]   = f_n[0:N]
 #        psi[0, :]   = np.abs(f_n[0:N]) #TODO: testing this; REMOVE LATER
         beta[0, :]  = f_n[N:2*N]
 	alpha[0, :] = f_n[2*N:3*N]
