@@ -347,7 +347,7 @@ Now we can compute the matter source quantities.  Starting with $\rho$, we find
 &+ (\alpha^{-2} \beta) (\alpha^{-2} \beta) \Phi'^2 - \frac{1}{2} (-\alpha^{-2}) (\gamma^{rr} - \alpha^{-2} \beta^2) \Phi'^2 \Big) \\
 &= \frac{1}{2} \alpha^{-2} \dot{\Phi}^2 - \beta \alpha^{-2} \Phi' \dot{\Phi} + \alpha^{-2} \beta^2 \Phi'^2 + \frac{1}{2} (\psi^{-4} - \alpha^{-2} \beta^2) \Phi'^2 \\
 &= \frac{1}{2} \alpha^{-2} \dot{\Phi}^2 - \beta \alpha^{-2} \Phi' \dot{\Phi} + \frac{1}{2} \alpha^{-2} \beta^2 \Phi'^2 + \frac{1}{2} \psi^{-4} \Phi'^2 \\
-%&= \frac{1}{2} \alpha^{-2} \dot{\Phi}^2 - \beta \alpha^{-2} \Phi' \dot{\Phi} + \frac{1}{2} \alpha^{-2} \beta^2 \Phi'^2 + \frac{1}{2} \psi^4 \Phi'^2. \\
+&= \frac{1}{2 \psi^{4}} \Big( \Pi^2 + \xi^2 \Big) \\
 \end{aligned}
 \end{equation}
 
@@ -388,13 +388,21 @@ S_{\phi \phi} &= \gamma_{\phi a} \gamma_{\phi b} T^{ab} \\
 \end{aligned}
 \end{equation}
 
-\subsection{Computing the Hamiltonian Constraint Equation}
+\subsection{Checking the Hamiltonian Constraint Equation}
 Now we can derive the Hamiltonian constraint equation.  Beginning with the ADM equation, we have
 \begin{equation}
 \begin{aligned}
 16 \pi \rho &= R + K^2 - K_{ij} K^{ij}\\
+\frac{16 \pi}{2 \psi^{4}} \Big( \Pi^2 + \xi^2 \Big) &= -\frac{2 \left( \psi^5 (\beta - \beta' r)^2 + 24 \alpha^2 \psi' r + 12 \alpha^2 \psi'' r^2 \right)}{3 \alpha^2 r^2 \psi^5} \\
+\pi \psi \Big( \Pi^2 + \xi^2 \Big) &= -\left( \psi^5 (\beta - \beta' r)^2 + 24 \alpha^2 \psi' r + 12 \alpha^2 \psi'' r^2 \right) \frac{1}{12 \alpha^2 r^2} \\
+\pi \psi \Big( \Pi^2 + \xi^2 \Big) &= -\left( \frac{\psi^5}{12 \alpha^2} \Big( \frac{\beta}{r} - \beta' \Big)^2 + \frac{2}{r} \psi' + \psi'' \right); \\
 \end{aligned}
 \end{equation}
+where the right-hand side of the second line was obtained using Mathematica.  Rearranging yields
+\begin{equation}
+\boxed{ \psi'' + \psi' \Big[ \frac{2}{r} \Big] + \frac{\psi^5}{12} \Big[ \frac{1}{\alpha} \Big( \frac{\beta}{r} - \beta' \Big) \Big]^2 + \pi \psi \Big( \Pi^2 + \xi^2 \Big) = 0 }
+\end{equation}
+which agrees with the project handout.
 
 \subsection{Computing the Mass Aspect}
 We need to find the mass aspect in our coordinates, starting with the equation
