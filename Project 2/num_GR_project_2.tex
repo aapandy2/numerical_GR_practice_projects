@@ -83,22 +83,6 @@ and the \textit{evolution equation for the extrinsic curvature}
 \end{aligned}
 \end{equation}
 
-Before we begin, we first need to find the stress-energy tensor for the scalar field, $T^{ab}$.  We may derive it beginning with the well-known Lagrangian of a massless scalar field $\Phi$:
-\begin{equation}
-\Lagr = \frac{1}{2} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi,
-\end{equation}
-so
-\begin{equation}
-\begin{aligned}
-T^{\mu}_{~\nu} &\equiv \frac{\partial \Lagr}{\partial (\partial_\mu \Phi)} \partial_\nu \Phi - \delta^\mu_\nu \Lagr \\
-T^{\mu \nu} &= g^{\gamma \nu} \frac{\partial \Lagr}{\partial (\partial_\mu \Phi)} \partial_\gamma \Phi - g^{\gamma \nu} \delta^\mu_\gamma \Lagr \\
-&= g^{\gamma \nu} \Big( \frac{1}{2} g^{\mu \nu} \delta^\mu_\nu \partial_\nu \Phi + \frac{1}{2} g^{\mu \nu} \partial_\mu \Phi \delta^\mu_\mu \Big) \partial_\gamma \Phi	 - g^{\gamma \nu} \delta^\mu_\gamma \frac{1}{2} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \\
-&= g^{\gamma \nu} \Big( \frac{1}{2} \partial^\mu \Phi + \frac{1}{2} \partial^\nu \Phi \Big) \partial_\gamma \Phi - g^{\gamma \nu} \delta^\mu_\gamma \frac{1}{2} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \\
-&= \partial^\mu \Phi \partial^\nu \Phi - \frac{1}{2} g^{\mu \nu} \partial^\gamma \Phi \partial_\gamma \Phi, \\
-\end{aligned}
-\end{equation}
-which agrees with the project description, equation 3.
-
 Now let's use equation \ref{eq:ADM_line_element} to find the metric and inverse metric.  Reading off the metric, we have
 \begin{equation}
 g_{ab} =
@@ -121,7 +105,7 @@ We may now compute the unit normal to the spacelike hypersurfaces:
 \begin{aligned}
 n^a &= -g^{ab} \alpha \nabla_b t \\
 &= -g^{a t} \alpha \nabla_t t \\
-&= (\alpha^{-1}, -\alpha^{-1} \beta^{j}),
+&= (\alpha^{-1}, -\alpha^{-1} \beta^{a}),
 \end{aligned}
 \end{equation}
 and similarly B\&S gives $n_a = (-\alpha, 0, 0, 0)$ because $n_a n^a = -1$ since $n^a$ is a timelike vector.
@@ -142,14 +126,6 @@ Now we assume the spherically symmetric spatial metric $\gamma_{ij} = \psi^4 \ma
 &= -2 \alpha K_{rr} + 2 \Big[ 4 \psi^3 \psi' \beta + \psi^4 \beta' - (2\psi' \psi^{-1}) (\psi^4 \beta) \Big] \\
 \partial_t (\psi^4) &= -2 \alpha K_{rr} + 4 \psi^3 \psi' \beta + 2 \psi^4 \beta' \\
 K_{rr} &= \frac{1}{\alpha} \Big( 2 \psi^3 \psi' \beta + \psi^4 \beta' - 2 \psi^3 \dot{\psi} \Big) \\
-%&= -2 \alpha K_{ij} + D_i (\gamma_{kj} \beta^{k}) + D_j (\gamma_{ik} \beta^{k}) \\
-%\partial_t \gamma_{rr} &= -2 \alpha K_{rr} + D_r (\gamma_{kr} \beta^{k}) + D_r (\gamma_{rk} \beta^{k}) \\
-%&= -2 \alpha K_{rr} + \gamma_{r}^{~b} \nabla_{b} (\gamma_{rr} \beta^{r}) + \gamma_{r}^{~b} \nabla_b (\gamma_{rr} \beta^{r}) \\
-%&= -2 \alpha K_{rr} + 2 \gamma^{ab} \gamma_{ra} \nabla_{b} (\gamma_{rr} \beta^{r}) \\
-%&= -2 \alpha K_{rr} + 2 \gamma^{rr} \gamma_{rr} \nabla_{r} (\gamma_{rr} \beta^{r}) \\
-%\partial_t \psi^4 &= -2 \alpha K_{rr} + 2 \partial_{r} (\psi^4 \beta) \\
-%4 \psi^3 \dot{\psi} &= -2 \alpha K_{rr} + 2 (4 \psi^3 \psi' \beta + \psi^4 \beta') \\
-%K_{rr} &= \frac{1}{\alpha} \Big( 4 \psi^3 \psi' \beta + \psi^4 \beta' - 2 \psi^3 \dot{\psi} \Big) \\
 \end{aligned}
 \end{equation}
 similarly
@@ -332,7 +308,23 @@ R &= \gamma^{r r} R_{r r} + \gamma^{\theta \theta} R_{\theta \theta} + \gamma^{\
 which again agrees with the UBC handout.
 
 \subsection{Matter Sources}
-Now we can compute the matter source quantities.  Starting with $\rho$, we find
+Now we can compute the matter source quantities.  Before we begin, we first need to find the stress-energy tensor for the scalar field, $T^{ab}$.  We may derive it beginning with the well-known Lagrangian of a massless scalar field $\Phi$:
+\begin{equation}
+\Lagr = \frac{1}{2} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi,
+\end{equation}
+so
+\begin{equation}
+\begin{aligned}
+T^{\mu}_{~\nu} &\equiv \frac{\partial \Lagr}{\partial (\partial_\mu \Phi)} \partial_\nu \Phi - \delta^\mu_\nu \Lagr \\
+T^{\mu \nu} &= g^{\gamma \nu} \frac{\partial \Lagr}{\partial (\partial_\mu \Phi)} \partial_\gamma \Phi - g^{\gamma \nu} \delta^\mu_\gamma \Lagr \\
+&= g^{\gamma \nu} \Big( \frac{1}{2} g^{\mu \nu} \delta^\mu_\nu \partial_\nu \Phi + \frac{1}{2} g^{\mu \nu} \partial_\mu \Phi \delta^\mu_\mu \Big) \partial_\gamma \Phi	 - g^{\gamma \nu} \delta^\mu_\gamma \frac{1}{2} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \\
+&= g^{\gamma \nu} \Big( \frac{1}{2} \partial^\mu \Phi + \frac{1}{2} \partial^\nu \Phi \Big) \partial_\gamma \Phi - g^{\gamma \nu} \delta^\mu_\gamma \frac{1}{2} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \\
+&= \partial^\mu \Phi \partial^\nu \Phi - \frac{1}{2} g^{\mu \nu} \partial^\gamma \Phi \partial_\gamma \Phi, \\
+\end{aligned}
+\end{equation}
+which agrees with the project description, equation 3.
+
+Now we can compute $\rho$:
 \begin{equation}
 \begin{aligned}
 \rho &= n_a n_b T^{ab} \\
@@ -357,13 +349,11 @@ Now we can do $S_{ij}$:
 S_{rr} &= \gamma_{ra} \gamma_{rb} T^{ab} \\
 &= \gamma_{rr} \gamma_{rr} T^{rr} + \gamma_{r \theta} \gamma_{r\theta} T^{\theta \theta} + \gamma_{r\phi} \gamma_{r\phi} T^{\phi \phi} \\
 &= (\psi^4) (\psi^4) T^{rr} \\
-%&= \partial^r \Phi \partial^r \Phi - \frac{1}{2} g^{r r} \partial^\gamma \Phi \partial_\gamma \Phi \\
-%&= g^{\mu r} g^{\nu r} \partial_\mu \Phi \partial_\nu \Phi - \frac{1}{2} g^{r r} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \\
-%&= g^{t r} g^{t r} \partial_t \Phi \partial_t \Phi + 2 g^{t r} g^{r r} \partial_t \Phi \partial_r \Phi + g^{r r} g^{r r} \partial_r \Phi \partial_r \Phi \\
-%&- \frac{1}{2} g^{r r} g^{t t} \partial_t \Phi \partial_t \Phi - \frac{1}{2} 2 g^{r r} g^{t r} \partial_t \Phi \partial_r \Phi - \frac{1}{2} g^{r r} g^{r r} \partial_r \Phi \partial_r \Phi\\
-%&= g^{t r} g^{t r} \partial_t \Phi \partial_t \Phi + g^{t r} g^{r r} \partial_t \Phi \partial_r \Phi + \frac{1}{2} g^{r r} g^{r r} \partial_r \Phi \partial_r \Phi - \frac{1}{2} g^{r r} g^{t t} \partial_t \Phi \partial_t \Phi \\
-%&= (\alpha^{-2} \beta)^2 \dot{\Phi}^2 + (\alpha^{-2} \beta) (\psi^{-4} - \alpha^{-2} \beta^2) \dot{\Phi} \Phi' \\
-%&+ \frac{1}{2} (\psi^{-4} - \alpha^{-2} \beta^2)^2 \Phi'^2 - \frac{1}{2} (\psi^{-4} - \alpha^{-2} \beta^2) (-\alpha^{-2}) \dot{\Phi}^2 \\
+&= \psi^8 \Big( g^{rr} g^{rr} \partial_r \Phi \partial_r \Phi - \frac{1}{2} g^{r r} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \Big) \\
+&= \psi^8 \Big( \psi^{-8} \Phi'^2 - \frac{1}{2} \psi^{-4} g^{t t} \dot{\Phi}^2 - \frac{1}{2} 2 \psi^{-4} g^{t r} \dot{\Phi} \Phi' - \frac{1}{2} \psi^{-4} g^{r r} \Phi'^2 \Big) \\
+&= \frac{1}{2} \Phi'^2 + \frac{1}{2} \psi^4 \alpha^{-2} \Big( \dot{\Phi}^2 - 2 \beta \dot{\Phi} \Phi' + \beta^2 \Phi'^2 \Big) \\
+&= \frac{1}{2} \xi^2 + \frac{1}{2} \psi^4 \alpha^{-2} \frac{\alpha^2}{\psi^4} \Pi^2 \\
+&= \frac{1}{2} \xi^2 + \frac{1}{2} \Pi^2 \\
 \end{aligned}
 \end{equation}
 and
@@ -372,9 +362,11 @@ and
 S_{\theta \theta} &= \gamma_{\theta a} \gamma_{\theta b} T^{ab} \\
 &= \gamma_{\theta \theta} \gamma_{\theta \theta} T^{\theta \theta} \\
 &= (\psi^4 r^2) (\psi^4 r^2) T^{\theta \theta} \\
-%&= (r^2) (r^2) \Big(  \partial^\theta \Phi \partial^\theta \Phi - \frac{1}{2} g^{\theta \theta} \partial^\gamma \Phi \partial_\gamma \Phi \Big) \\
-%&= r^4 \Big( - \frac{1}{2} r^{-2} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi \Big) \\
-%&= - \frac{1}{2} r^2 \Big( g^{t t} \partial_t \Phi \partial_t \Phi + 2 g^{t r} \partial_t \Phi \partial_r \Phi + g^{r r} \partial_r \Phi \partial_r \Phi \Big) \\
+&= (\psi^8 r^4) \Big( \partial^\theta \Phi \partial^\theta \Phi - \frac{1}{2} g^{\theta \theta} g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi  \Big) \\
+&= - \frac{1}{2} (\psi^8 r^4) \Big( g^{\theta \theta} g^{t t} \dot{\Phi}^2 + 2 g^{\theta \theta} g^{t r} \dot{\Phi} \Phi' + g^{\theta \theta} g^{r r} \Phi'^2  \Big) \\
+&= - \frac{1}{2} \Big( - \psi^4 r^2 \alpha^{-2} \dot{\Phi}^2 + 2 \psi^4 r^2 \alpha^{-2} \beta \dot{\Phi} \Phi' + \psi^4 r^2 \psi^{-4} \Phi'^2 - \psi^4 r^2 \alpha^{-2} \beta^2 \Phi'^2 \Big) \\
+&= - \frac{1}{2} r^2 \Big( - \psi^4 \alpha^{-2} (\dot{\Phi}^2 - 2 \beta \dot{\Phi} \xi + \beta^2 \xi^2) + \xi^2 \Big) \\
+&= \frac{r^2}{2} \Big( \Pi^2 - \xi^2 \Big) \\
 \end{aligned}
 \end{equation}
 and
@@ -383,9 +375,86 @@ and
 S_{\phi \phi} &= \gamma_{\phi a} \gamma_{\phi b} T^{ab} \\
 &= \gamma_{\phi \phi} \gamma_{\phi \phi} T^{\phi \phi} \\
 &= (\psi^4 r^2 \sin^2 \theta) (\psi^4 r^2 \sin^2 \theta) \Big( \partial^\phi \Phi \partial^\phi \Phi - \frac{1}{2} g^{\phi \phi} \partial^\gamma \Phi \partial_\gamma \Phi  \Big) \\
-%&= - \frac{1}{2} \frac{1}{r^2 \sin^2 \theta} r^4 \sin^4 \theta \Big( g^{\mu \nu} \partial_\mu \Phi \partial_\nu \Phi  \Big) \\
-%&= - \frac{1}{2} r^2 \sin^2 \theta \Big( g^{t t} \partial_t \Phi \partial_t \Phi + 2 g^{r t} \partial_r \Phi \partial_t \Phi + g^{r r} \partial_r \Phi \partial_r \Phi \Big) \\
+&= - (\psi^4 r^2 \sin^2 \theta) \Big( \frac{1}{2} g^{t t} \partial_t \Phi \partial_t \Phi + \frac{1}{2} 2 g^{t r} \partial_t \Phi \partial_r \Phi + \frac{1}{2} g^{r r} \partial_r \Phi \partial_r \Phi \Big) \\
+&= - \frac{1}{2} (\psi^4 r^2 \sin^2 \theta) \Big( -\alpha^{-2} \dot{\Phi}^2 + 2 \alpha^{-2} \beta \dot{\Phi} \xi - \alpha^{-2} \beta^2 \xi^2 + \psi^{-4} \xi^2 \Big) \\
+&= \frac{r^2 \sin^2 \theta}{2} \Big( \Pi^2 - \xi^2 \Big). \\
 \end{aligned}
+\end{equation}
+We will need the trace of this tensor
+\begin{equation}
+\begin{aligned}
+S &= \gamma^{rr} S_{rr} + \gamma^{\theta \theta} S_{\theta \theta} + \gamma^{\phi \phi} S_{\phi \phi} \\
+&= \psi^{-4} \frac{1}{2} \Big( \xi^2 + \Pi^2 \Big) + \psi^{-4} \frac{1}{2} \Big( \Pi^2 - \xi^2 \Big) + \psi^{-4} \frac{1}{2} \Big( \Pi^2 - \xi^2 \Big) \\
+&= \frac{1}{2 \psi^{4}} ( 3 \Pi^2 - \xi^2). \\
+\end{aligned}
+\end{equation}
+
+We will also need the quantity
+\begin{equation}
+\begin{aligned}
+S^i &= - \gamma^{ij} n^a T_{aj} \\
+S^r &= - \gamma^{rr} n^a T_{a r} \\
+&= - \gamma^{rr} n^t T_{t r} - \gamma^{rr} n^r T_{r r} \\
+&= - \psi^{-4} \alpha^{-1} g_{t \mu} g_{\nu r} T^{\mu \nu} + \psi^{-4} \alpha^{-1} \beta g_{r \mu} g_{\nu r} T^{\mu \nu} \\
+&= - \psi^{-4} \alpha^{-1} (g_{t t} g_{t r} T^{t t} + g_{t t} g_{r r} T^{t r} + g_{t r} g_{t r} T^{r t} + g_{t r} g_{r r} T^{r r}) \\
+&+ \psi^{-4} \alpha^{-1} \beta (g_{r t} g_{t r} T^{t t} + g_{r t} g_{r r} T^{t r} + g_{r r} g_{t r} T^{r t} + g_{r r} g_{r r} T^{r r}); \\
+\end{aligned}
+\end{equation}
+using Mathematica we find
+\begin{equation}
+\begin{aligned}
+S^r &= \frac{1}{\alpha^5} \beta \dot{\Phi}^2 \left(\alpha^2 - \beta^2 \left(\psi^4 - 1\right) \right) \\
+&+ \frac{1}{\alpha^5 \psi^8} \dot{\Phi} \Phi' \left(-\alpha^4 \psi^4 + \alpha^2 \beta^2 + \beta^4 \left( \psi^4 - 1 \right)^2 \psi^4 \right) \\
+&+ \frac{1}{\alpha^5 \psi^8} \beta^3 \Phi'^2 \left(\psi^4 - 1\right) \left(\beta^2 \psi^4 - \alpha^2 \right).
+\end{aligned}
+\end{equation}
+Similarly,
+\begin{equation}
+\begin{aligned}
+S^\theta &= - \gamma^{\theta \theta} n^t T_{t \theta} - \gamma^{\theta \theta} n^r T_{r \theta} \\
+&= - \gamma^{\theta \theta} \alpha^{-1} g_{tt} g_{t \mu} g_{\nu \theta} T^{\mu \nu} + \gamma^{\theta \theta} \alpha^{-1} \beta g_{r \mu} g_{\nu \theta} T^{\mu \nu} \\
+&= - \gamma^{\theta \theta} \alpha^{-1} g_{tt} (g_{t t} g_{t \theta} T^{t t} + g_{t t} g_{r \theta} T^{t r} + g_{t t} g_{\theta \theta} T^{t \theta} + g_{t r} g_{\nu t} T^{r t} \\
+&+ g_{t r} g_{r \theta} T^{r r} + g_{t r} g_{\theta \theta} T^{r \theta} + g_{t \theta} g_{t \theta} T^{\theta t} + g_{t \theta} g_{r r} T^{\theta r} + g_{t \theta} g_{\theta \theta} T^{\theta \theta}) \\
+&+ \gamma^{\theta \theta} \alpha^{-1} \beta (g_{r t} g_{t \theta} T^{t t} + g_{r t} g_{r \theta} T^{t r} + g_{r t} g_{\theta \theta} T^{t \theta} + g_{r r} g_{t \theta} T^{r t} \\
+&+ g_{r r} g_{r \theta} T^{r r} + g_{r r} g_{\theta \theta} T^{r \theta} + g_{r \theta} g_{t \theta} T^{\theta t} + g_{r \theta} g_{r \theta} T^{\theta r} + g_{r \theta} g_{\theta \theta} T^{\theta \theta}) \\
+&= 0
+\end{aligned}
+\end{equation}
+and likewise
+\begin{equation}
+S^\phi = 0.
+\end{equation}
+
+\subsection{Checking the $\alpha$ Constraint Equation}
+Beginning with a contraction of the evolution equation for the extrinsic curvature (B \& S equation 2.137) and applying the maximal slicing condition ($K = 0$) we begin with
+\begin{equation}
+0 = - \gamma^{ij} D_i D_j \alpha + \alpha (K_{ij} K^{ij} + 4 \pi (\rho + S));
+\end{equation}
+evaluation of the first term on the right-hand side is subtle, so we'll do it explicitly:
+\begin{equation}
+\begin{aligned}
+\gamma^{ij} D_i D_j \alpha &= \gamma^{ij} \gamma_{i}^{~a} \nabla_a (\gamma_{j}^{~b} \nabla_b \alpha) \\
+&= \gamma^{ij} \gamma_{i}^{~a} \nabla_a (\gamma_{j}^{~b} \nabla_b \alpha) \\
+&= \gamma^{ij} \gamma_{i}^{~a} \Big[ \partial_a (\gamma_{j}^{~b} \nabla_b \alpha) - \Gamma^{\lambda}_{a j} (\gamma_{\lambda}^{~b} \nabla_b \alpha) \Big] \\
+&= \gamma^{rr} \gamma_{r}^{~r} \Big[ \partial_r (\gamma_{r}^{~r} \nabla_r \alpha) - \Gamma^{r}_{r r} (\gamma_{r}^{~r} \nabla_r \alpha) \Big] \\
+&+ \gamma^{\theta \theta} \gamma_{\theta}^{~\theta} \Big[ \partial_\theta (\gamma_{\theta}^{~\theta} \nabla_\theta \alpha) - \Gamma^{r}_{\theta \theta} (\gamma_{r}^{~r} \nabla_r \alpha) \Big] \\
+&+ \gamma^{\phi \phi} \gamma_{\phi}^{~\phi} \Big[ \partial_\phi (\gamma_{\phi}^{~\phi} \nabla_\phi \alpha) - \Gamma^{r}_{\phi \phi} (\gamma_{r}^{~r} \nabla_r \alpha) - \Gamma^{\theta}_{\phi \phi} (\gamma_{\theta}^{~\theta} \nabla_\theta \alpha) \Big] \\
+&= \gamma^{rr} \Big[ \alpha'' - \Gamma^{r}_{r r} \alpha' \Big] - \gamma^{\theta \theta} \Gamma^{r}_{\theta \theta} \alpha' - \gamma^{\phi \phi} \Gamma^{r}_{\phi \phi} \alpha' \\
+&= \psi^{-4} \Big[ \alpha'' - \Gamma^{r}_{r r} \alpha' \Big] - \psi^{-4} r^{-2} \Gamma^{r}_{\theta \theta} \alpha' - \psi^{-4} r^{-2} \sin^{-2} \theta \Gamma^{r}_{\phi \phi} \alpha' \\
+&= \psi^{-4} \alpha'' - \psi^{-4} \frac{2 \psi'}{\psi} \alpha' + 2 \psi^{-4} \Big( \frac{2 \psi'}{\psi} + \frac{1}{r} \Big) \alpha'; \\
+\end{aligned}
+\end{equation}
+we can now plug everything into Mathematica to yield
+\begin{equation}
+\begin{aligned}
+0 &= \frac{-6 \alpha \alpha' r (\psi' r + \psi ) - 3 \alpha \alpha'' r^2 \psi + 2 \beta^2 \psi^5 + 2 \beta'^2 r^2 \psi ^5-4 \beta \beta' r \psi^5 + 24 \pi  \alpha^2 \Pi^2 r^2 \psi }{3 \alpha  r^2 \psi^5} \\
+&= - \alpha' \Big[ \frac{2 \psi'}{\psi} + \frac{2}{r} \Big] \frac{1}{\psi^4} - \alpha'' \frac{1}{\psi^4} + 2 \beta^2 \frac{1}{3 \alpha r^2} + 2 \beta'^2 \frac{1}{3 \alpha} - 4 \beta \beta' \frac{1}{3 \alpha r} + 8 \pi \alpha \Pi^2 \frac{1}{\psi^4} \\
+&= - \alpha' \Big[ \frac{2 \psi'}{\psi} + \frac{2}{r} \Big] - \alpha'' + \alpha^{-1} \Big[ \frac{2 \psi^4}{3} \Big( \frac{\beta}{r} - \beta' \Big)^2 \Big] + 8 \pi \alpha \Pi^2. \\
+\end{aligned}
+\end{equation}
+Multiplying through by $-1$ and rearranging yields the equation in the handout:
+\begin{equation}
+\boxed{ \alpha'' + \alpha' \Big[ \frac{2 \psi'}{\psi} + \frac{2}{r} \Big] - \alpha^{-1} \Big[ \frac{2 \psi^4}{3} \Big( \frac{\beta}{r} - \beta' \Big)^2 \Big] - 8 \pi \alpha \Pi^2 = 0}.
 \end{equation}
 
 \subsection{Checking the Hamiltonian Constraint Equation}
@@ -403,6 +472,36 @@ where the right-hand side of the second line was obtained using Mathematica.  Re
 \boxed{ \psi'' + \psi' \Big[ \frac{2}{r} \Big] + \frac{\psi^5}{12} \Big[ \frac{1}{\alpha} \Big( \frac{\beta}{r} - \beta' \Big) \Big]^2 + \pi \psi \Big( \Pi^2 + \xi^2 \Big) = 0 }
 \end{equation}
 which agrees with the project handout.
+
+\subsection{Checking the Momentum Constraint}
+The momentum constraint is (using the maximal slicing condition $K = 0$)
+\begin{equation}
+\begin{aligned}
+D_j (K^{ij} - \gamma^{ij} K) &= 8 \pi S^i \\
+D_r (K^{rr}) &= 8 \pi S^r; \\
+%\partial_r \Big[ \frac{1}{\alpha \psi^4} \Big( \frac{2 \psi'}{\psi} \beta + \beta' - \frac{2}{\psi}\dot{\psi} \Big) \Big] &= 8 \pi S^r \\
+%\frac{2}{3} \partial_r \Big[ \frac{1}{\alpha \psi^4} \Big( \beta' - \frac{\beta}{r} \Big) \Big] &= 8 \pi S^r \\
+%\frac{2}{3} \Big[ \frac{\beta''}{\alpha \psi^4} - \frac{\beta' \alpha'}{\alpha^2 \psi^4} - \frac{4 \beta' \psi'}{\alpha \psi^5} - \frac{\beta'}{\alpha \psi^4 r} + \frac{\beta \alpha'}{\alpha^2 \psi^4 r} + \frac{4 \beta \psi'}{\alpha \psi^5 r} + \frac{\beta}{\alpha \psi^4 r^2} \Big] &= 8 \pi S^r \\
+%\beta'' + \Big( - \frac{\beta' \alpha'}{\alpha} - \frac{4 \beta' \psi'}{\psi} - \frac{\beta'}{r} \Big) + \Big( \frac{\beta \alpha'}{\alpha r} + \frac{4 \beta \psi'}{\psi r} + \frac{\beta}{r^2} \Big) &= 12 \psi^4 \alpha \pi S^r \\
+%\beta'' - \beta' \Big( \frac{\alpha'}{\alpha} + \frac{4 \psi'}{\psi} + \frac{1}{r} \Big) + \frac{\beta}{r} \Big( \frac{\alpha'}{\alpha} + \frac{4 \psi'}{\psi} + \frac{1}{r} \Big) &= 12 \psi^4 \alpha \pi S^r \\
+%\beta'' \Big( \frac{\beta}{r} - \beta' \Big) \Big( \frac{\alpha'}{\alpha} + \frac{4 \psi'}{\psi} + \frac{1}{r} \Big) + \Big( \frac{\alpha'}{\alpha} + \frac{4 \psi'}{\psi} + \frac{1}{r} \Big) &= 12 \psi^4 \alpha \pi S^r \\
+\end{aligned}
+\end{equation}
+we again need to pay special attention to the derivative term.  Doing it explicitly, we find
+\begin{equation}
+\begin{aligned}
+D_r K^{rr} &= \gamma_{r}^{~b} \nabla_b K^{rr} \\
+&= \gamma_{r}^{~b} (\partial_b K^{rr} + \Gamma^{r}_{b \lambda} K^{r \lambda} + \Gamma^{r}_{\lambda b} K^{\lambda r}) \\
+&= \gamma_{r}^{~r} (\partial_r K^{rr} + \Gamma^{r}_{r r} K^{r r} + \Gamma^{r}_{r r} K^{r r}) \\
+&= \partial_r K^{rr} + \frac{4 \psi'}{\psi} K^{r r} \\
+&= \partial_r \Big[ \frac{2 \psi^{-5} \psi' \beta}{\alpha} + \frac{\psi^{-4} \beta'}{\alpha} - \frac{2 \psi^{-5}}{\alpha} \dot{\psi} \Big] + \frac{4 \psi'}{\psi} K^{r r} \\
+&= \partial_r \Big[ \frac{2 \psi^{-5} \psi' \beta}{\alpha} + \frac{\psi^{-4} \beta'}{\alpha} - \frac{2 \psi^{-5} \beta \psi'}{\alpha} - \frac{2 \psi^{-5} \beta \psi}{3 r \alpha} - \frac{2 \psi^{-5} \beta' \psi}{6 \alpha} \Big] + \frac{4 \psi'}{\psi} K^{r r} \\
+&= \partial_r \Big[ \frac{\psi^{-4} \beta'}{\alpha} - \frac{2 \psi^{-5} \beta \psi}{3 r \alpha} - \frac{2 \psi^{-5} \beta' \psi}{6 \alpha} \Big] + \frac{4 \psi'}{\psi} K^{r r} \\
+&= \Big[ \frac{2 \beta''}{3 \psi^{4} \alpha} - \frac{8 \beta' \psi'}{3 \psi^{5} \alpha} - \frac{2 \beta' }{3 \psi^{4} r \alpha} - \frac{2 \beta' \alpha'}{3 \psi^{4} \alpha^2} + \frac{8 \beta \psi' }{3 \psi^{5} r \alpha} + \frac{2 \beta }{3 \psi^{4} r^2 \alpha} + \frac{2 \beta \alpha'}{3 \psi^{4} r \alpha^2} \Big] \\
+&+ \frac{8 \psi'}{3 \psi^5 \alpha} \Big( \beta' - \frac{\beta}{r} \Big) \\
+&= \frac{2 \beta''}{3 \psi^{4} \alpha} - \frac{2 \beta' }{3 \psi^{4} r \alpha} - \frac{2 \beta' \alpha'}{3 \psi^{4} \alpha^2} + \frac{2 \beta }{3 \psi^{4} r^2 \alpha} + \frac{2 \beta \alpha'}{3 \psi^{4} r \alpha^2} \\
+\end{aligned}
+\end{equation}
 
 \subsection{Computing the Mass Aspect}
 We need to find the mass aspect in our coordinates, starting with the equation
