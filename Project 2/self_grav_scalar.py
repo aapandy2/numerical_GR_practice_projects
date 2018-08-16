@@ -8,11 +8,11 @@ N = 150
 delta_r = 1./N
 delta_t = 0.01
 courant = delta_t / delta_r
-timesteps = 10
+timesteps = 300
 epsilon = 0.3
 
 correction_weight = 1.
-GEOM_COUPLING     = True
+GEOM_COUPLING     = False
 PSI_EVOL          = False
 
 #define grid

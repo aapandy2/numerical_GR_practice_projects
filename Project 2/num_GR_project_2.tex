@@ -181,21 +181,6 @@ K &= \gamma^{ij} K_{ij} \\
 %\end{equation}
 %which agrees with our result above.
 
-\subsection{Checking the $\psi$ Hyperbolic Equation}
-We are told that using our remaining coordinate freedom to choose \textit{maximal slicing} results in the equation $K = 0$, so
-\begin{equation}
-\begin{aligned}
-0 &= \frac{6 \psi' \beta}{\psi \alpha} + \frac{\beta'}{\alpha} - \frac{6 \dot{\psi}}{\psi \alpha} + \frac{2 \beta}{r \alpha} \\
-6 \dot{\psi} &= 6 \psi' \beta + \beta' \psi + \frac{2 \beta \psi}{r} \\
-\dot{\psi} &= \psi' \beta + \frac{\beta' \psi}{6} + \frac{\beta \psi}{3 r}; \\
-\end{aligned}
-\end{equation}
-rearranging once more gives
-\begin{equation}
-\boxed{\dot{\psi} = \beta \Big(\psi' + \frac{\psi}{3 r} \Big) + \frac{\beta' \psi}{6} }
-\end{equation}
-which agrees with the project handout.
-
 Now we can compute the Ricci tensor.  In the ADM formalism Christoffel symbols with upper index zero are equal to zero, resulting in the equation
 \begin{equation}
 R_{ij} = \partial_k \Gamma^k_{ij} - \partial_j \Gamma^k_{ik} + \Gamma^k_{ij} \Gamma^l_{kl} - \Gamma^k_{il} \Gamma^l_{jk},
@@ -425,6 +410,21 @@ and likewise
 S^\phi = 0.
 \end{equation}
 
+\subsection{Checking the $\psi$ Hyperbolic Equation}
+Now we can begin checking equations.  We are told that using our remaining coordinate freedom to choose \textit{maximal slicing} results in the equation $K = 0$, so
+\begin{equation}
+\begin{aligned}
+0 &= \frac{6 \psi' \beta}{\psi \alpha} + \frac{\beta'}{\alpha} - \frac{6 \dot{\psi}}{\psi \alpha} + \frac{2 \beta}{r \alpha} \\
+6 \dot{\psi} &= 6 \psi' \beta + \beta' \psi + \frac{2 \beta \psi}{r} \\
+\dot{\psi} &= \psi' \beta + \frac{\beta' \psi}{6} + \frac{\beta \psi}{3 r}; \\
+\end{aligned}
+\end{equation}
+rearranging once more gives
+\begin{equation}
+\boxed{\dot{\psi} = \beta \Big(\psi' + \frac{\psi}{3 r} \Big) + \frac{\beta' \psi}{6} }
+\end{equation}
+which agrees with the project handout.
+
 \subsection{Checking the $\alpha$ Constraint Equation}
 Beginning with a contraction of the evolution equation for the extrinsic curvature (B \& S equation 2.137) and applying the maximal slicing condition ($K = 0$) we begin with
 \begin{equation}
@@ -524,6 +524,51 @@ Inserting the matter source term, we find
 \boxed{\beta'' + \Big( \beta' - \frac{\beta}{r} \Big) \Big( \frac{6 \psi'}{\psi} + \frac{2}{r} - \frac{\alpha'}{\alpha} \Big) + \frac{12 \pi \alpha \xi \Pi}{\psi^2} = 0},
 \end{equation}
 which agrees with the momentum constraint equation in the handout.
+
+\subsection{Checking the $\Pi$ Hyperbolic Equation}
+We now need to check the version of the Klein-Gordon (KG) equation provided in the handout.  There are a couple ways we can do this -- we can compute all of the Christoffel symbols with a $t$ index, or we can use the identity
+\begin{equation}
+\Box \Phi = \frac{1}{\sqrt{-g}} \partial_\nu \Big( \sqrt{-g} g^{\mu \nu} \partial_\mu \Phi \Big)
+\end{equation}
+to rewrite the KG equation without the $t$ Christoffel symbols.  The latter approach is easier (and a derivation of the above identity is provided in the writeup for the first project).
+
+Thus
+\begin{equation}
+\begin{aligned}
+0 &= \Box \Phi \\
+&= \frac{1}{\sqrt{-g}} \partial_\nu \Big( \sqrt{-g} g^{\mu \nu} \partial_\mu \Phi \Big) \\
+&= \frac{1}{\sqrt{-g}} \partial_t \Big( \sqrt{-g} g^{t t} \partial_t \Phi \Big) + \frac{1}{\sqrt{-g}} \partial_r \Big( \sqrt{-g} g^{t r} \partial_t \Phi \Big) \\
+&+ \frac{1}{\sqrt{-g}} \partial_t \Big( \sqrt{-g} g^{r t} \partial_r \Phi \Big) + \frac{1}{\sqrt{-g}} \partial_r \Big( \sqrt{-g} g^{r r} \partial_r \Phi \Big) \\
+&+ \frac{1}{\sqrt{-g}} \partial_\theta \Big( \sqrt{-g} g^{\theta \theta} \partial_\theta \Phi \Big) + \frac{1}{\sqrt{-g}} \partial_\phi \Big( \sqrt{-g} g^{\phi \phi} \partial_\phi \Phi \Big) \\
+&= \frac{1}{\sqrt{-g}} \partial_t \Big( \sqrt{-g} g^{t t} \partial_t \Phi \Big) + \frac{1}{\sqrt{-g}} \partial_r \Big( \sqrt{-g} g^{t r} \partial_t \Phi \Big) \\
+&+ \frac{1}{\sqrt{-g}} \partial_t \Big( \sqrt{-g} g^{r t} \partial_r \Phi \Big) + \frac{1}{\sqrt{-g}} \partial_r \Big( \sqrt{-g} g^{r r} \partial_r \Phi \Big) \\
+&= \frac{1}{\sqrt{-g}} \partial_t \sqrt{-g} \Big( - \alpha^{-2} \dot{\Phi} + \alpha^{-2} \beta \Phi' \Big) \\
+&+ \frac{1}{\sqrt{-g}} \partial_r \sqrt{-g} \Big( \alpha^{-2} \beta \dot{\Phi} + (\psi^{-4} - \alpha^{-2} \beta^2) \Phi' \Big) \\
+&= - \frac{1}{\sqrt{-g}} \partial_t \sqrt{-g} \frac{\Pi}{\alpha \psi^2} + \frac{1}{\sqrt{-g}} \partial_r \sqrt{-g} \alpha^{-2} \beta \Big( \frac{\alpha \Pi}{\psi^2} + \psi^{-4} \alpha^2 \beta^{-1} \xi \Big) \\
+&= - \frac{1}{r^2 \alpha \psi^6 \sin \theta} \partial_t r^2 \alpha \psi^6 \sin \theta \frac{\Pi}{\alpha \psi^2} + \frac{1}{r^2 \alpha \psi^6 \sin \theta} \partial_r r^2 \alpha \psi^6 \sin \theta \alpha^{-2} \beta \Big( \frac{\alpha \Pi}{\psi^2} + \psi^{-4} \alpha^2 \beta^{-1} \xi \Big) \\
+&= - \frac{1}{\psi^4} \partial_t (\psi^4 \Pi) + \frac{1}{r^2 \psi^4} \partial_r \Big[ r^2 \psi^4 \Big( \beta \Pi + \frac{\alpha \xi}{\psi^{2}} \Big) \Big] \\
+&= \frac{2 \Pi}{3} \Big( \frac{6 \beta \psi'}{\psi} + \frac{2 \beta}{r} + \beta' \Big) + \dot{\Pi} - \frac{1}{r^2 \psi^4} \partial_r \Big[ r^2 \psi^4 \Big( \beta \Pi + \frac{\alpha \xi}{\psi^{2}} \Big) \Big] \\
+\end{aligned}
+\end{equation}
+where we have used $\sqrt{-g} = r^2 \alpha \psi^6 \sin \theta$. Rearranging once more yields
+\begin{equation}
+\boxed{ \dot{\Pi} - \frac{1}{r^2 \psi^4} \Big[ r^2 \psi^4 \Big( \beta \Pi + \frac{\alpha \xi}{\psi^{2}} \Big) \Big]' + \frac{2 \Pi}{3} \Big[ \beta' + \frac{2 \beta}{r} \Big( \frac{3 \psi' r}{\psi} + 1 \Big) \Big] = 0}
+\end{equation}
+which agrees with the handout \textit{but not the provided sample code}.
+
+\subsection{Checking the $\xi$ Hyperbolic Equation}
+It is straightforward to check the $\xi$ hyperbolic equation.  We begin with the fact that
+\begin{equation}
+\begin{aligned}
+\partial_t (\partial_r \Phi) &= \partial_r (\partial_t \Phi) \\
+\dot{\xi} &= (\dot{\Phi})'; \\
+\end{aligned}
+\end{equation}
+we can now substitute in $\dot{\Phi}$ by rearranging the $\Pi$ definition (equation \ref{eq:Pi_defn}) to yield
+\begin{equation}
+\boxed{ \dot{\xi} = \Big( \frac{\alpha}{\psi^2} \Pi + \beta \xi \Big)' }, \\
+\end{equation}
+which agrees with the handout.
 
 \subsection{Computing the Mass Aspect}
 We need to find the mass aspect in our coordinates, starting with the equation
