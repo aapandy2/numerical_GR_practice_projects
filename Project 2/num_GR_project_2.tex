@@ -134,7 +134,7 @@ similarly
 \partial_t \gamma_{\theta \theta} &= -2 \alpha K_{\theta \theta} + D_\theta \beta_\theta + D_\theta \beta_\theta \\
 r^2 4 \psi^3 \dot{\psi} &= -2 \alpha K_{\theta \theta} - 2 \Big( - \frac{2 \psi' r^2}{\psi} - r \Big) \gamma_{rr} \beta \\
 \alpha K_{\theta \theta} &= 2 \psi' r^2 \psi^3 \beta + r \psi^4 \beta - 2 r^2 \psi^3 \dot{\psi}\\
-K_{\theta \theta} &= \frac{1}{\alpha} \Big( 2 \psi' r^2 \psi^3 \beta + r \psi^4 \beta - 2 r^2 \psi^3 \dot{\psi} \Big) , \\
+K_{\theta \theta} &= \frac{1}{\alpha} \Big( 2 \psi' r^2 \psi^3 \beta + r \psi^4 \beta - 2 r^2 \psi^3 \dot{\psi} \Big), \\
 \end{aligned}
 \end{equation}
 and
@@ -400,12 +400,12 @@ S^r &= - \gamma^{rr} n^a T_{a r} \\
 &+ \psi^{-4} \alpha^{-1} \beta (g_{r t} g_{t r} T^{t t} + g_{r t} g_{r r} T^{t r} + g_{r r} g_{t r} T^{r t} + g_{r r} g_{r r} T^{r r}); \\
 \end{aligned}
 \end{equation}
-using Mathematica we find
+using Mathematica (\redtext{used UBC notes $j^r$ definition rather than B\&S definition}) we find
 \begin{equation}
 \begin{aligned}
-S^r &= \frac{1}{\alpha^5} \beta \dot{\Phi}^2 \left(\alpha^2 - \beta^2 \left(\psi^4 - 1\right) \right) \\
-&+ \frac{1}{\alpha^5 \psi^8} \dot{\Phi} \Phi' \left(-\alpha^4 \psi^4 + \alpha^2 \beta^2 + \beta^4 \left( \psi^4 - 1 \right)^2 \psi^4 \right) \\
-&+ \frac{1}{\alpha^5 \psi^8} \beta^3 \Phi'^2 \left(\psi^4 - 1\right) \left(\beta^2 \psi^4 - \alpha^2 \right).
+S^r &= \frac{\Phi' (\dot{\Phi} - \beta \Phi')}{\alpha \psi^4} \\
+&= \frac{\xi (\dot{\Phi} - \beta \xi)}{\alpha \psi^4} \\
+&= \frac{\xi \Pi}{\psi^6}. \\
 \end{aligned}
 \end{equation}
 Similarly,
@@ -478,7 +478,6 @@ The momentum constraint is (using the maximal slicing condition $K = 0$)
 \begin{equation}
 \begin{aligned}
 D_j (K^{ij} - \gamma^{ij} K) &= 8 \pi S^i \\
-D_r (K^{rr}) &= 8 \pi S^r; \\
 %\partial_r \Big[ \frac{1}{\alpha \psi^4} \Big( \frac{2 \psi'}{\psi} \beta + \beta' - \frac{2}{\psi}\dot{\psi} \Big) \Big] &= 8 \pi S^r \\
 %\frac{2}{3} \partial_r \Big[ \frac{1}{\alpha \psi^4} \Big( \beta' - \frac{\beta}{r} \Big) \Big] &= 8 \pi S^r \\
 %\frac{2}{3} \Big[ \frac{\beta''}{\alpha \psi^4} - \frac{\beta' \alpha'}{\alpha^2 \psi^4} - \frac{4 \beta' \psi'}{\alpha \psi^5} - \frac{\beta'}{\alpha \psi^4 r} + \frac{\beta \alpha'}{\alpha^2 \psi^4 r} + \frac{4 \beta \psi'}{\alpha \psi^5 r} + \frac{\beta}{\alpha \psi^4 r^2} \Big] &= 8 \pi S^r \\
@@ -487,21 +486,44 @@ D_r (K^{rr}) &= 8 \pi S^r; \\
 %\beta'' \Big( \frac{\beta}{r} - \beta' \Big) \Big( \frac{\alpha'}{\alpha} + \frac{4 \psi'}{\psi} + \frac{1}{r} \Big) + \Big( \frac{\alpha'}{\alpha} + \frac{4 \psi'}{\psi} + \frac{1}{r} \Big) &= 12 \psi^4 \alpha \pi S^r \\
 \end{aligned}
 \end{equation}
-we again need to pay special attention to the derivative term.  Doing it explicitly, we find
+we again need to pay special attention to the derivative term.  Starting with $i = r$, we have
 \begin{equation}
 \begin{aligned}
-D_r K^{rr} &= \gamma_{r}^{~b} \nabla_b K^{rr} \\
-&= \gamma_{r}^{~b} (\partial_b K^{rr} + \Gamma^{r}_{b \lambda} K^{r \lambda} + \Gamma^{r}_{\lambda b} K^{\lambda r}) \\
-&= \gamma_{r}^{~r} (\partial_r K^{rr} + \Gamma^{r}_{r r} K^{r r} + \Gamma^{r}_{r r} K^{r r}) \\
-&= \partial_r K^{rr} + \frac{4 \psi'}{\psi} K^{r r} \\
-&= \partial_r \Big[ \frac{2 \psi^{-5} \psi' \beta}{\alpha} + \frac{\psi^{-4} \beta'}{\alpha} - \frac{2 \psi^{-5}}{\alpha} \dot{\psi} \Big] + \frac{4 \psi'}{\psi} K^{r r} \\
-&= \partial_r \Big[ \frac{2 \psi^{-5} \psi' \beta}{\alpha} + \frac{\psi^{-4} \beta'}{\alpha} - \frac{2 \psi^{-5} \beta \psi'}{\alpha} - \frac{2 \psi^{-5} \beta \psi}{3 r \alpha} - \frac{2 \psi^{-5} \beta' \psi}{6 \alpha} \Big] + \frac{4 \psi'}{\psi} K^{r r} \\
-&= \partial_r \Big[ \frac{\psi^{-4} \beta'}{\alpha} - \frac{2 \psi^{-5} \beta \psi}{3 r \alpha} - \frac{2 \psi^{-5} \beta' \psi}{6 \alpha} \Big] + \frac{4 \psi'}{\psi} K^{r r} \\
-&= \Big[ \frac{2 \beta''}{3 \psi^{4} \alpha} - \frac{8 \beta' \psi'}{3 \psi^{5} \alpha} - \frac{2 \beta' }{3 \psi^{4} r \alpha} - \frac{2 \beta' \alpha'}{3 \psi^{4} \alpha^2} + \frac{8 \beta \psi' }{3 \psi^{5} r \alpha} + \frac{2 \beta }{3 \psi^{4} r^2 \alpha} + \frac{2 \beta \alpha'}{3 \psi^{4} r \alpha^2} \Big] \\
-&+ \frac{8 \psi'}{3 \psi^5 \alpha} \Big( \beta' - \frac{\beta}{r} \Big) \\
-&= \frac{2 \beta''}{3 \psi^{4} \alpha} - \frac{2 \beta' }{3 \psi^{4} r \alpha} - \frac{2 \beta' \alpha'}{3 \psi^{4} \alpha^2} + \frac{2 \beta }{3 \psi^{4} r^2 \alpha} + \frac{2 \beta \alpha'}{3 \psi^{4} r \alpha^2} \\
+D_j K^{rj} &= \gamma_{j}^{~b} \nabla_b K^{rj} \\
+&= \gamma_r^{~r} (\partial_r K^{r r} + \Gamma^{r}_{r \lambda} K^{\lambda r} + \Gamma^{r}_{\lambda r} K^{r \lambda}) \\
+&+ \gamma_\theta^{~\theta} (\partial_\theta K^{r \theta} + \Gamma^{r}_{\theta \lambda} K^{\lambda \theta} + \Gamma^{\theta}_{\lambda \theta} K^{r \lambda}) \\
+&+ \gamma_\phi^{~\phi} (\partial_\phi K^{r \phi} + \Gamma^{r}_{\phi \lambda} K^{\lambda \phi} + \Gamma^{\phi}_{\lambda \phi} K^{r \lambda}) \\
+&= \gamma_r^{~r} (\partial_r K^{r r} + \Gamma^{r}_{r r} K^{r r} + \Gamma^{r}_{r r} K^{r r}) \\
+&+ \gamma_\theta^{~\theta} (\partial_\theta K^{r \theta} + \Gamma^{r}_{\theta \theta} K^{\theta \theta} + \Gamma^{\theta}_{r \theta} K^{r r}) \\
+&+ \gamma_\phi^{~\phi} (\partial_\phi K^{r \phi} + \Gamma^{r}_{\phi \phi} K^{\phi \phi} + \Gamma^{\phi}_{r \phi} K^{r r}) \\
+&= \partial_r K^{r r} + 2 \Gamma^{r}_{r r} K^{r r} + \Gamma^{r}_{\theta \theta} K^{\theta \theta} + \Gamma^{\theta}_{r \theta} K^{r r} + \Gamma^{r}_{\phi \phi} K^{\phi \phi} + \Gamma^{\phi}_{r \phi} K^{r r} \\
+&= \partial_r (\gamma^{rr} \gamma^{rr} K_{r r}) \\
+&+ 2 \Gamma^{r}_{r r} (\gamma^{rr} \gamma^{rr} K_{r r}) + \Gamma^{\theta}_{r \theta} (\gamma^{rr} \gamma^{rr} K_{r r}) + \Gamma^{\phi}_{r \phi} (\gamma^{rr} \gamma^{rr} K_{r r}) \\
+&+ \Gamma^{r}_{\theta \theta} (\gamma^{\theta \theta} \gamma^{\theta \theta} K_{\theta \theta}) + \Gamma^{r}_{\phi \phi} (\gamma^{\phi \phi} \gamma^{\phi \phi} K_{\phi \phi}) \\
+&= \partial_r (\gamma^{rr} \gamma^{rr} K_{r r}) \\
+&+ (\gamma^{rr} \gamma^{rr} K_{r r}) \Big( 2 \Gamma^{r}_{r r} + \Gamma^{\theta}_{r \theta} + \Gamma^{\phi}_{r \phi} \Big) \\
+&+ \Gamma^{r}_{\theta \theta} (\gamma^{\theta \theta} \gamma^{\theta \theta} K_{\theta \theta}) + \Gamma^{r}_{\phi \phi} (\gamma^{\phi \phi} \gamma^{\phi \phi} K_{\phi \phi}) \\
+&= \partial_r  \Big( \frac{2 \beta'}{3 \psi^{4} \alpha} - \frac{2 \beta}{3 r \psi^{4} \alpha} \Big)  \\
+&+ \Big( \frac{2 \beta'}{3 \psi^{4} \alpha} - \frac{2 \beta}{3 r \psi^{4} \alpha} \Big) \Big( 2 \Gamma^{r}_{r r} + \Gamma^{\theta}_{r \theta} + \Gamma^{\phi}_{r \phi} \Big) \\
+&+ \Gamma^{r}_{\theta \theta} (\gamma^{\theta \theta} \gamma^{\theta \theta} K_{\theta \theta}) + \Gamma^{r}_{\phi \phi} (\gamma^{\phi \phi} \gamma^{\phi \phi} K_{\phi \phi}) \\
+&=  \frac{2 \beta''}{3 \psi^{4} \alpha} - \frac{8 \psi' \beta'}{3 \psi^{5} \alpha} - \frac{2 \alpha' \beta'}{3 \psi^{4} \alpha^2} - \frac{2 \beta'}{3 r \psi^{4} \alpha} + \frac{8 \psi' \beta}{3 r \psi^{5} \alpha} + \frac{2 \beta}{3 r^2 \psi^{4} \alpha} + \frac{2 \beta \alpha'}{3 r \psi^{4} \alpha^2}  \\
+&+ \frac{2 \beta' 8 \psi'}{3 \psi^{4} \alpha \psi} + \frac{4 \beta'}{3 r \psi^{4} \alpha} - \frac{2 \beta 8 \psi'}{3 r \psi^{4} \alpha \psi} - \frac{4 \beta}{3 r^2 \psi^{4} \alpha} \\
+&+ \Gamma^{r}_{\theta \theta} (\gamma^{\theta \theta} \gamma^{\theta \theta} K_{\theta \theta}) + \Gamma^{r}_{\phi \phi} (\gamma^{\phi \phi} \gamma^{\phi \phi} K_{\phi \phi}) \\
+&= \frac{2 \beta''}{3 \psi^{4} \alpha} + \frac{8 \beta' \psi'}{3 \psi^{5} \alpha} - \frac{2 \alpha' \beta'}{3 \psi^{4} \alpha^2} + \frac{2 \beta'}{3 r \psi^{4} \alpha} - \frac{8 \psi' \beta}{3 r \psi^{5} \alpha} - \frac{2 \beta}{3 r^2 \psi^{4} \alpha} + \frac{2 \beta \alpha'}{3 r \psi^{4} \alpha^2} \\
+&+ \Gamma^{r}_{\theta \theta} (\psi^{-4} r^{-2} \psi^{-4} r^{-2} K_{\theta \theta}) \\
+&+ \Gamma^{r}_{\theta \theta} \sin^{2} \theta (\psi^{-4} r^{-2} \sin^{-2} \theta \psi^{-4} r^{-2} \sin^{-2} \theta K_{\theta \theta} \sin^{2} \theta) \\
+&= \frac{2 \beta''}{3 \psi^{4} \alpha} + \frac{8 \beta' \psi'}{3 \psi^{5} \alpha} - \frac{2 \alpha' \beta'}{3 \psi^{4} \alpha^2} + \frac{2 \beta'}{3 r \psi^{4} \alpha} - \frac{8 \psi' \beta}{3 r \psi^{5} \alpha} - \frac{2 \beta}{3 r^2 \psi^{4} \alpha} + \frac{2 \beta \alpha'}{3 r \psi^{4} \alpha^2} \\
+&- \frac{4 \psi' r \psi^4 \beta}{\psi^{9} r^{2} \alpha} - \frac{2 r \psi^4 \beta}{\psi^{8} r^{3} \alpha} + \frac{8 \beta \psi'}{3 \psi^{5} \alpha r} + \frac{4 \beta}{3 r^2 \psi^{4} \alpha} + \frac{8 \beta' \psi'}{6 \psi^{5} \alpha} + \frac{4 \beta'}{6 \psi^{4} r \alpha} \\
+&= \frac{2}{3 \psi^{4} \alpha} \beta'' + \frac{2}{3 \psi^4 \alpha} \Big( \beta' - \frac{\beta}{r} \Big) \Big( \frac{6 \psi'}{\psi} + \frac{2}{r} - \frac{\alpha'}{\alpha} \Big), \\
 \end{aligned}
 \end{equation}
+which is starting to look very similar to the momentum constraint equation in the handout.
+
+Inserting the matter source term, we find
+\begin{equation}
+\boxed{\beta'' + \Big( \beta' - \frac{\beta}{r} \Big) \Big( \frac{6 \psi'}{\psi} + \frac{2}{r} - \frac{\alpha'}{\alpha} \Big) \redtext{-} \frac{12 \pi \alpha \xi \Pi}{\psi^2} = 0},
+\end{equation}
+which \textbf{differs from} the momentum constraint equation in the handout.
 
 \subsection{Computing the Mass Aspect}
 We need to find the mass aspect in our coordinates, starting with the equation
