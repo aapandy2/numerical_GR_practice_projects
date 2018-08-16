@@ -400,12 +400,12 @@ S^r &= - \gamma^{rr} n^a T_{a r} \\
 &+ \psi^{-4} \alpha^{-1} \beta (g_{r t} g_{t r} T^{t t} + g_{r t} g_{r r} T^{t r} + g_{r r} g_{t r} T^{r t} + g_{r r} g_{r r} T^{r r}); \\
 \end{aligned}
 \end{equation}
-using Mathematica (\redtext{used UBC notes $j^r$ definition rather than B\&S definition}) we find
+using Mathematica we find
 \begin{equation}
 \begin{aligned}
-S^r &= \frac{\Phi' (\dot{\Phi} - \beta \Phi')}{\alpha \psi^4} \\
-&= \frac{\xi (\dot{\Phi} - \beta \xi)}{\alpha \psi^4} \\
-&= \frac{\xi \Pi}{\psi^6}. \\
+S^r &= \frac{\Phi' (-\dot{\Phi} + \beta \Phi')}{\alpha \psi^4} \\
+&= - \frac{\xi (\dot{\Phi} - \beta \xi)}{\alpha \psi^4} \\
+&= - \frac{\xi \Pi}{\psi^6}. \\
 \end{aligned}
 \end{equation}
 Similarly,
@@ -521,9 +521,9 @@ which is starting to look very similar to the momentum constraint equation in th
 
 Inserting the matter source term, we find
 \begin{equation}
-\boxed{\beta'' + \Big( \beta' - \frac{\beta}{r} \Big) \Big( \frac{6 \psi'}{\psi} + \frac{2}{r} - \frac{\alpha'}{\alpha} \Big) \redtext{-} \frac{12 \pi \alpha \xi \Pi}{\psi^2} = 0},
+\boxed{\beta'' + \Big( \beta' - \frac{\beta}{r} \Big) \Big( \frac{6 \psi'}{\psi} + \frac{2}{r} - \frac{\alpha'}{\alpha} \Big) + \frac{12 \pi \alpha \xi \Pi}{\psi^2} = 0},
 \end{equation}
-which \textbf{differs from} the momentum constraint equation in the handout.
+which agrees with the momentum constraint equation in the handout.
 
 \subsection{Computing the Mass Aspect}
 We need to find the mass aspect in our coordinates, starting with the equation
@@ -550,9 +550,9 @@ g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R &= g^{tt} \partial_t R \partial_
 \end{aligned}
 \end{equation}
 we can now notice that the provided mass aspect function does not depend on $\dot{\psi}$; we can eliminate it using the evolution equation for $\psi$:
-\begin{equation}
+\begin{equation*}
 \dot{\psi} = \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6}
-\end{equation}
+\end{equation*}
 so
 \begin{equation}
 \begin{aligned}
