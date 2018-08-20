@@ -4,25 +4,23 @@ from elliptics_solver import *
 import sys
 
 #set parameters for simulation
-N = 150
-delta_r = 1./N
+N = 256
 delta_t = 0.01
-courant = delta_t / delta_r
-timesteps = 300
-epsilon = 0.3
+timesteps = 10
+epsilon = 0.
 
 correction_weight = 1.
-GEOM_COUPLING     = False
+GEOM_COUPLING     = True
 PSI_EVOL          = False
 
 #define grid
-R     = 50. 
-amp   = 0.02
-r_0   = 20.
-delta = 5.
+R       = 50. 
+delta_r = R/N
+amp     = 0.02
+r_0     = 20.
+delta   = 5.
 
 r_grid = np.linspace(delta_r, R, N)
-
 
 #initialize arrays
 phi = np.zeros((timesteps, N))

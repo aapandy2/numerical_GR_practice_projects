@@ -2,7 +2,8 @@ import numpy as np
 
 def matter_residuals(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon):
 	N = np.shape(r_grid)[0]
-	delta_r = 1./N
+	R = r_grid[-1]
+	delta_r = R/N
 
 	xi_residual  = np.zeros(N)
 	Pi_residual  = np.zeros(N)
@@ -125,7 +126,8 @@ def matter_residuals(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon):
 def jacobian(f_n, xi, Pi, r_grid):
 	
 	N = np.shape(r_grid)[0]
-	delta_r = 1./N
+	R = r_grid[-1]
+	delta_r = R/N
 
 	psi   = f_n[0:N]
         beta  = f_n[N:2*N]
@@ -242,8 +244,8 @@ def inv_matrix(jacobian):
 
 def residual(f_n, xi, Pi, r_grid):
 	N = np.shape(r_grid)[0]
-
-        delta_r = 1./N
+	R = r_grid[-1]
+        delta_r = R/N
 
 	psi   = f_n[0:N]
         beta  = f_n[N:2*N]
@@ -304,7 +306,8 @@ def solve_elliptics_first_ts(f_n, xi, Pi, r_grid, correction_weight=1.):
 
 def Newton_iteration(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon, correction_weight=1, PSI_EVOL=False):
 	N = np.shape(r_grid)[0]
-	delta_r = 1./N
+	R = r_grid[-1]
+	delta_r = R/N
 
 #	correction_weight = 1. #TODO: later remove this make argument to function
 
