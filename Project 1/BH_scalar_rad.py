@@ -6,7 +6,7 @@ from scipy.integrate import cumtrapz, simps
 #set parameters for simulation
 N = 300
 delta_x = 1./N
-delta_t = 0.005
+delta_t = 0.001
 courant = delta_t / delta_x
 timesteps = 800
 

@@ -41,7 +41,167 @@
 	\date{June 20th, 2018}
 	\maketitle
 
-\section{Deriving the Equations}
+\section{Background}
+In this project we aim to solve the equations of motion for a self-gravitating scalar field in spherical symmetry.  The key difference between this project and the previous one is that we now care about how the scalar field modifies the spacetime it occupies, whereas in the previous project we used a static Schwarzschild spacetime.
+
+The spherically symmetric line element in isotropic (conformally flat) form is given by
+\begin{equation} \label{eq:line_element}
+ds^2 = -(\alpha^2 - \psi^4 \beta^2) dt^2 + 2 \psi^4 \beta dr dt + \psi^4 [dr^2 + r^2 (d\theta^2 + \sin^2 \theta d\phi^2)],
+\end{equation}
+where $\alpha(r, t)$ is called the \textit{lapse function}, $\beta(r, t)$ is the \textit{shift} (which is the radial component of the \textit{shift vector}; the other components are zero), and $\psi(r, t)$ is the \textit{conformal factor}.
+
+In this formalism, the Klein-Gordon equation for the scalar field $\Phi(r, t)$ may be written in terms of auxiliary variables $\xi$ and $\Pi$, defined to be:
+\begin{align}
+\xi(r, t) &= \Phi' \label{eq:xi_defn} \\
+\Pi(r, t) &= \frac{\psi^2}{\alpha}(\dot{\Phi} - \beta \xi), \label{eq:Pi_defn} 
+\end{align}
+where throughout this document a dot $(\dot{~})$ denotes a partial derivative with respect to $t$, and a prime $(')$ denotes a partial derivative with respect to $r$.  Using these auxiliary variables, we can derive a closed system of equations for the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$).
+
+The first equation of this system is the hyperbolic Klein-Gordon equation\footnote{Note that this equation differs from that in the sample code.  The sample code has an additional factor of $1/2$ in the $3r\psi'/\psi$ term, which I believe to be in error.}
+\begin{equation} \label{eq:hyperbolic_KGE}
+\dot{\Pi} - \frac{1}{r^2 \psi^4} \Big[ r^2 \psi^4 \Big( \beta \Pi + \frac{\alpha \xi}{\psi^2} \Big)\Big]' + \frac{2}{3} \Pi \Big[ \beta' + \frac{2 \beta}{r} \Big(1 + \frac{3 r \psi'}{\psi} \Big) \Big] = 0,
+\end{equation}
+followed by the hyperbolic evolution equation for $\xi$:
+\begin{equation} \label{eq:xi_evol}
+\dot{\xi} - \Big( \frac{\alpha \Pi}{\psi^2} + \beta \xi \Big)' = 0,
+\end{equation}
+the Hamiltonian constraint equation, which we will use as an elliptic constraint for $\psi$
+\begin{equation} \label{eq:psi_evol}
+\psi'' + \psi' \frac{2}{r} + \frac{\psi^5}{12} \Big[ \frac{1}{\alpha} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] + \pi \psi [\xi^2 + \Pi^2] = 0,
+\end{equation}
+the momentum constraint equation, an elliptic equation for $\beta$
+\begin{equation} \label{eq:beta_evol}
+\beta'' + \Big( \beta' - \frac{\beta}{r} \Big) \Big[ \frac{2}{r} + \frac{6 \psi'}{\psi} - \frac{\alpha'}{\alpha} \Big] + \frac{12 \pi \alpha \xi \Pi}{\psi^2} = 0,
+\end{equation}
+and the maximal slicing condition yields an elliptic equation for $\alpha$:
+\begin{equation} \label{eq:alpha_evol}
+\alpha'' + \alpha' \Big[ \frac{2}{r} + \frac{2 \psi'}{\psi} \Big] - \alpha^{-1} \Big[ \frac{2 \psi^4}{3} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] - 8 \pi \alpha \Pi^2 = 0.
+\end{equation}
+All of the above equations are derived from the ADM equations in the appendix.
+
+\section{Problem 1}
+This problem asks us to verify the boundary conditions on the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$) at $r = 0$, to ensure that they are regular and finite there.
+
+Expanding out equation \ref{eq:hyperbolic_KGE}, we get:
+\begin{equation}
+\begin{aligned}
+0 &= \dot{\Pi} - \Big[ \frac{2 \beta \Pi}{r} + \frac{4 \psi' \beta \Pi}{\psi} + \beta' \Pi + \beta \Pi' + \frac{2 \alpha \xi}{r \psi^2} + \frac{2 \psi' \alpha \xi}{\psi^3} + \frac{\alpha' \xi}{\psi^2} + \frac{\alpha \xi'}{\psi^2} \Big] \\
+&+ \frac{2}{3} \Pi \Big[ \beta' + \frac{2 \beta}{r} \Big(1 + \frac{3 r \psi'}{\psi} \Big) \Big]; \\
+\end{aligned}
+\end{equation}
+inspection of this equation implies that in order for it to be regular and finite at $r = 0$, we must require $\beta \Pi \to 0$ and $\alpha \xi \to 0$ as $r \to 0$.  We need more equations to constrain the behavior further.
+
+Expanding out equation \ref{eq:xi_evol} doesn't help us, so we can determine most of the other conditions simply by inspection of equations \ref{eq:psi_evol} - \ref{eq:alpha_evol}.  The second term in equation \ref{eq:psi_evol} implies that $\psi' \to 0$ as $r \to 0$, and the term inside both brackets and parentheses implies $\beta \to 0$ as $r \to 0$.  Equation \ref{eq:alpha_evol}'s second term implies $\alpha' \to 0$ as $r \to 0$.  Now that we know these things, the constraint on $\alpha'$ implies that $\alpha$ will not be constrained, so from the paragraph above we know that $\xi \to 0$.  
+
+So far, we have:
+\begin{equation*}
+\begin{aligned}
+\beta  (r=0, t) &= 0 \\
+\xi    (r=0, t) &= 0 \\
+\psi'  (r=0, t) &= 0 \\
+\alpha'(r=0, t) &= 0,
+\end{aligned}
+\end{equation*}
+but we still need an equation for $\Pi$ or $\Pi'$ to fully constrain the system.  Looking at the definition of $\Pi$ in equation \ref{eq:Pi_defn}, we can see that as $r \to 0$ the second term drops out, but we don't know anything about the first term.  Let's try taking a derivative with respect to $r$, and see what falls out:
+\begin{equation*}
+\begin{aligned}
+\Pi' &= \Big[ \psi^2 \alpha^{-1} \dot{\phi} - \psi^2 \alpha^{-1} \beta \xi \Big]' \\
+&= 2 \psi \psi' \alpha^{-1} \dot{\phi} - \psi^2 \alpha^{-2} \alpha' \dot{\phi} + \psi^2 \alpha^{-1} \dot{\phi}' \\
+&- 2 \psi \psi' \alpha^{-1} \beta \xi + \psi^2 \alpha^{-2} \alpha' \beta \xi - \psi^2 \alpha^{-1} \beta' \xi - \psi^2 \alpha^{-1} \beta \xi';
+\end{aligned}
+\end{equation*}
+applying the constraints we already know for when $r \to 0$, we find:
+\begin{equation*}
+\begin{aligned}
+\Pi'(r=0, t) &= \psi^2 \alpha^{-1} \dot{\phi}' \\
+&= \psi^2 \alpha^{-1} \partial_r (\partial_t \phi) \\
+&= \psi^2 \alpha^{-1} \partial_t (\partial_r \phi) \\
+&= \psi^2 \alpha^{-1} \partial_t (\xi) \\
+&= \psi^2 \alpha^{-1} \partial_t (0) \\
+&= 0,
+\end{aligned}
+\end{equation*}
+so in summary, at $r = 0$, we have the full set of conditions
+\begin{equation}
+\begin{aligned}
+\beta  (r=0, t) &= 0 \\
+\xi    (r=0, t) &= 0 \\
+\psi'  (r=0, t) &= 0 \\
+\alpha'(r=0, t) &= 0 \\
+\Pi'   (r=0, t) &= 0,
+\end{aligned}
+\end{equation}
+as we were asked to show.
+
+\section{Problem 2}
+In this problem we are asked to derive boundary conditions to be applied at the outer boundary ($r = R$) which do not couple matter variables ($\Pi, \xi$) or space variables ($\alpha, \beta, \psi$) amongst themselves or to each other.  We are told to define the space variable boundary conditions such that they are consistent to $O(1/r^2)$ with asymptotic flatness (which we should expect for large $R$), which means we should have conditions with solutions of the form
+\begin{equation} \label{eq:space_var_outer_behavior}
+\begin{aligned}
+\psi   &= 1 + \frac{a_0(t)}{r} + O(1/r^2) \\
+\alpha &= 1 + \frac{b_0(t)}{r} + O(1/r^2) \\
+\beta  &= 0 + \frac{c_0(t)}{r} + O(1/r^2),
+\end{aligned}
+\end{equation}
+where the leading order behavior is determined by the asymptotic behavior of the space variable (e.g. by comparing the metric \ref{eq:line_element} to the Minkowski metric).
+
+We have to enforce the above behavior on our variables somehow and write constraint equations.  Taking a derivative with respect to $r$ of the above equations, we find:
+\begin{align}
+\psi' + \frac{\psi - 1}{r}     &= 0 \\
+\alpha' + \frac{\alpha - 1}{r} &= 0 \\
+\beta' + \frac{\beta}{r}       &= 0,
+\end{align} 
+which we will enforce as our outer boundary condition on these variables\footnote{I don't like the description for this problem very much.  I think it's important to state that for these boundary conditions we're trying to write down constraint equations which force $\{\psi, \alpha, \beta\}$ to obey equation \ref{eq:space_var_outer_behavior}.}.
+
+Now we need boundary conditions for the matter variables $\xi$ and $\Pi$.  We are asked to force these variables to be consistent with the outgoing radiation condition to $O(1/r^2)$.  Applying the outgoing radiation condition to the matter variables, we have:
+\begin{equation}
+\begin{aligned}
+0 &= \partial_t (r \xi) + \partial_r (r \xi) \\
+&= r \partial_t \xi + r \partial_r \xi + \xi \\
+&= r \dot{\xi} + r \xi' + \xi \\
+&= \dot{\xi} + \xi' + \frac{\xi}{r}.
+\end{aligned}
+\end{equation}
+following the exact same procedure for $\Pi$, we find
+\begin{equation}
+0 = \dot{\Pi} + \Pi' + \frac{\Pi}{r}.
+\end{equation}
+Since we directly used the outgoing radiation condition to derive these equations, they are guaranteed to be consistent with the outgoing radiation condition to any order in $1/r$.
+
+These boundary conditions have been verified by comparison with those coded up in the sample code for this project\footnote{Sample code which solves problems 1-5: \url{http://physics.princeton.edu/~fpretori/group_resources/PiTP_2009/emkg_5.tar.gz}} and by taking the spherical-symmetry special case of the boundary conditions\footnote{The outer boundary conditions can be found in equation 9 of \url{https://arxiv.org/pdf/gr-qc/0508110.pdf}.  These equations may be converted to spherical coordinates by noting that $r = \sqrt{\rho^2 + z^2}$, and converting the $\rho$ and $z$ derivatives to be $r$ derivatives.} in a paper describing an axisymmetric self-gravitating scalar field code \cite{Pretorius06}, though in the latter they use Dirichlet boundary conditions for $\alpha, \beta$ rather than the Robin conditions we use here.
+
+\section{Problem 3}
+In this problem we are asked to write code to solve the Klein-Gordon equation in the form of equations \ref{eq:hyperbolic_KGE} - \ref{eq:xi_evol} to integrate $\Pi$ and $\xi$ for a flat space background.  We are also asked to use equation \ref{eq:Pi_defn} to integrate the scalar field $\Phi$.  The problem statement tells us to use a second-order Crank-Nicolson scheme, and to implement Kreiss-Oliger (KO) dissipation near the origin.
+
+To begin, we must note that the flat space background part of the problem statement implies that we can take the zeroth order behavior of equation \ref{eq:space_var_outer_behavior} to set the values of the space variables, namely: $\psi = \alpha = 1$ and $\beta = 0$.  We initialize the matter variables with $\Phi$ a Gaussian, $\xi = \Phi'$.  To set $\Pi$, we use the ``as in-going as possible" condition on the matter, namely $\dot{\Phi} = \Phi'$.  In flat space our matter variables become
+\begin{equation*}
+\begin{aligned}
+\xi_{\mathrm{flat~space}} &= \Phi' \\
+\Pi_{\mathrm{flat~space}} &= \dot{\Phi},
+\end{aligned}
+\end{equation*}
+so the ingoing radiation condition implies $\Pi = \xi$.
+
+Finally, we'll also need to apply KO dissipation to the hyperbolic equations to damp out high-frequency noise.  This is done by simply adding the KO stencil to the hyperbolic equations after the Crank-Nicolson discretization.  We will apply standard KO dissipation in the bulk of the domain ($i \in [2, N-3]$), and a special even or odd KO dissipation near the inner boundary ($i = 1$).  The inner boundary ($i=0$) itself, the outermost internal grid point ($i = N-2$), and the outer boundary ($i = N-1$) are left without KO dissipation.  The KO stencil is
+\begin{equation}
+\mathrm{KO~dissipation} = -\frac{\epsilon}{16} (f^{n}_{i-2} - 4 f^{n}_{i-1} + 6 f^{n}_{i} - 4 f^{n}_{i+1} + f^{n}_{i+2}),
+\end{equation}
+where all terms are at the known $n$ timestep, and the parameter $\epsilon$ determines the amount of damping where $\epsilon \in [0, 1]$ for stability.  For the innermost internal grid point $i = 1$ we apply an even reflected version of KO dissipation for $\Pi$ (and later the $\psi$ hyperbolic equation)
+\begin{equation}
+\mathrm{even~KO~dissipation~near~inner~boundary} = -\frac{\epsilon}{16} (f^{n}_{0} - 4 f^{n}_{-1} + 6 f^{n}_{0} - 4 f^{n}_{1} + f^{n}_{2})
+\end{equation}
+and for $\xi$ we apply odd KO dissipation
+\begin{equation}
+\mathrm{odd~KO~dissipation~near~inner~boundary} = -\frac{\epsilon}{16} (-f^{n}_{0} - 4 f^{n}_{-1} + 6 f^{n}_{0} - 4 f^{n}_{1} + f^{n}_{2}),
+\end{equation}
+where the even/odd designation comes from the fact that the $\Pi$ (and $\psi$) hyperbolic equations are 
+
+\begin{thebibliography}{widestlabel}
+	\bibitem{Pretorius06}
+	F. Pretorius and M. W. Choptuik, ``Adaptive Mesh Refinement for Coupled Elliptic-Hyperbolic Systems", J. Comput. Phys. 218 (2006)
+\end{thebibliography}
+
+\appendix
+\section{Derivation of the Governing PDEs}
 It is possible to derive the equations in the handout starting from the ADM equations (taken from Shapiro and Baumgarte).  We may begin with some basic definitions before showing the full equations.  First we define the matter source terms
 \begin{align}
 \rho &= n_a n_b T^{ab} \\
@@ -235,10 +395,7 @@ and the ones with a $\phi$ upper index are
 \end{equation}
 and the Christoffel symbols are symmetric in their lower indices, so permuting them results in a symbol with the same value.
 
-
-
-
-and the Ricci tensor is
+The Ricci tensor is
 \begin{equation}
 R_{ij} = \partial_k \Gamma^k_{ij} - \partial_j \Gamma^k_{ik} + \Gamma^k_{ij} \Gamma^l_{kl} - \Gamma^k_{il} \Gamma^l_{jk},
 \end{equation}
@@ -644,148 +801,5 @@ m(r, t) &= \frac{R}{2} (1 - g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R) \\
 &= \frac{r \psi^6}{18 \alpha^2} (\beta - r \beta')^2 - 2 r^2 \psi' (r \psi)' - r^2 \psi^5 \alpha^{-2} \beta^2 \psi' \\
 \end{aligned}
 \end{equation}
-
-\section{Background}
-In this project we now aim to solve the equations of motion for a self-gravitating scalar field in spherical symmetry.  The key difference between this project and the previous one is that we now care about how the scalar field modifies the spacetime it occupies, whereas in the previous project we used a static Schwarzschild spacetime.
-
-The spherically symmetric line element in isotropic (conformally flat) form is given by
-\begin{equation} \label{eq:line_element}
-ds^2 = -(\alpha^2 - \psi^4 \beta^2) dt^2 + 2 \psi^4 \beta dr dt + \psi^4 [dr^2 + r^2 (d\theta^2 + \sin^2 \theta d\phi^2)],
-\end{equation}
-where $\alpha(r, t)$ is called the \textit{lapse function}, $\beta(r, t)$ is the \textit{shift} (which comes from the norm of the \textit{shift vector} $\beta^i$ when we don't have spherical symmetry), and $\psi(r, t)$ is the \textit{conformal factor}.
-
-In this formalism, the Klein-Gordon equation for the scalar field $\Phi(r, t)$ may be written in terms of auxiliary variables $\xi$ and $\Pi$, defined to be:
-\begin{align}
-\xi(r, t) &= \Phi' \label{eq:xi_defn} \\
-\Pi(r, t) &= \frac{\psi^2}{\alpha}(\dot{\Phi} - \beta \xi), \label{eq:Pi_defn} 
-\end{align}
-where throughout this document a dot $(\dot{~})$ denotes a partial derivative with respect to $t$, and a prime $(')$ denotes a partial derivative with respect to $r$.  Using these auxiliary variables, we can derive a closed system of equations for the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$).
-
-The first equation of this system is the hyperbolic Klein-Gordon equation
-\begin{equation} \label{eq:hyperbolic_KGE}
-\dot{\Pi} - \frac{1}{r^2 \psi^4} \Big[ r^2 \psi^4 \Big( \beta \Pi + \frac{\alpha \xi}{\psi^2} \Big)\Big]' + \frac{2}{3} \Pi \Big[ \beta' + \frac{2 \beta}{r} \Big(1 + \frac{3 r \psi'}{\redtext{2} \psi} \Big) \Big] = 0,
-\end{equation}
-followed by the hyperbolic evolution equation for $\xi$:
-\begin{equation} \label{eq:xi_evol}
-\dot{\xi} - \Big( \frac{\alpha \Pi}{\psi^2} + \beta \xi \Big)' = 0,
-\end{equation}
-the Hamiltonian constraint equation, which we will use as an elliptic constraint for $\psi$
-\begin{equation} \label{eq:psi_evol}
-\psi'' + \psi' \frac{2}{r} + \frac{\psi^5}{12} \Big[ \frac{1}{\alpha} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] + \pi \psi [\xi^2 + \Pi^2] = 0,
-\end{equation}
-the momentum constraint equation, an elliptic equation for $\beta$
-\begin{equation} \label{eq:beta_evol}
-\beta'' + \Big( \beta' - \frac{\beta}{r} \Big) \Big[ \frac{2}{r} + \frac{6 \psi'}{\psi} - \frac{\alpha'}{\alpha} \Big] + \frac{12 \pi \alpha \xi \Pi}{\psi^2} = 0,
-\end{equation}
-and the maximal slicing condition yields an elliptic equation for $\alpha$:
-\begin{equation} \label{eq:alpha_evol}
-\alpha'' + \alpha' \Big[ \frac{2}{r} + \frac{2 \psi'}{\psi} \Big] - \alpha^{-1} \Big[ \frac{2 \psi^4}{3} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] - 8 \pi \alpha \Pi^2 = 0.
-\end{equation}
-
-\section{Problem 1}
-This problem asks us to verify the boundary conditions on the quantities of interest ($\xi, \Pi, \psi, \alpha, \beta$) at $r = 0$, to ensure that they are regular and finite there.
-
-Expanding out equation \ref{eq:hyperbolic_KGE}, we get:
-\begin{equation}
-\begin{aligned}
-0 &= \dot{\Pi} - \Big[ \frac{2 \beta \Pi}{r} + \frac{4 \psi' \beta \Pi}{\psi} + \beta' \Pi + \beta \Pi' + \frac{2 \alpha \xi}{r \psi^2} + \frac{2 \psi' \alpha \xi}{\psi^3} + \frac{\alpha' \xi}{\psi^2} + \frac{\alpha \xi'}{\psi^2} \Big] \\
-&+ \frac{2}{3} \Pi \Big[ \beta' + \frac{2 \beta}{r} \Big(1 + \frac{3 r \psi'}{\psi} \Big) \Big]; \\
-\end{aligned}
-\end{equation}
-inspection of this equation implies that in order for it to be regular and finite at $r = 0$, we must require $\beta \Pi \to 0$ and $\alpha \xi \to 0$ as $r \to 0$.  We need more equations to constrain the behavior further.
-
-Expanding out equation \ref{eq:xi_evol} doesn't help us, so we can determine most of the other conditions simply by inspection of equations \ref{eq:psi_evol} - \ref{eq:alpha_evol}.  The second term in equation \ref{eq:psi_evol} implies that $\psi' \to 0$ as $r \to 0$, and the term inside both brackets and parentheses implies $\beta \to 0$ as $r \to 0$.  Equation \ref{eq:alpha_evol}'s second term implies $\alpha' \to 0$ as $r \to 0$.  Now that we know these things, the constraint on $\alpha'$ implies that $\alpha$ will not be constrained, so from the paragraph above we know that $\xi \to 0$.  
-
-So far, we have:
-\begin{equation*}
-\begin{aligned}
-\beta  (r=0, t) &= 0 \\
-\xi    (r=0, t) &= 0 \\
-\psi'  (r=0, t) &= 0 \\
-\alpha'(r=0, t) &= 0,
-\end{aligned}
-\end{equation*}
-but we still need a constraint on $\Pi$ or $\Pi'$ to fully constrain the system.  Looking at the definition of $\Pi$ in equation \ref{eq:Pi_defn}, we can see that as $r \to 0$ the second term drops out, but we don't know anything about the first term.  Let's try taking a derivative with respect to $r$, and see what falls out:
-\begin{equation*}
-\begin{aligned}
-\Pi' &= \Big[ \psi^2 \alpha^{-1} \dot{\phi} - \psi^2 \alpha^{-1} \beta \xi \Big]' \\
-&= 2 \psi \psi' \alpha^{-1} \dot{\phi} - \psi^2 \alpha^{-2} \alpha' \dot{\phi} + \psi^2 \alpha^{-1} \dot{\phi}' \\
-&- 2 \psi \psi' \alpha^{-1} \beta \xi + \psi^2 \alpha^{-2} \alpha' \beta \xi - \psi^2 \alpha^{-1} \beta' \xi - \psi^2 \alpha^{-1} \beta \xi';
-\end{aligned}
-\end{equation*}
-applying the constraints we already know for when $r \to 0$, we find:
-\begin{equation*}
-\begin{aligned}
-\Pi'(r=0, t) &= \psi^2 \alpha^{-1} \dot{\phi}' \\
-&= \psi^2 \alpha^{-1} \partial_r (\partial_t \phi) \\
-&= \psi^2 \alpha^{-1} \partial_t (\partial_r \phi) \\
-&= \psi^2 \alpha^{-1} \partial_t (\xi) \\
-&= \psi^2 \alpha^{-1} \partial_t (0) \\
-&= 0,
-\end{aligned}
-\end{equation*}
-so in summary, at $r = 0$, we have the full set of conditions
-\begin{equation}
-\begin{aligned}
-\beta  (r=0, t) &= 0 \\
-\xi    (r=0, t) &= 0 \\
-\psi'  (r=0, t) &= 0 \\
-\alpha'(r=0, t) &= 0 \\
-\Pi'   (r=0, t) &= 0,
-\end{aligned}
-\end{equation}
-as we were asked to show.
-
-\section{Problem 2}
-In this problem we are asked to derive boundary conditions to be applied at the outer boundary ($r = R$) which do not couple matter variables ($\Pi, \xi$) or space variables ($\alpha, \beta, \psi$) amongst themselves or to each other.  We are told to define the space variable boundary conditions such that they are consistent to $O(1/r^2)$ with asymptotic flatness (which we should expect for large $R$), which means we should have conditions with solutions of the form
-\begin{equation} \label{eq:space_var_outer_behavior}
-\begin{aligned}
-\psi   &= 1 + \frac{a_0(t)}{r} + O(1/r^2) \\
-\alpha &= 1 + \frac{b_0(t)}{r} + O(1/r^2) \\
-\beta  &= 0 + \frac{c_0(t)}{r} + O(1/r^2),
-\end{aligned}
-\end{equation}
-where the leading order behavior is determined by the asymptotic behavior of the space variable (e.g. by comparing the metric \ref{eq:line_element} to the Minkowski metric).
-
-We have to enforce the above behavior on our variables somehow and write constraint equations.  Taking a derivative with respect to $r$ of the above equations, we find:
-\begin{align}
-\psi' + \frac{\psi - 1}{r}     &= 0 \\
-\alpha' + \frac{\alpha - 1}{r} &= 0 \\
-\beta' + \frac{\beta}{r}       &= 0,
-\end{align} 
-which we will enforce as our outer boundary condition on these variables\footnote{I don't like the description for this problem very much.  I think it's important to state that for these boundary conditions we're trying to write down constraint equations which force $\{\psi, \alpha, \beta\}$ to obey equation \ref{eq:space_var_outer_behavior}.}.
-
-Now we need boundary conditions for the matter variables $\xi$ and $\Pi$.  We are asked to force these variables to be consistent with the outgoing radiation condition to $O(1/r^2)$.  Applying the outgoing radiation condition to the matter variables, we have:
-\begin{equation}
-\begin{aligned}
-0 &= \partial_t (r \xi) + \partial_r (r \xi) \\
-&= r \partial_t \xi + r \partial_r \xi + \xi \\
-&= r \dot{\xi} + r \xi' + \xi \\
-&= \dot{\xi} + \xi' + \frac{\xi}{r}.
-\end{aligned}
-\end{equation}
-following the exact same procedure for $\Pi$, we find
-\begin{equation}
-0 = \dot{\Pi} + \Pi' + \frac{\Pi}{r}.
-\end{equation}
-Since we directly used the outgoing radiation condition to derive these equations, they are guaranteed to be consistent with the outgoing radiation condition to any order in $1/r$.
-
-These boundary conditions have been verified by comparison with those coded up in the sample code for this project\footnote{Sample code which solves problems 1-5: \url{http://physics.princeton.edu/~fpretori/group_resources/PiTP_2009/emkg_5.tar.gz}} and by taking the spherical-symmetry special case of the boundary conditions\footnote{The outer boundary conditions can be found in equation 9 of \url{https://arxiv.org/pdf/gr-qc/0508110.pdf}.  These equations may be converted to spherical coordinates by noting that $r = \sqrt{\rho^2 + z^2}$, and converting the $\rho$ and $z$ derivatives to be $r$ derivatives.} in a paper describing an axisymmetric self-gravitating scalar field code \cite{Pretorius06}, though in the latter they use Dirichlet boundary conditions for $\alpha, \beta$ rather than the Robin conditions we use here.
-
-\section{Problem 3}
-In this problem we are asked to write code to solve the Klein-Gordon equation in the form of equations \ref{eq:hyperbolic_KGE} - \ref{eq:xi_evol} to integrate $\Pi$ and $\xi$ for a flat space background.  We are also asked to use equation \ref{eq:Pi_defn} to integrate the scalar field $\Phi$.  The problem statement tells us to use a second-order Crank-Nicolson scheme, and to implement Kreiss-Oliger (KO) dissipation near the origin.
-
-To begin, we must note that the flat space background part of the problem statement implies that we can take the zeroth order behavior of equation \ref{eq:space_var_outer_behavior} to set the values of the space variables, namely: $\psi = \alpha = 1$ and $\beta = 0$.
-
-Now we can go about discretizing the equations.  Starting with equation \ref{eq:hyperbolic_KGE}, we get (for our centered difference):
-\begin{equation}
-\dot{\Pi} - \frac{1}{r^2 \psi^4} \Big[ r^2 \psi^4 \Big( \beta \Pi + \frac{\alpha \xi}{\psi^2} \Big)\Big]' + \frac{2}{3} \Pi \Big[ \beta' + \frac{2 \beta}{r} \Big(1 + \frac{3 r \psi'}{\psi} \Big) \Big] = 0
-\end{equation}
-
-\begin{thebibliography}{widestlabel}
-	\bibitem{Pretorius06}
-	F. Pretorius and M. W. Choptuik, ``Adaptive Mesh Refinement for Coupled Elliptic-Hyperbolic Systems", J. Comput. Phys. 218 (2006)
-\end{thebibliography}
-
 
 \end{document}
