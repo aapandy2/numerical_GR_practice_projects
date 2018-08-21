@@ -5,14 +5,17 @@ def matter_residuals(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon):
 	R = r_grid[-1]
 	delta_r = R/N
 
-	xi_residual  = np.zeros(N)
-	Pi_residual  = np.zeros(N)
+	xi_residual      = np.zeros(N)
+	Pi_residual      = np.zeros(N)
+	psi_evo_residual = np.zeros(N)
 
 	for j in range(N):
 		if(j == 0):
 			xi_residual[j]  = 0.5*(xi[n, j] + xi[n+1,j])
 			Pi_residual[j]  = ( -Pi[n+1,j+2] + 4.*Pi[n+1,j+1] - 3.*Pi[n+1,j] 
 				            -Pi[n,j+2]   + 4.*Pi[n,j+1]   - 3.*Pi[n,j] )
+			psi_evo_residual[j] = (-3.*psi[n+1, j] + 4.*psi[n+1, j+1] - psi[n+1, j+2]
+					       -3.*psi[n, j]   + 4.*psi[n, j+1]   - psi[n, j+2])
 		elif(j == 1):
                         xi_residual[j] = ( (xi[n+1,j]-xi[n,j])/delta_t
                                          -0.5*(-2.*Pi[n,j]*alpha[n,j]/psi[n,j]**3. * (psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
@@ -46,6 +49,13 @@ def matter_residuals(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon):
                                           -0.5*xi[n+1,j]/psi[n+1,j]**2.*(alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
                                           +(epsilon/(16.*delta_t))*(Pi[n,j]-4*Pi[n,j-1]+6*Pi[n,j]-4*Pi[n,j+1]+Pi[n,j+2])
                                          )
+			psi_evo_residual[j] = ( psi[n+1, j] - delta_t/2. * (beta[n+1, j]*psi[n+1, j]/(3.*r_grid[j])
+									    + beta[n+1,j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+									    + psi[n+1,j]/6.*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r) )
+					       -psi[n, j] - delta_t/2. * (beta[n, j]*psi[n, j]/(3.*r_grid[j]) 
+                                                                            + beta[n,j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r) 
+                                                                            + psi[n,j]/6.*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r) )
+						+(epsilon/16.)*(psi[n,j]-4.*psi[n,j-1]+6.*psi[n,j]-4.*psi[n,j+1]+psi[n,j+2]) ) 
 		elif(j == N-1):
 			xi_residual[j] = ( (xi[n+1,j]-xi[n,j])/delta_t 
                                         + 0.5 * ( (3.*xi[n+1,j] - 4.*xi[n+1,j-1] + xi[n+1, j-2])/(2.*delta_r) 
@@ -57,6 +67,7 @@ def matter_residuals(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon):
                                                  + Pi[n+1,j]/r_grid[j]
                                                  +(3.*Pi[n,j] - 4.*Pi[n,j-1] + Pi[n, j-2])/(2.*delta_r)
                                                  + Pi[n,j]/r_grid[j]) )
+			psi_evo_residual[j] = (3.*psi[n+1,j]-4.*psi[n+1,j-1]+psi[n+1,j-2])/(2.*delta_r) + (psi[n+1,j]-1.)/r_grid[j]
 		elif(j == N-2):
                         xi_residual[j] = ( (xi[n+1,j]-xi[n,j])/delta_t
                                          -0.5*(-2.*Pi[n,j]*alpha[n,j]/psi[n,j]**3. * (psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
@@ -88,6 +99,13 @@ def matter_residuals(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon):
                                           -0.5*2.*alpha[n+1,j]*xi[n+1,j]/psi[n+1,j]**3.*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
                                           -0.5*xi[n+1,j]/psi[n+1,j]**2.*(alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
                                          )
+			psi_evo_residual[j] = ( psi[n+1, j] - delta_t/2. * (beta[n+1, j]*psi[n+1, j]/(3.*r_grid[j])
+                                                                            + beta[n+1,j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+                                                                            + psi[n+1,j]/6.*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r) )
+                                               -psi[n, j] - delta_t/2. * (beta[n, j]*psi[n, j]/(3.*r_grid[j])
+                                                                            + beta[n,j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+                                                                            + psi[n,j]/6.*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r) )
+                                              )
 		else:
 			xi_residual[j] = ( (xi[n+1,j]-xi[n,j])/delta_t
 				         -0.5*(-2.*Pi[n,j]*alpha[n,j]/psi[n,j]**3. * (psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
@@ -121,7 +139,15 @@ def matter_residuals(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon):
                                              -0.5*xi[n+1,j]/psi[n+1,j]**2.*(alpha[n+1,j+1]-alpha[n+1,j-1])/(2.*delta_r)
 					     +(epsilon/(16.*delta_t))*(Pi[n,j-2]-4*Pi[n,j-1]+6*Pi[n,j]-4*Pi[n,j+1]+Pi[n,j+2])
 					    )
-	return [xi_residual, Pi_residual]
+			psi_evo_residual[j] = ( psi[n+1, j] - delta_t/2. * (beta[n+1, j]*psi[n+1, j]/(3.*r_grid[j])
+                                                                            + beta[n+1,j]*(psi[n+1,j+1]-psi[n+1,j-1])/(2.*delta_r)
+                                                                            + psi[n+1,j]/6.*(beta[n+1,j+1]-beta[n+1,j-1])/(2.*delta_r) )
+                                               -psi[n, j] - delta_t/2. * (beta[n, j]*psi[n, j]/(3.*r_grid[j])
+                                                                            + beta[n,j]*(psi[n,j+1]-psi[n,j-1])/(2.*delta_r)
+                                                                            + psi[n,j]/6.*(beta[n,j+1]-beta[n,j-1])/(2.*delta_r) )
+                                                +(epsilon/16.)*(psi[n,j-2]-4.*psi[n,j-1]+6.*psi[n,j]-4.*psi[n,j+1]+psi[n,j+2]) )
+
+	return [xi_residual, Pi_residual, psi_evo_residual]
 
 def jacobian(f_n, xi, Pi, r_grid):
 	
@@ -304,7 +330,7 @@ def solve_elliptics_first_ts(f_n, xi, Pi, r_grid, correction_weight=1.):
 	return f_n
 
 
-def Newton_iteration(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon, correction_weight=1, PSI_EVOL=False):
+def Newton_iteration(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon, correction_weight=1):
 	N = np.shape(r_grid)[0]
 	R = r_grid[-1]
 	delta_r = R/N
@@ -324,10 +350,11 @@ def Newton_iteration(xi, Pi, psi, beta, alpha, r_grid, n, delta_t, epsilon, corr
 	jacobi = jacobian(f_n, xi[n, :], Pi[n, :], r_grid)
 	diffvector = np.linalg.solve(jacobi, -elliptic_res)
 
-	if(PSI_EVOL == True): #only update beta, alpha; keep psi unchanged
-		f_n[N:3*N] = f_n[N:3*N] + diffvector[N:3*N]
-	else: #update psi, beta, alpha
-		f_n = f_n + diffvector #now contains updated psi, beta, alpha at timestep n
+#	if(PSI_EVOL == True): #only update beta, alpha; keep psi unchanged
+#		f_n[N:3*N] = f_n[N:3*N] + diffvector[N:3*N]
+#	else: #update psi, beta, alpha
+#		f_n = f_n + diffvector #now contains updated psi, beta, alpha at timestep n
+	f_n = f_n + diffvector
 
 	return [f_n, elliptic_res/correction_weight]
 

@@ -44,13 +44,13 @@ beta        = np.loadtxt('beta.txt')
 alpha       = np.loadtxt('alpha.txt')
 mass_aspect = np.loadtxt('mass_aspect.txt')
 
-#xi_residual     = np.loadtxt('xi_residual.txt')
-#phi_residual    = np.loadtxt('phi_residual.txt')
-#Pi_residual     = np.loadtxt('Pi_residual.txt')
-psi_residual    = np.loadtxt('psi_residual.txt')
-psi_ev_residual = np.loadtxt('psi_ev_residual.txt')
-beta_residual   = np.loadtxt('beta_residual.txt')
-alpha_residual  = np.loadtxt('alpha_residual.txt')
+xi_residual     = np.loadtxt('xi_residual.txt')
+phi_residual    = np.loadtxt('phi_residual.txt')
+Pi_residual     = np.loadtxt('Pi_residual.txt')
+psi_residual     = np.loadtxt('psi_residual.txt')
+psi_evo_residual = np.loadtxt('psi_evo_residual.txt')
+beta_residual    = np.loadtxt('beta_residual.txt')
+alpha_residual   = np.loadtxt('alpha_residual.txt')
 print '-----done loading datafiles-----'
 
 step      = 1
@@ -114,12 +114,12 @@ def make_movie(plot_variables='matter'):
 #                    ax[2].set_ylim(-10.*np.mean(Pi_residual), 10.*np.mean(Pi_residual))
 #                    ax[2].set_ylim(np.amin(Pi_residual), np.amax(Pi_residual))
 	    elif(plot_variables == 'geometry_residuals'):
-                    ax[0].plot(r_grid, psi_residual[i, :])
-                    ax[0].set_title('$$\\psi~residual$$')
-                    ax[0].set_ylim(np.amin(psi_residual), np.amax(psi_residual))
-#                    ax[0].plot(r_grid, psi_ev_residual[i, :])
-#                    ax[0].set_title('$$\\psi~evolution~eqn~residual$$')
-#                    ax[0].set_ylim(np.amin(psi_ev_residual), np.amax(psi_ev_residual))
+#                    ax[0].plot(r_grid, psi_residual[i, :])
+#                    ax[0].set_title('$$\\psi~residual$$')
+#                    ax[0].set_ylim(np.amin(psi_residual), np.amax(psi_residual))
+                    ax[0].plot(r_grid, psi_evo_residual[i, :])
+                    ax[0].set_title('$$\\psi~evolution~eqn~residual$$')
+                    ax[0].set_ylim(np.amin(psi_evo_residual), np.amax(psi_evo_residual))
                     ax[1].plot(r_grid, beta_residual[i, :])
                     ax[1].set_title('$$\\beta~residual$$')
 #                    ax[1].set_ylim(np.amin(beta_residual), np.amax(beta_residual))
@@ -147,14 +147,14 @@ def make_movie(plot_variables='matter'):
 
 	return 0.
 
-print '-----make matter movie-----'
-make_movie('matter')
+#print '-----make matter movie-----'
+#make_movie('matter')
 #print '-----make matter residuals movie-----'
 #make_movie('matter_residuals')
 print '-----make geometry movie-----'
 make_movie('geometry')
 print '-----make geometry residuals movie-----'
 make_movie('geometry_residuals')
-print '-----make mass aspect movie-----'
-make_movie('mass_aspect')
+#print '-----make mass aspect movie-----'
+#make_movie('mass_aspect')
 print '-----done-----'
