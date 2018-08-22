@@ -5,9 +5,9 @@ import sys
 
 #set parameters for simulation
 N = 256
-delta_t = 0.01
-timesteps = 300
-epsilon = 0.3
+delta_t = 0.05
+timesteps = 50
+epsilon = 0.
 
 correction_weight = 1.
 GEOM_COUPLING     = True
@@ -15,7 +15,7 @@ PSI_EVOL          = True
 
 #define grid
 R       = 50. 
-delta_r = R/N
+delta_r = R/(N-1.)
 amp     = 0.02
 r_0     = 20.
 delta   = 5.
@@ -213,9 +213,9 @@ def populate_matrices(n):
 	#PSI EVOLUTION EQUATIONS	
 	for i in range(2*N, 3*N):
 	    if(i == 2*N): #psi r=0 BC
-	        A[i, :] = [-3./(2.*delta_t) if j==i
-	                   else 4./(2.*delta_t) if j==i+1
-	                   else -1./(2.*delta_t)  if j==i+2
+	        A[i, :] = [-3. if j==i
+	                   else 4. if j==i+1
+	                   else -1.  if j==i+2
 	                   else 0 for j in range(3*N)]
 	    elif(i == 3*N-1): #psi r=R BC
 	        A[i, :] = [3./(2.*delta_r) + 1./r_grid[i%N] if j==i
@@ -230,10 +230,9 @@ def populate_matrices(n):
 	                             else 0 for j in range(3*N)]
 	for i in range(2*N, 3*N):
 	    if(i == 2*N): #psi r=0 BC
-#		B[i, :] = [0 for j in range(3*N)]
-	    	B[i, :] = [3./(2.*delta_t)  if j==i
-	    		   else -4./(2.*delta_t)  if j==i+1
-	    		   else 1./(2.*delta_t)  if j==i+2
+	    	B[i, :] = [3.  if j==i
+	    		   else -4.  if j==i+1
+	    		   else 1.  if j==i+2
 	    		   else 0 for j in range(3*N)]
 	    elif(i == 2*N+1): #psi internal eq. with DISS_EVEN_KO
 	    	B[i, :] = [1. + delta_t/2. * ( beta[n][i%N]/(3.*r_grid[i%N])
@@ -250,10 +249,6 @@ def populate_matrices(n):
 	                       else 0 for j in range(3*N)]
 	    elif(i == 3*N-1): #psi r=R BC
 	    	B[i, :] = [0 for j in range(3*N)]
-#	             B[i, :] = [-3./(2.*delta_r) - 1./r_grid[i%N] if j==i
-#	                              else 4./(2.*delta_r) if j==i-1
-#	                              else -1./(2.*delta_r) if j==i-2
-#	                              else 0 for j in range(3*N)]
 	    else: #psi internal eq. with KO_DISS
 	    	B[i, :] = [1. + delta_t/2. * ( beta[n][i%N]/(3.*r_grid[i%N])
 	                                          + (beta[n][i%N+1]-beta[n][i%N-1])/(6. * 2. * delta_r) ) - epsilon/(16.*1.)*6. if j==i
