@@ -77,6 +77,13 @@ and the maximal slicing condition yields an elliptic equation for $\alpha$:
 \begin{equation} \label{eq:alpha_evol}
 \alpha'' + \alpha' \Big[ \frac{2}{r} + \frac{2 \psi'}{\psi} \Big] - \alpha^{-1} \Big[ \frac{2 \psi^4}{3} \Big( \beta' - \frac{\beta}{r} \Big)^2 \Big] - 8 \pi \alpha \Pi^2 = 0.
 \end{equation}
+
+Setting the trace of the extrinsic curvature equal to zero (the maximal slicing condition itself) yields a hyperbolic equation for the conformal factor:
+\begin{equation} \label{eq:psi_hyperbolic_eqn}
+\dot{\psi} - \beta \Big( \frac{\psi}{3 r} + \psi' \Big) - \frac{\psi \beta'}{6} = 0,
+\end{equation}
+which may be used to evolve $\psi$, but only after the initial timestep is solved for using the $\psi$ elliptic equation in order to ensure that the initial conditions are consistent.
+
 All of the above equations are derived from the ADM equations in the appendix.
 
 \section{Problem 1}
@@ -183,17 +190,92 @@ so the ingoing radiation condition implies $\Pi = \xi$.
 
 Finally, we'll also need to apply KO dissipation to the hyperbolic equations to damp out high-frequency noise.  This is done by simply adding the KO stencil to the hyperbolic equations after the Crank-Nicolson discretization.  We will apply standard KO dissipation in the bulk of the domain ($i \in [2, N-3]$), and a special even or odd KO dissipation near the inner boundary ($i = 1$).  The inner boundary ($i=0$) itself, the outermost internal grid point ($i = N-2$), and the outer boundary ($i = N-1$) are left without KO dissipation.  The KO stencil is
 \begin{equation}
-\mathrm{KO~dissipation} = -\frac{\epsilon}{16} (f^{n}_{i-2} - 4 f^{n}_{i-1} + 6 f^{n}_{i} - 4 f^{n}_{i+1} + f^{n}_{i+2}),
+\mathrm{KO~dissipation} = -\frac{\epsilon}{16 \Delta t} (f^{n}_{i-2} - 4 f^{n}_{i-1} + 6 f^{n}_{i} - 4 f^{n}_{i+1} + f^{n}_{i+2}),
 \end{equation}
 where all terms are at the known $n$ timestep, and the parameter $\epsilon$ determines the amount of damping where $\epsilon \in [0, 1]$ for stability.  For the innermost internal grid point $i = 1$ we apply an even reflected version of KO dissipation for $\Pi$ (and later the $\psi$ hyperbolic equation)
 \begin{equation}
-\mathrm{even~KO~dissipation~near~inner~boundary} = -\frac{\epsilon}{16} (f^{n}_{0} - 4 f^{n}_{-1} + 6 f^{n}_{0} - 4 f^{n}_{1} + f^{n}_{2})
+\mathrm{even~KO~dissipation~near~inner~boundary} = -\frac{\epsilon}{16 \Delta t} (f^{n}_{0} - 4 f^{n}_{-1} + 6 f^{n}_{0} - 4 f^{n}_{1} + f^{n}_{2})
 \end{equation}
 and for $\xi$ we apply odd KO dissipation
 \begin{equation}
-\mathrm{odd~KO~dissipation~near~inner~boundary} = -\frac{\epsilon}{16} (-f^{n}_{0} - 4 f^{n}_{-1} + 6 f^{n}_{0} - 4 f^{n}_{1} + f^{n}_{2}),
+\mathrm{odd~KO~dissipation~near~inner~boundary} = -\frac{\epsilon}{16 \Delta t} (-f^{n}_{0} - 4 f^{n}_{-1} + 6 f^{n}_{0} - 4 f^{n}_{1} + f^{n}_{2}),
 \end{equation}
-where the even/odd designation comes from the fact that the $\Pi$ (and $\psi$) hyperbolic equations are 
+where the even/odd designation comes from the fact that the $\Pi$ (and $\psi$) hyperbolic equations are \redtext{finish this sentence.}
+
+\section{Problem 4}
+
+\section{Problem 5}
+
+\section{Problem 6}
+In this problem we are asked to write a function to locate apparent horizons if they form during a given simulation.  An apparent horizon is defined to be a location where the outward expansion of radially outgoing null vectors goes to zero -- namely, where outgoing light rays are unable to spread apart from each other because they cannot move outward to a location with greater surface area.  
+
+The surface area of a given spatial sphere in spacetime is $A = 4 \pi R^2$, where $R = r \psi^2$ in our coordinates.  Thus an apparent horizon can be identified by computing where the fractional change in surface area, $\theta \equiv l^\nu (\partial_\nu A / A)$, goes to zero, where $l^\nu$ is an outward pointing null vector.  Using the derivative of the natural log function, we can rewrite this quantity as
+\begin{equation} \label{eq:apparent_horiz_defn}
+\begin{aligned}
+\theta &\equiv \frac{l^\nu \partial_\nu A}{A} \\
+&= l^\nu \partial_\nu \ln(A) \\
+&= l^\nu \partial_\nu \ln(4 \pi R^2) \\
+&= l^\nu \partial_\nu [\ln(4) + \ln(\pi) + 2 \ln(r)] \\
+&= 2 l^\nu \partial_\nu \ln(R).
+\end{aligned}
+\end{equation}
+
+Now we need to define $l^\nu$.  We want a vector that is null and outward-pointing in both the radial and time directions (because we're interested in the outward spread of null vectors in the positive radial and time directions).  We choose to define
+\begin{equation}
+l^\nu \equiv n^\nu + s^\nu,
+\end{equation}
+where $n^\nu$ is a purely timelike unit normal, and $s^\nu$ is a purely spacelike unit normal.  Both of these are relevant to the ADM decomposition used to derive the PDEs of the Einstein-KG system, so we have already computed $n^\nu$ and $n_\nu$ in the appendix for our coordinates (see equation \ref{eq:timelike_normal}).  Thus we can solve the equations
+\begin{equation}
+\begin{aligned}
+s_\nu s^\nu &= 1 \\
+n_\nu s^\nu &= 0
+\end{aligned}
+\end{equation}
+to find the components of $s^\nu$.  Noting that the unit vector in the radial direction is $\partial_r$ in our coordinates, we can solve the above equations to find $s^\nu$:
+\begin{equation}
+\begin{aligned}
+0 &= n_t s^t + n_r s^r + n_\theta s^\theta + n_\phi s^\phi \\
+&= n_t s^t \\
+&= -\alpha s^t \\
+&= s^t,
+\end{aligned}
+\end{equation}
+so the $t$ component is zero.  It is important to note that we have defined $s^\nu$ to be a radial vector, so $s^\theta = s^\phi = 0$.  Using the second equation we get:
+\begin{equation}
+\begin{aligned}
+1 &= s_t s^t + s_r s^r \\
+&= 0 + g_{rr} s^r s^r \\
+&= \psi^4 s^r s^r, \\
+\end{aligned}
+\end{equation}
+so inserting the unit vectors, we find that
+\begin{equation}
+s^\nu = (0, \psi^{-2} \partial_r, 0, 0).
+\end{equation}
+
+Now we can compute $\theta$ in our coordinates (suppressing the unit vectors):
+\begin{equation}
+\begin{aligned}
+\theta &= 2 l^\nu \partial_\nu \ln(R) \\
+&= 2 (n^\nu + s^\nu) \partial_\nu \ln(R) \\
+&= 2 n^\nu \partial_\nu \ln(R) + 2 s^\nu \partial_\nu \ln(R) \\
+&= 2 n^t \partial_t \ln(R) + 2 n^r \partial_r \ln(R) + 2 s^r \partial_r \ln(R) \\
+&= 2 \alpha^{-1} \partial_t \ln(R) - 2 \alpha^{-1} \beta \partial_r \ln(R) + 2 \psi^{-2} \partial_r \ln(R); \\
+\end{aligned}
+\end{equation}
+using Mathematica at this step to evaluate the derivatives (and using \ref{eq:psi_hyperbolic_eqn}), we get
+\begin{equation}
+\begin{aligned}
+\theta &= \frac{2}{3 r \alpha \psi^3} [3 \alpha \psi - \beta \psi^3 + r \psi^3 \beta' + 6 r \alpha \psi'] \\
+&= \frac{2}{3 r \alpha \psi^3} 3 \alpha \psi - \frac{2}{3 r \alpha \psi^3} \beta \psi^3 + \frac{2}{3 r \alpha \psi^3} r \psi^3 \beta' + \frac{2}{3 r \alpha \psi^3} 6 r \alpha \psi' \\
+&= \frac{2}{r \psi^4} \Big( \psi^2 + 2 r \psi \psi' \Big) + \frac{2 r}{3 \alpha} \Big( - \frac{\beta}{r^2} + \frac{\beta'}{r} \Big), \\
+\end{aligned}
+\end{equation}
+which may be rearranged to yield
+\begin{equation}
+\boxed{\theta = \frac{2}{r \psi^4} (r \psi^2)' + \frac{2 r}{3 \alpha} \Big( \frac{\beta}{r} \Big)' }
+\end{equation}
+which agrees with the project description.
 
 \begin{thebibliography}{widestlabel}
 	\bibitem{Pretorius06}
@@ -261,7 +343,7 @@ g^{ab} =
 \end{equation}
 
 We may now compute the unit normal to the spacelike hypersurfaces:
-\begin{equation}
+\begin{equation} \label{eq:timelike_normal}
 \begin{aligned}
 n^a &= -g^{ab} \alpha \nabla_b t \\
 &= -g^{a t} \alpha \nabla_t t \\

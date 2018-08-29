@@ -53,7 +53,7 @@ beta_residual    = np.loadtxt('beta_residual.txt')
 alpha_residual   = np.loadtxt('alpha_residual.txt')
 print '-----done loading datafiles-----'
 
-step      = 1
+step      = 4
 timesteps = np.shape(phi)[0]
 N         = np.shape(phi)[1]
 
