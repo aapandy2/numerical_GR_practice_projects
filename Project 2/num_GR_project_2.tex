@@ -235,7 +235,7 @@ Q &= \frac{|| u^{2h} - u^{4h} ||_2}{|| u^h - u^{2h} ||_2} \\
 &= \frac{|| u + 2 h e_1 + 4 h^2 e_2 + 8 h^3 e_3 + ... - (u + 4 h e_1 + 16 h^2 e_2 + 4096 e_3 + ...) ||_2}{|| u + h e_1 + h^2 e_2 + h^3 e_3 + ... - (u + 2 h e_1 + 4 h^2 e_2 + 8 h^3 e_3 + ...) ||_2} \\
 &= \frac{|| u + 2 h (0) + 4 h^2 e_2 - u - 4 h (0) - 16 h^2 e_2 + O(h^3) ||_2}{|| u + h (0) + h^2 e_2 - u - 2 h (0) - 4 h^2 e_2 + O(h^3) ||_2} \\
 &= \frac{|| - 12 h^2 e_2 + O(h^3) ||_2}{|| - 3 h^2 e_2 + O(h^3) ||_2} \\
-&\approx 4.
+&\approx 4 ~\mathrm{as~} h \to 0.
 \end{aligned}
 \end{equation}
 This quantity is computed for all three matter variables and all three geometry variables in figure 1, and we empirically find that $Q \approx 4$.  The outer boundary condition is only correct to $O(1/r^2)$, so we find that the convergence factor is somewhat lower than $4$ when the variable of interest is large near the outer boundary (which happens in the later timesteps at the right of the plots in figure 1).
@@ -348,7 +348,7 @@ We find the following:
 	A & max(R) & min(R) \\
 	\hline
 	\hline
-	0.06 &  &  \\
+	0.06 (through 250 timesteps) & 0.019596937612643896 & -0.07217458810320448 \\
 	 &  &  \\
 	 &  &  \\
 \end{tabular}
@@ -357,6 +357,9 @@ We find the following:
 \begin{thebibliography}{widestlabel}
 	\bibitem{Pretorius06}
 	F. Pretorius and M. W. Choptuik, ``Adaptive Mesh Refinement for Coupled Elliptic-Hyperbolic Systems", J. Comput. Phys. 218 (2006)
+	
+	\bibitem{Inaki}
+	I. Olabarrieta, Lecture Notes. \url{laplace.physics.ubc.ca/People/inaki/master/system.ps}.
 \end{thebibliography}
 
 \appendix
@@ -569,7 +572,7 @@ R_{rr} &= \partial_k \Gamma^k_{rr} - \partial_r \Gamma^k_{rk} + \Gamma^k_{rr} \G
 &= - \frac{4 \psi''}{\psi} + \frac{4 \psi'^2}{\psi^2} - \frac{4 \psi'}{r \psi},
 \end{aligned}
 \end{equation}
-which agrees with the UBC handout.  Similarly
+which agrees with the UBC lecture notes \cite{Inaki}.  Similarly
 \begin{equation}
 \begin{aligned}
 R_{\theta \theta} &= \partial_k \Gamma^k_{\theta \theta} - \partial_\theta \Gamma^k_{\theta k} + \Gamma^k_{\theta \theta} \Gamma^l_{kl} - \Gamma^k_{\theta l} \Gamma^l_{\theta k} \\
@@ -581,7 +584,7 @@ R_{\theta \theta} &= \partial_k \Gamma^k_{\theta \theta} - \partial_\theta \Gamm
 &=  - \frac{2 \psi'' r^2}{\psi} - \frac{6 \psi' r}{\psi} - \frac{2 \psi'^2 r^2}{\psi^2}, \\
 \end{aligned}
 \end{equation}
-which agrees with the UBC handout.  Finally we have
+which agrees with the aforementioned lecture notes.  Finally we have
 \begin{equation}
 \begin{aligned}
 R_{\phi \phi} &= \partial_k \Gamma^k_{\phi \phi} - \partial_\phi \Gamma^k_{\phi k} + \Gamma^k_{\phi \phi} \Gamma^l_{kl} - \Gamma^k_{\phi l} \Gamma^l_{\phi k} \\
@@ -594,7 +597,7 @@ R_{\phi \phi} &= \partial_k \Gamma^k_{\phi \phi} - \partial_\phi \Gamma^k_{\phi 
 &= R_{\theta \theta} \sin^2 \theta,
 \end{aligned}
 \end{equation}
-which also agrees with the UBC handout.
+which also agrees with the UBC lecture notes.
 
 We can now compute the Ricci scalar
 \begin{equation}
@@ -606,7 +609,7 @@ R &= \gamma^{r r} R_{r r} + \gamma^{\theta \theta} R_{\theta \theta} + \gamma^{\
 &= - \frac{8 \psi''}{\psi^5} - \frac{16 \psi'}{r \psi^5}, \\
 \end{aligned}
 \end{equation}
-which again agrees with the UBC handout.
+which again agrees with the UBC lecture notes.
 
 \subsection{Matter Sources}
 Now we can compute the matter source quantities.  Before we begin, we first need to find the stress-energy tensor for the scalar field, $T^{ab}$.  We may derive it beginning with the well-known Lagrangian of a massless scalar field $\Phi$:
@@ -739,7 +742,7 @@ rearranging once more gives
 \begin{equation}
 \boxed{\dot{\psi} = \beta \Big(\psi' + \frac{\psi}{3 r} \Big) + \frac{\beta' \psi}{6} }
 \end{equation}
-which agrees with the project handout.
+which agrees with the project description.
 
 \subsection{Checking the $\alpha$ Constraint Equation}
 Beginning with a contraction of the evolution equation for the extrinsic curvature (B \& S equation 2.137) and applying the maximal slicing condition ($K = 0$) we begin with
@@ -768,7 +771,7 @@ we can now plug everything into Mathematica to yield
 &= - \alpha' \Big[ \frac{2 \psi'}{\psi} + \frac{2}{r} \Big] - \alpha'' + \alpha^{-1} \Big[ \frac{2 \psi^4}{3} \Big( \frac{\beta}{r} - \beta' \Big)^2 \Big] + 8 \pi \alpha \Pi^2. \\
 \end{aligned}
 \end{equation}
-Multiplying through by $-1$ and rearranging yields the equation in the handout:
+Multiplying through by $-1$ and rearranging yields the equation in the project outline:
 \begin{equation}
 \boxed{ \alpha'' + \alpha' \Big[ \frac{2 \psi'}{\psi} + \frac{2}{r} \Big] - \alpha^{-1} \Big[ \frac{2 \psi^4}{3} \Big( \frac{\beta}{r} - \beta' \Big)^2 \Big] - 8 \pi \alpha \Pi^2 = 0}.
 \end{equation}
@@ -787,7 +790,7 @@ where the right-hand side of the second line was obtained using Mathematica.  Re
 \begin{equation}
 \boxed{ \psi'' + \psi' \Big[ \frac{2}{r} \Big] + \frac{\psi^5}{12} \Big[ \frac{1}{\alpha} \Big( \frac{\beta}{r} - \beta' \Big) \Big]^2 + \pi \psi \Big( \Pi^2 + \xi^2 \Big) = 0 }
 \end{equation}
-which agrees with the project handout.
+which agrees with the project outline.
 
 \subsection{Checking the Momentum Constraint}
 The momentum constraint is (using the maximal slicing condition $K = 0$)
@@ -833,13 +836,13 @@ D_j K^{rj} &= \gamma_{j}^{~b} \nabla_b K^{rj} \\
 &= \frac{2}{3 \psi^{4} \alpha} \beta'' + \frac{2}{3 \psi^4 \alpha} \Big( \beta' - \frac{\beta}{r} \Big) \Big( \frac{6 \psi'}{\psi} + \frac{2}{r} - \frac{\alpha'}{\alpha} \Big), \\
 \end{aligned}
 \end{equation}
-which is starting to look very similar to the momentum constraint equation in the handout.
+which is starting to look very similar to the momentum constraint equation in the project description.
 
 Inserting the matter source term, we find
 \begin{equation}
 \boxed{\beta'' + \Big( \beta' - \frac{\beta}{r} \Big) \Big( \frac{6 \psi'}{\psi} + \frac{2}{r} - \frac{\alpha'}{\alpha} \Big) + \frac{12 \pi \alpha \xi \Pi}{\psi^2} = 0},
 \end{equation}
-which agrees with the momentum constraint equation in the handout.
+which agrees with the momentum constraint equation in the project description.
 
 \subsection{Checking the $\Pi$ Hyperbolic Equation}
 We now need to check the version of the Klein-Gordon (KG) equation provided in the handout.  There are a couple ways we can do this -- we can compute all of the Christoffel symbols with a $t$ index, or we can use the identity
@@ -884,83 +887,17 @@ we can now substitute in $\dot{\Phi}$ by rearranging the $\Pi$ definition (equat
 \begin{equation}
 \boxed{ \dot{\xi} = \Big( \frac{\alpha}{\psi^2} \Pi + \beta \xi \Big)' }, \\
 \end{equation}
-which agrees with the handout.
+which agrees with the project description.
 
 \subsection{Computing the Mass Aspect}
 We need to find the mass aspect in our coordinates, starting with the equation
 \begin{equation}
 m(r, t) = \frac{R}{2} (1 - g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R),
 \end{equation}
-where $R = r \psi^2$.  Using the inverse metric above, we can expand the derivative term of the mass aspect out
+where $R = r \psi^2$.  Using Mathematica and equation \ref{eq:psi_hyperbolic_eqn} to get rid of $\dot{\psi}$, we find
 \begin{equation}
-\begin{aligned}
-g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R &= g^{tt} \partial_t R \partial_t R + 2 g^{rt} \partial_t R \partial_r R + g^{rr} \partial_r R \partial_r R \\
-&= (-\alpha^{-2}) \partial_t R \partial_t R + 2 (\alpha^{-2} \beta) \partial_t R \partial_r R + (\psi^{-4} - \alpha^{-2} \beta^2) \partial_r R \partial_r R \\
-&= (-\alpha^{-2}) [\partial_t (r \psi^2)]^2 + 2 (\alpha^{-2} \beta) \partial_t (r \psi^2) \partial_r (r \psi^2) \\
-&+ (\psi^{-4} - \alpha^{-2} \beta^2) [\partial_r (r \psi^2)]^2 \\
-&= -\alpha^{-2} r^2 [2 \psi \dot{\psi}]^2 + 2 (\alpha^{-2} \beta) r (2 \psi \dot{\psi}) (\psi^2 + 2 r \psi \psi') \\
-&+ (\psi^{-4} - \alpha^{-2} \beta^2) [\psi^2 + 2 r \psi \psi']^2 \\
-&= -4 \alpha^{-2} r^2 \psi^2 \dot{\psi}^2 + 4 \alpha^{-2} \beta r \psi \dot{\psi} (\psi^2 + 2 r \psi \psi') \\
-&+ (\psi^{-4} - \alpha^{-2} \beta^2) [\psi^4 + 4 r \psi^3 \psi' + 4 r^2 \psi^2 \psi'^2] \\
-&= -4 \alpha^{-2} r^2 \psi^2 \dot{\psi}^2 + 4 \alpha^{-2} \beta r \dot{\psi} \psi^3 + 8 r^2 \alpha^{-2} \beta \psi^2 \dot{\psi} \psi' \\
-&+ [\psi^{-4} \psi^4 + \psi^{-4} 4 r \psi^3 \psi' + \psi^{-4} 4 r^2 \psi^2 \psi'^2] \\
-&- [\alpha^{-2} \beta^2 \psi^4 + \alpha^{-2} \beta^2 2 r \psi^3 \psi' + \alpha^{-2} \beta^2 4 r^2 \psi^2 \psi'^2] \\
-&= -4 \alpha^{-2} r^2 \psi^2 \dot{\psi}^2 + 4 \alpha^{-2} \beta r \dot{\psi} \psi^3 + 8 r^2 \alpha^{-2} \beta \psi^2 \dot{\psi} \psi' \\
-&+ 1 + \psi^{-1} 4 r \psi' + \psi^{-2} 4 r^2 \psi'^2 \\
-&+ -\alpha^{-2} \beta^2 \psi^4 - \alpha^{-2} \beta^2 2 r \psi^3 \psi' - \alpha^{-2} \beta^2 4 r^2 \psi^2 \psi'^2 \\
-\end{aligned}
+\boxed{m(r, t) = \frac{r \psi^6}{18 \alpha^2} (r \beta' - \beta)^2 - 2 r^2 \psi' (r \psi)'}
 \end{equation}
-we can now notice that the provided mass aspect function does not depend on $\dot{\psi}$; we can eliminate it using the evolution equation for $\psi$:
-\begin{equation*}
-\dot{\psi} = \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6}
-\end{equation*}
-so
-\begin{equation}
-\begin{aligned}
-g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R &= -4 \alpha^{-2} r^2 \psi^2 \Big[ \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6} \Big]^2 \\
-&+ 4 \alpha^{-2} \beta r \Big[ \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6} \Big] \psi^3 \\
-&+ 8 r^2 \alpha^{-2} \beta \psi^2 \Big[ \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6} \Big] \psi' \\
-&+ 1 + \psi^{-1} 4 r \psi' + \psi^{-2} 4 r^2 \psi'^2 \\
-&+ -\alpha^{-2} \beta^2 \psi^4 - \alpha^{-2} \beta^2 2 r \psi^3 \psi' - \alpha^{-2} \beta^2 4 r^2 \psi^2 \psi'^2 \\
-&= -4 \alpha^{-2} r^2 \psi^2 \Big[ \beta^2 \Big( \frac{\psi}{3 r} + \psi' \Big)^2 + \frac{\psi^2 \beta'^2}{36} + 2 \beta \Big(\frac{\psi}{3r} + \psi'\Big) \frac{\psi \beta'}{6} \Big] \\
-&+ 4 \alpha^{-2} \beta r \Big[ \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6} \Big] \psi^3 \\
-&+ 8 r^2 \alpha^{-2} \beta \psi^2 \Big[ \beta \Big( \frac{\psi}{3 r} + \psi' \Big) + \frac{\psi \beta'}{6} \Big] \psi' \\
-&+ 1 + \psi^{-1} 4 r \psi' + \psi^{-2} 4 r^2 \psi'^2 \\
-&+ -\alpha^{-2} \beta^2 \psi^4 - \alpha^{-2} \beta^2 2 r \psi^3 \psi' - \alpha^{-2} \beta^2 4 r^2 \psi^2 \psi'^2 \\
-&= - \frac{4 \alpha^{-2} \beta^2 \psi^4}{9} - \frac{8 \alpha^{-2} r \psi^3 \beta^2  \psi'}{3} - 4 \alpha^{-2} r^2 \psi^2 \beta^2 \psi'^2  \\
-&- \frac{4 \alpha^{-2} r^2 \psi^4 \beta'^2}{36} - \frac{8 \alpha^{-2} r \psi^4 \beta \beta'}{18} - \frac{8 \alpha^{-2} r^2 \psi^3 \beta \psi' \beta'}{6} \\
-&+ \frac{4 \alpha^{-2} \beta^2 \psi^4}{3} + 4 \alpha^{-2} \beta^2 r \psi^3 \psi' + \frac{4 \alpha^{-2} \beta r \psi^4 \beta'}{6}   \\
-&+ \frac{8 r \alpha^{-2} \beta^2 \psi^3 \psi'}{3} + 8 r^2 \alpha^{-2} \beta^2 \psi^2 \psi'^2 + \frac{8 r^2 \alpha^{-2} \beta \psi^3 \psi' \beta'}{6} \\
-&+ 1 + \psi^{-1} 4 r \psi' + \psi^{-2} 4 r^2 \psi'^2 \\
-&+ -\alpha^{-2} \beta^2 \psi^4 - \alpha^{-2} \beta^2 2 r \psi^3 \psi' - \alpha^{-2} \beta^2 4 r^2 \psi^2 \psi'^2 \\
-\end{aligned}
-\end{equation}
-simplifying further we have
-\begin{equation}
-\begin{aligned}
-&=-\alpha^{-2} \beta^2 \psi^4 - \frac{4 \alpha^{-2} \beta^2 \psi^4}{9} + \frac{4 \alpha^{-2} \beta^2 \psi^4}{3} \\
-&- \frac{8 \alpha^{-2} r \psi^3 \beta^2  \psi'}{3} - \alpha^{-2} \beta^2 2 r \psi^3 \psi' + 4 \alpha^{-2} \beta^2 r \psi^3 \psi' + \frac{8 r \alpha^{-2} \beta^2 \psi^3 \psi'}{3}\\
-&- 4 \alpha^{-2} r^2 \psi^2 \beta^2 \psi'^2  - \alpha^{-2} \beta^2 4 r^2 \psi^2 \psi'^2 + 8 r^2 \alpha^{-2} \beta^2 \psi^2 \psi'^2 \\
-&- \frac{4 \alpha^{-2} r^2 \psi^4 \beta'^2}{36} \\
-&- \frac{8 \alpha^{-2} r \psi^4 \beta \beta'}{18} + \frac{4 \alpha^{-2} \beta r \psi^4 \beta'}{6} \\
-&- \frac{8 \alpha^{-2} r^2 \psi^3 \beta \psi' \beta'}{6} + \frac{8 r^2 \alpha^{-2} \beta \psi^3 \psi' \beta'}{6} \\
-&+ 1 + \frac{4 r \psi'}{\psi} + \frac{4 r^2 \psi'^2}{\psi^2} \\
-&=-\frac{\alpha^{-2} \beta^2 \psi^4}{9} + 2 r \alpha^{-2} \beta^2 \psi^3 \psi' - \frac{\alpha^{-2} r^2 \psi^4 \beta'^2}{9} + \frac{4 \alpha^{-2} \beta r \psi^4 \beta'}{18} \\
-&+ 1 + \frac{4 r \psi'}{\psi} + \frac{4 r^2 \psi'^2}{\psi^2} \\
-\end{aligned}
-\end{equation}
-so
-\begin{equation}
-\begin{aligned}
-m(r, t) &= \frac{R}{2} (1 - g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R) \\
-&= - \Big( -\frac{r \alpha^{-2} \beta^2 \psi^6}{18} + r^2 \psi^5 \alpha^{-2} \beta^2 \psi' - \frac{\alpha^{-2} r^3 \psi^6 \beta'^2}{18} + \frac{2 \alpha^{-2} \beta r^2 \psi^6 \beta'}{18} \\
-&+ 2 r \psi r \psi' + 2 r r^2 \psi'^2  \Big) \\
-&= \frac{r \psi^6}{18 \alpha^2} \Big( \beta^2 + r^2 \beta'^2 - 2 \beta r \beta' \Big) - 2 r \psi r \psi' - 2 r r^2 \psi'^2 - r^2 \psi^5 \alpha^{-2} \beta^2 \psi' \\
-&= \frac{r \psi^6}{18 \alpha^2} (\beta - r \beta')^2 - 2 r^2 \psi' \Big( \psi + r \psi' \Big) - r^2 \psi^5 \alpha^{-2} \beta^2 \psi' \\
-&= \frac{r \psi^6}{18 \alpha^2} (\beta - r \beta')^2 - 2 r^2 \psi' (r \psi)' - r^2 \psi^5 \alpha^{-2} \beta^2 \psi' \\
-\end{aligned}
-\end{equation}
-
-\redtext{Re-check this.}
+which agrees with the project description.
 
 \end{document}
