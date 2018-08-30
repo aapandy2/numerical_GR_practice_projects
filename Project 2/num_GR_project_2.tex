@@ -278,7 +278,37 @@ which may be rearranged to yield
 which agrees with the project description.
 
 \section{Problem 7}
-We are now asked to compute the Ricci scalar 
+We are now asked to compute the Ricci scalar, which may be related to the trace of the stress-energy tensor via a contraction of the Einstein equation:
+\begin{equation}
+R = - 8 \pi T.
+\end{equation}
+Thus, if we compute the trace of the stress-energy tensor we may trivially obtain the Riemann scalar.  Fortunately in the appendix we compute a number of components required to compute $T$: equation \ref{eq:rho} is $\alpha^2 T^{tt}$, equation \ref{eq:S_rr} gives us $\psi^8 T^{rr}$, equation \ref{eq:S_thetatheta} gives us $\psi^8 r^4 T^{\theta \theta}$, and equation \ref{eq:S_phiphi} gives us $\psi^8 r^4 \sin^4 \theta T^{\phi \phi}$.  All we have left to compute is $T^{tr} = T^{rt}$, which is:
+\begin{equation}
+\begin{aligned}
+T^{tr} &= -\frac{\beta  \dot{\Phi}^2}{2 \alpha ^4}-\frac{\dot{\Phi} \Phi' \left(\frac{1}{\psi ^4}-\frac{\beta ^2}{\alpha ^2}\right)}{\alpha ^2}+\frac{\beta  \Phi'^2 \left(\frac{1}{\psi ^4}-\frac{\beta ^2}{\alpha ^2}\right)}{2 \alpha ^2} \\
+&= \frac{\beta  \xi^2}{\psi ^4 2 \alpha ^2} - \frac{\dot{\Phi} \xi}{\alpha^2 \psi ^4} - \frac{1}{2} \Big( \frac{\beta  \dot{\Phi}^2}{\alpha ^4} - \frac{2 \dot{\Phi} \xi \beta ^2}{\alpha ^4} + \frac{\beta  \xi^2 \beta ^2}{\alpha^4} \Big) \\
+&= \frac{\beta  \xi^2}{\psi ^4 2 \alpha ^2} - \frac{\dot{\Phi} \xi}{\alpha^2 \psi ^4} - \frac{\beta}{2 \alpha^4} \Big( \dot{\Phi}^2 - 2 \dot{\Phi} \xi \beta + \xi^2 \beta ^2 \Big) \\
+&= \frac{\beta  \xi^2}{\psi ^4 2 \alpha ^2} - \frac{\dot{\Phi} \xi}{\alpha^2 \psi ^4} - \frac{\beta}{2 \alpha^4} \frac{\alpha^2}{\psi^4} \Pi^2 \\
+&= \frac{\beta  \xi^2}{\psi ^4 2 \alpha ^2} - \frac{\beta}{2 \alpha^4} \frac{\alpha^2}{\psi^4} \Pi^2 - \frac{\dot{\Phi} \xi}{\alpha^2 \psi ^4} \\
+&= \frac{\beta  \xi^2}{\psi ^4 2 \alpha ^2} - \frac{\beta}{2 \alpha^4} \frac{\alpha^2}{\psi^4} \Pi^2 - \frac{\xi}{\alpha^2 \psi ^4} \Big[ \frac{\alpha \Pi}{\psi^2} + \beta \xi \Big] \\
+&= -\frac{\beta  \xi^2}{\psi ^4 2 \alpha ^2} - \frac{\beta \Pi^2}{2 \alpha^2 \psi^4} - \frac{\xi \Pi}{\alpha \psi^6}. \\
+\end{aligned}
+\end{equation}
+Now we can collect the other terms from the aforementioned equations in the appendix:
+\begin{align}
+T^{tt} &= \frac{1}{2 \alpha^2 \psi^{4}} \Big( \Pi^2 + \xi^2 \Big) \\
+T^{rr} &= \frac{1}{2 \psi^8} \Big( \xi^2 + \Pi^2 \Big) \\
+T^{\theta \theta} &= \frac{1}{2 \psi^8 r^2} \Big( \Pi^2 - \xi^2 \Big) \\
+T^{\phi \phi} &= \frac{1}{2 \psi^8 r^2 \sin^2 \theta} \Big( \Pi^2 - \xi^2 \Big).
+\end{align}
+Now we can finally compute the trace
+\begin{equation}
+\begin{aligned}
+T &= g_{tt} T^{tt} + g_{tr} T^{tr} + g_{rt} T^{rt} + g_{rr} T^{rr} + g_{\theta \theta} T^{\theta \theta} + g_{\phi \phi} T^{\phi \phi} \\
+&= 
+\end{aligned}
+\end{equation}
+
 
 \begin{thebibliography}{widestlabel}
 	\bibitem{Pretorius06}
@@ -552,7 +582,7 @@ T^{\mu \nu} &= g^{\gamma \nu} \frac{\partial \Lagr}{\partial (\partial_\mu \Phi)
 which agrees with the project description, equation 3.
 
 Now we can compute $\rho$:
-\begin{equation}
+\begin{equation} \label{eq:rho}
 \begin{aligned}
 \rho &= n_a n_b T^{ab} \\
 &= n_t n_t T^{tt} + n_r n_r T^{rr} + n_\theta n_\theta T^{\theta \theta} + n_\phi n_\phi T^{\phi \phi} \\
@@ -571,7 +601,7 @@ Now we can compute $\rho$:
 \end{equation}
 
 Now we can do $S_{ij}$:
-\begin{equation}
+\begin{equation} \label{eq:S_rr}
 \begin{aligned}
 S_{rr} &= \gamma_{ra} \gamma_{rb} T^{ab} \\
 &= \gamma_{rr} \gamma_{rr} T^{rr} + \gamma_{r \theta} \gamma_{r\theta} T^{\theta \theta} + \gamma_{r\phi} \gamma_{r\phi} T^{\phi \phi} \\
@@ -584,7 +614,7 @@ S_{rr} &= \gamma_{ra} \gamma_{rb} T^{ab} \\
 \end{aligned}
 \end{equation}
 and
-\begin{equation}
+\begin{equation} \label{eq:S_thetatheta}
 \begin{aligned}
 S_{\theta \theta} &= \gamma_{\theta a} \gamma_{\theta b} T^{ab} \\
 &= \gamma_{\theta \theta} \gamma_{\theta \theta} T^{\theta \theta} \\
@@ -597,7 +627,7 @@ S_{\theta \theta} &= \gamma_{\theta a} \gamma_{\theta b} T^{ab} \\
 \end{aligned}
 \end{equation}
 and
-\begin{equation}
+\begin{equation} \label{eq:S_phiphi}
 \begin{aligned}
 S_{\phi \phi} &= \gamma_{\phi a} \gamma_{\phi b} T^{ab} \\
 &= \gamma_{\phi \phi} \gamma_{\phi \phi} T^{\phi \phi} \\
