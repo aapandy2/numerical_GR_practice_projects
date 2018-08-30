@@ -11,7 +11,7 @@ dt        = courant * dr
 timesteps = 250
 eps       = 0.3
 
-correction_weight = 0.5
+correction_weight = 1.
 
 GEOM_COUPLING = True
 EVOL_PSI      = True
@@ -30,9 +30,10 @@ beta  = np.zeros((timesteps, N))
 alpha = np.ones((timesteps, N))
 
 theta = np.zeros((timesteps, N))
+ricci = np.zeros((timesteps, N))
 
 #define matter at initial timestep
-A     = 0.08
+A     = 0.06
 Delta = 5.
 r0    = 20.
 
@@ -590,12 +591,12 @@ else:
             #refine n+1 elliptics iteratively until matter_res < mtol
             mres             = 10.  #setting to arbitrary value so loop initiates
             elliptic_counter = 10 #setting to arbitrary value so loop initiates
-            mtol             = 1e-5 #depends strongly on resolution
+            mtol             = 1e-8 #depends strongly on resolution
             mcounter         = 0
             max_mcounter     = 20
     
-    #        while(mres > mtol and mcounter <= max_mcounter):
-            while(elliptic_counter > 1 and mcounter <= max_mcounter):
+            while(mres > mtol and mcounter <= max_mcounter):
+#            while(elliptic_counter > 1 and mcounter <= max_mcounter):
                 mcounter += 1
     
                 #solve system
@@ -612,6 +613,23 @@ else:
                 mres = np.amax(np.abs(mres_vector))
     
                 print 'matter iteration:', mcounter, 'matter residual:', mres, elliptic_counter 
+
+            #compute outgoing null expansion theta to look for apparent horizons
+            #1.) assuming no apparent horizon at r=0 (would contain nothing)
+            #2.) assuming no apparent horizon at r=R (would contain entire grid)
+            for j in range(N):
+                ricci[n, j] = 8.*np.pi*(tAVG(xi, n, j)**2.-tAVG(Pi, n, j)**2.)/tAVG(psi, n, j)**4.
+
+                if(j != 0 and j != N-1):
+                    theta[n, j] = ( 2.*r[j]/(3.*tAVG(alpha, n, j)) * ( (tAVG(beta, n, j+1)-tAVG(beta, n, j-1))/(2.*dr*r[j])
+                                                                      - tAVG(beta, n, j)/r[j]**2. )
+                                   +2./(r[j]*tAVG(psi, n, j)**4.) * ( tAVG(psi, n, j)**2.
+                                                                     +2.*r[j]*tAVG(psi, n, j)
+                                                                      *(tAVG(psi,n,j+1)-tAVG(psi,n,j-1))/(2.*dr) )
+                                  )
+                    if(j != 1 and theta[n, j-1] <= 0. and theta[n, j] > 0.):
+                        print '\nAPPARENT HORIZON DETECTED at r = ', r[j-1]
+
 
     else:
         #solve elliptics at first timestep n = 0
@@ -667,6 +685,8 @@ else:
             #1.) assuming no apparent horizon at r=0 (would contain nothing)
             #2.) assuming no apparent horizon at r=R (would contain entire grid)
             for j in range(N):
+                ricci[n, j] = 8.*np.pi*(tAVG(xi, n, j)**2.-tAVG(Pi, n, j)**2.)/tAVG(psi, n, j)**4.
+
                 if(j != 0 and j != N-1):
                     theta[n, j] = ( 2.*r[j]/(3.*tAVG(alpha, n, j)) * ( (tAVG(beta, n, j+1)-tAVG(beta, n, j-1))/(2.*dr*r[j]) 
                                                                       - tAVG(beta, n, j)/r[j]**2. )
@@ -729,6 +749,7 @@ np.savetxt('alpha.txt', alpha)
 np.savetxt('phi.txt', phi)
 np.savetxt('m.txt', m)
 np.savetxt('theta.txt', theta)
+np.savetxt('ricci.txt', ricci)
 
 np.savetxt('xi_res.txt', xi_res)
 np.savetxt('Pi_res.txt', Pi_res)
