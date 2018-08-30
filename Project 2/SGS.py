@@ -11,7 +11,7 @@ dt        = courant * dr
 timesteps = 250
 eps       = 0.3
 
-correction_weight = 1.
+correction_weight = 0.5
 
 GEOM_COUPLING = True
 EVOL_PSI      = True

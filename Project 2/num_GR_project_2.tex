@@ -179,7 +179,11 @@ These boundary conditions have been verified by comparison with those coded up i
 \section{Problem 3}
 In this problem we are asked to write code to solve the Klein-Gordon equation in the form of equations \ref{eq:hyperbolic_KGE} - \ref{eq:xi_evol} to integrate $\Pi$ and $\xi$ for a flat space background.  We are also asked to use equation \ref{eq:Pi_defn} to integrate the scalar field $\Phi$.  The problem statement tells us to use a second-order Crank-Nicolson scheme, and to implement Kreiss-Oliger (KO) dissipation near the origin.
 
-To begin, we must note that the flat space background part of the problem statement implies that we can take the zeroth order behavior of equation \ref{eq:space_var_outer_behavior} to set the values of the space variables, namely: $\psi = \alpha = 1$ and $\beta = 0$.  We initialize the matter variables with $\Phi$ a Gaussian, $\xi = \Phi'$.  To set $\Pi$, we use the ``as in-going as possible" condition on the matter, namely $\dot{\Phi} = \Phi'$.  In flat space our matter variables become
+To begin, we must note that the flat space background part of the problem statement implies that we can take the zeroth order behavior of equation \ref{eq:space_var_outer_behavior} to set the values of the space variables, namely: $\psi = \alpha = 1$ and $\beta = 0$.  We initialize the matter variables with $\Phi$ a Gaussian, 
+\begin{equation}
+\Phi(t=0, r) = A \exp \Big( -\frac{(r-r_0)^2}{\Delta^2} \Big),
+\end{equation}
+and $\xi = \Phi'$.  To set $\Pi$, we use the ``as in-going as possible" condition on the matter, namely $\dot{\Phi} = \Phi'$.  In flat space our matter variables become
 \begin{equation*}
 \begin{aligned}
 \xi_{\mathrm{flat~space}} &= \Phi' \\
@@ -200,16 +204,43 @@ and for $\xi$ we apply odd KO dissipation
 \begin{equation}
 \mathrm{odd~KO~dissipation~near~inner~boundary} = -\frac{\epsilon}{16 \Delta t} (-f^{n}_{0} - 4 f^{n}_{-1} + 6 f^{n}_{0} - 4 f^{n}_{1} + f^{n}_{2}),
 \end{equation}
-where the even/odd designation comes from the fact that the $\Pi$ (and $\psi$) hyperbolic equations are \redtext{finish this sentence.}
+where the even/odd designation comes from the fact that the $\Pi$ (and $\psi$) hyperbolic equations are even in $r$ about the origin.  We know this because these two variables have Neumann boundary conditions at the origin that require them to be flat there, and thus they cannot simultaneously be flat at the origin and change sign there.  The variable $\xi$ has a Dirichlet condition, which only specifies that $\xi = 0$ at the origin; thus $\xi$ must change sign at the origin to avoid having an unphysical kink there.
+
+The code is available in the ``Project 2" folder of the following GitHub repository: \url{https://github.com/aapandy2/numerical_GR_practice_projects}.  The file {\tt SGS.py} contains the full simulation code, and is written in Python 2.7.  The code saves text files with the data for the variables $\Phi, \xi, \Pi, \psi, \beta, \alpha$, as well as the mass aspect $m$ (see the next section), the fractional change of proper area $\theta$ (see section 6), and the Ricci scalar (see section 7). 
 
 \section{Problem 4}
+In this problem we are asked to solve the elliptic equations at a given timestep $n$ via a Newton iteration.  This is implemented in the aforementioned code, which is publicly available on GitHub.
+
+We are also asked to compute the mass aspect function for the spacetime.  We derive the mass aspect function in the appendix, and we find empirically that it is monotonically increasing (albeit with some breakdown at the outer boundary for free evolution of $\psi$) and is zero at the origin.
 
 \section{Problem 5}
 In this problem we are asked to solve equation \ref{eq:psi_hyperbolic_eqn} to evolve the conformal factor.  This process is called \textit{free evolution}, and is contrasted with the evolution of $\psi$ via the elliptic constraint (equation \ref{eq:psi_evol}) which we shall call \textit{constrained evolution}.  
 
-We are asked to confirm that the code converges at 2nd order in the grid spacing, which is related to the temporal spacing by the \textit{Courant-Friedrichs-Lewy (CFL) number} $\lambda \equiv \Delta t / \Delta r$ which is held constant.
+We are asked to confirm that the code converges at 2nd order in the grid spacing, which is related to the temporal spacing by the \textit{Courant-Friedrichs-Lewy (CFL) number} $\lambda \equiv \Delta t / \Delta r$ which is held constant.  The overall discretization scale for the simulation is denoted $h$ ($= \Delta r$).
 
-The way we perform this test is by assuming that the \textit{Richardson expansion} holds, and 
+The convergence test is reliant upon the assumption that all of the variables we solve for follow the \textit{Richardson ansatz} and may be written
+\begin{equation}
+u^h = u + h e_1 + h^2 e_2 + h^3 e_3 + ...,
+\end{equation}
+for variable with continuous solution $u$ and discrete approximation $u^h$ at grid spacing $h$, where the functions $e_i$ are the continuum error functions which are independent of $h$.  Since our scheme is entirely composed of derivative operators which have error $O(h^2)$, the term $e_1$ should be equal zero for the variables in our simulation.
+
+Keeping this fact in mind, we may define a \textit{convergence factor} $Q$ to be
+\begin{equation}
+Q = \frac{|| u^{2h} - u^{4h} ||_2}{|| u^h - u^{2h} ||_2},
+\end{equation}
+where the $||\cdot||_2$ denotes the L2-norm (vector norm) of the quantity inside.  If our solutions (which are second-order with $e_1 = 0$) obey the Richardson ansatz, then $Q$ should equal
+\begin{equation}
+\begin{aligned}
+Q &= \frac{|| u^{2h} - u^{4h} ||_2}{|| u^h - u^{2h} ||_2} \\
+&= \frac{|| u + 2 h e_1 + 4 h^2 e_2 + 8 h^3 e_3 + ... - (u + 4 h e_1 + 16 h^2 e_2 + 4096 e_3 + ...) ||_2}{|| u + h e_1 + h^2 e_2 + h^3 e_3 + ... - (u + 2 h e_1 + 4 h^2 e_2 + 8 h^3 e_3 + ...) ||_2} \\
+&= \frac{|| u + 2 h (0) + 4 h^2 e_2 - u - 4 h (0) - 16 h^2 e_2 + O(h^3) ||_2}{|| u + h (0) + h^2 e_2 - u - 2 h (0) - 4 h^2 e_2 + O(h^3) ||_2} \\
+&= \frac{|| - 12 h^2 e_2 + O(h^3) ||_2}{|| - 3 h^2 e_2 + O(h^3) ||_2} \\
+&\approx 4.
+\end{aligned}
+\end{equation}
+This quantity is computed for all three matter variables and all three geometry variables in figure 1, and we empirically find that $Q \approx 4$.  The outer boundary condition is only correct to $O(1/r^2)$, so we find that the convergence factor is somewhat lower than $4$ when the variable of interest is large near the outer boundary (which happens in the later timesteps at the right of the plots in figure 1).
+
+We also find empirically that the total mass of the spacetime is conserved before any of the scalar field leaves the domain -- meaning the maximum of the mass aspect function is conserved before matter escapes beyond $r = R_{max}$.  This may be computed directly in the case of the constrained evolution, but in the free evolution the outermost gridpoints of $\psi$ and thus $m$ break down, so one must monitor the value of $m$ left of those outer few gridpoints.
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{conv_plot.pdf}
@@ -288,6 +319,8 @@ which may be rearranged to yield
 \end{equation}
 which agrees with the project description.
 
+We implement $\theta$ in the code, and find that apparent horizon formation occurs for scalar field amplitude $A \approx 0.06.$
+
 \section{Problem 7}
 We are now asked to compute the Ricci scalar in terms of the matter quantities (we compute it purely in terms of geometric quantities in the appendix).  We may do this quickly by noting that the full contraction of the Einstein equation with the metric yields
 \begin{equation}
@@ -302,6 +335,24 @@ so
 \boxed{ R = \frac{8 \pi (\xi^2 - \Pi^2)}{\psi^4} }
 \end{equation}
 which agrees with the project description.
+
+We are now asked to implement the above equation in the code, and to determine the scaling of the Ricci scalar with scalar field amplitude $A$ near the critical amplitude of black hole formation $A^*$.  Perturbation theory calculations (which are not done here) imply that we should find the relation
+\begin{equation}
+R_{max} \propto (A^* - A)^{-2 \gamma},
+\end{equation}
+where $\gamma$ is called the \textit{scaling exponent}.  We are asked to estimate $\gamma$ using our code.
+
+We find the following:
+\begin{center}
+\begin{tabular}{ l | c | r }
+	A & max(R) & min(R) \\
+	\hline
+	\hline
+	0.06 &  &  \\
+	 &  &  \\
+	 &  &  \\
+\end{tabular}
+\end{center}
 
 \begin{thebibliography}{widestlabel}
 	\bibitem{Pretorius06}
@@ -909,5 +960,7 @@ m(r, t) &= \frac{R}{2} (1 - g^{\alpha \beta} \nabla_\alpha R \nabla_\beta R) \\
 &= \frac{r \psi^6}{18 \alpha^2} (\beta - r \beta')^2 - 2 r^2 \psi' (r \psi)' - r^2 \psi^5 \alpha^{-2} \beta^2 \psi' \\
 \end{aligned}
 \end{equation}
+
+\redtext{Re-check this.}
 
 \end{document}
