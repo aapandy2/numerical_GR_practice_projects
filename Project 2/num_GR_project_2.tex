@@ -205,6 +205,17 @@ where the even/odd designation comes from the fact that the $\Pi$ (and $\psi$) h
 \section{Problem 4}
 
 \section{Problem 5}
+In this problem we are asked to solve equation \ref{eq:psi_hyperbolic_eqn} to evolve the conformal factor.  This process is called \textit{free evolution}, and is contrasted with the evolution of $\psi$ via the elliptic constraint (equation \ref{eq:psi_evol}) which we shall call \textit{constrained evolution}.  
+
+We are asked to confirm that the code converges at 2nd order in the grid spacing, which is related to the temporal spacing by the \textit{Courant-Friedrichs-Lewy (CFL) number} $\lambda \equiv \Delta t / \Delta r$ which is held constant.
+
+The way we perform this test is by assuming that the \textit{Richardson expansion} holds, and 
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{conv_plot.pdf}
+	\caption{Convergence plot showing the quantity $Q_x$ for quantity $x$ at resolutions $N = 201, 401, 801$.  These resolutions are chosen such that $\Delta r = R_{max}/(N-1)$ is halved with each increased resolution.  The simulation was run with constrained evolution for $\psi$ (blue) and with free evolution for $\psi$ (orange), and both produce nearly identical second-order convergence plots except for $\psi$ itself.  All quantities converge at second order.  This simulation was run with $A = 0.01$, $\lambda = 0.5$, $\epsilon = 0.5$, $R_{max}=50$, $\Delta = 5$, $r_0 = 20$.}
+\end{figure}
+
 
 \section{Problem 6}
 In this problem we are asked to write a function to locate apparent horizons if they form during a given simulation.  An apparent horizon is defined to be a location where the outward expansion of radially outgoing null vectors goes to zero -- namely, where outgoing light rays are unable to spread apart from each other because they cannot move outward to a location with greater surface area.  
@@ -278,7 +289,19 @@ which may be rearranged to yield
 which agrees with the project description.
 
 \section{Problem 7}
-We are now asked to compute the Ricci scalar 
+We are now asked to compute the Ricci scalar in terms of the matter quantities (we compute it purely in terms of geometric quantities in the appendix).  We may do this quickly by noting that the full contraction of the Einstein equation with the metric yields
+\begin{equation}
+R = - 8 \pi T,
+\end{equation}
+where $T$ is the trace of the stress-energy tensor.  Computing the trace in Mathematica (see Mathematica notebook in GitHub repository) we get
+\begin{equation}
+T = \frac{\Pi^2 - \xi^2}{\psi^4},
+\end{equation}
+so
+\begin{equation}
+\boxed{ R = \frac{8 \pi (\xi^2 - \Pi^2)}{\psi^4} }
+\end{equation}
+which agrees with the project description.
 
 \begin{thebibliography}{widestlabel}
 	\bibitem{Pretorius06}
