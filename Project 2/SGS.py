@@ -4,11 +4,11 @@ import sys
 
 #simulation parameters
 N         = 256
-courant   = 1.0
+courant   = 0.25
 R         = 50.
 dr        = R/(N-1.)
 dt        = courant * dr
-timesteps = 250
+timesteps = 50
 eps       = 0.3
 
 correction_weight = 0.5
@@ -33,7 +33,7 @@ theta = np.zeros((timesteps, N))
 ricci = np.zeros((timesteps, N))
 
 #define matter at initial timestep
-A     = 0.06
+A     = 0.0263
 Delta = 5.
 r0    = 20.
 

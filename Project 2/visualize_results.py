@@ -35,22 +35,22 @@ pl.rcParams['ytick.direction']  = 'in'
 print '-----loading datafiles-----'
 
 #LOAD DATAFILES
-r_grid      = np.loadtxt('r_grid.txt')
+r_grid      = np.loadtxt('r.txt')
 phi         = np.loadtxt('phi.txt')
 xi          = np.loadtxt('xi.txt')
 Pi          = np.loadtxt('Pi.txt')
 psi         = np.loadtxt('psi.txt')
 beta        = np.loadtxt('beta.txt')
 alpha       = np.loadtxt('alpha.txt')
-mass_aspect = np.loadtxt('mass_aspect.txt')
+mass_aspect = np.loadtxt('m.txt')
 
-xi_residual     = np.loadtxt('xi_residual.txt')
-phi_residual    = np.loadtxt('phi_residual.txt')
-Pi_residual     = np.loadtxt('Pi_residual.txt')
-psi_residual     = np.loadtxt('psi_residual.txt')
-psi_evo_residual = np.loadtxt('psi_evo_residual.txt')
-beta_residual    = np.loadtxt('beta_residual.txt')
-alpha_residual   = np.loadtxt('alpha_residual.txt')
+xi_residual     = np.loadtxt('xi_res.txt')
+#phi_residual    = np.loadtxt('phi_res.txt')
+Pi_residual     = np.loadtxt('Pi_res.txt')
+psi_residual     = np.loadtxt('psi_res.txt')
+psi_evo_residual = np.loadtxt('psi_h_res.txt')
+beta_residual    = np.loadtxt('beta_res.txt')
+alpha_residual   = np.loadtxt('alpha_res.txt')
 print '-----done loading datafiles-----'
 
 step      = 4
@@ -147,12 +147,12 @@ def make_movie(plot_variables='matter'):
 
 	return 0.
 
-#print '-----make matter movie-----'
-#make_movie('matter')
+print '-----make matter movie-----'
+make_movie('matter')
 #print '-----make matter residuals movie-----'
 #make_movie('matter_residuals')
-print '-----make geometry movie-----'
-make_movie('geometry')
+#print '-----make geometry movie-----'
+#make_movie('geometry')
 #print '-----make geometry residuals movie-----'
 #make_movie('geometry_residuals')
 #print '-----make mass aspect movie-----'
